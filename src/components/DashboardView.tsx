@@ -3,7 +3,6 @@ import { useApp } from '../context/AppContext';
 import {
   LogOut,
   Zap,
-  DollarSign,
   Briefcase,
   ChevronRight,
   ShieldAlert,
@@ -14,8 +13,80 @@ import {
   Sparkles,
   Printer,
   Users,
-  FileText
+  FileText,
+  Pin,
+  Landmark,
+  CreditCard,
+  Heart,
+  BarChart3,
+  TrendingUp,
+  Globe
 } from 'lucide-react';
+
+/* PhonePe Style Vector Icons */
+const RunnerIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="#5f259f" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
+    <circle cx="16" cy="4.5" r="2" />
+    <path d="M7.5 13.5l3-2.5 3 2 3-3" />
+    <path d="M10.5 11l-2.5 4-3.5-1" />
+    <path d="M13.5 13l-1.5 4 3.5 3.5" />
+    <path d="M8 15l2 5" />
+  </svg>
+);
+
+const HabitIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="#5f259f" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
+    <rect x="3" y="3" width="18" height="18" rx="5" />
+    <polyline points="8 12 11 15 16 9" />
+  </svg>
+);
+
+const DiaryIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="#5f259f" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
+    <rect x="3" y="3" width="18" height="18" rx="5" />
+    <path d="M7.5 9.5l2 4.5 2.5-3.5 2.5 3.5 2-4.5" />
+  </svg>
+);
+
+const BucketIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="#5f259f" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
+    <path d="M5.5 5.5h13l-1.6 14a1.2 1.2 0 0 1-1.2 1H8.3a1.2 1.2 0 0 1-1.2-1L5.5 5.5z" />
+    <path d="M4.5 5.5h15" />
+  </svg>
+);
+
+const PlanningIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="#5f259f" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
+    <rect x="3" y="4" width="18" height="17" rx="4" />
+    <line x1="16" y1="2" x2="16" y2="6" />
+    <line x1="8" y1="2" x2="8" y2="6" />
+    <line x1="3" y1="9" x2="21" y2="9" />
+    <text x="12" y="17.5" textAnchor="middle" fontSize="7" fontWeight="900" fill="#5f259f" stroke="none">17</text>
+  </svg>
+);
+
+const SkillIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="#5f259f" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
+    <circle cx="12" cy="8.5" r="5.5" />
+    <path d="M9.5 7l2.5 2.5 2.5-2.5" />
+    <line x1="12" y1="9.5" x2="12" y2="14" />
+    <line x1="10" y1="16.5" x2="14" y2="16.5" />
+    <line x1="11" y1="19" x2="13" y2="19" />
+  </svg>
+);
+
+const CakeIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="#5f259f" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
+    <path d="M4 14h16v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6z" />
+    <path d="M4 14a2.7 2.7 0 0 1 5 0 2.7 2.7 0 0 1 5 0 2.7 2.7 0 0 1 5 0" />
+    <line x1="7.5" y1="9.5" x2="7.5" y2="12" />
+    <line x1="12" y1="9.5" x2="12" y2="12" />
+    <line x1="16.5" y1="9.5" x2="16.5" y2="12" />
+    <circle cx="7.5" cy="8" r="0.75" fill="#5f259f" stroke="none" />
+    <circle cx="12" cy="8" r="0.75" fill="#5f259f" stroke="none" />
+    <circle cx="16.5" cy="8" r="0.75" fill="#5f259f" stroke="none" />
+  </svg>
+);
 
 interface DashboardViewProps {
   onSelectView: (view: string) => void;
@@ -46,10 +117,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
   };
 
   return (
-    <div className="space-y-4 pb-12 animate-fadeIn">
+    <div className="space-y-3 pb-8 animate-fadeIn">
 
-      {/* CUTE COMPACT HERO CARD */}
-      <div className="relative overflow-hidden rounded-2xl px-4 py-3 sm:px-5 sm:py-3.5 text-white shadow-md shadow-indigo-600/15 bg-gradient-to-r from-[#5b35e0] via-[#7049eb] to-[#8f7af5] flex items-center justify-between">
+      {/* CUTE COMPACT HERO CARD - PHONEPE THEME */}
+      <div className="relative overflow-hidden rounded-2xl px-4 py-3 sm:px-5 sm:py-3.5 text-white shadow-md shadow-[#5f259f]/25 bg-gradient-to-r from-[#4d1680] via-[#5f259f] to-[#792fc4] flex items-center justify-between">
         <div className="relative z-10 flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-sm shadow-inner text-amber-300">
             <Sparkles className="w-4 h-4 fill-amber-300 text-amber-300" />
@@ -61,74 +132,74 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
           </div>
         </div>
 
-        {/* Cute Petite Vector Graphic */}
+        {/* Cute Petite Vector Graphic - Harmonized with PhonePe Purple */}
         <div className="relative z-10 w-16 sm:w-20 pointer-events-none opacity-90 flex items-center justify-end">
           <svg viewBox="0 0 240 160" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto drop-shadow-sm">
             <ellipse cx="130" cy="152" rx="100" ry="6" fill="#000" opacity=".12"/>
-            <rect x="62" y="44" width="110" height="26" rx="8" fill="#4f2bdc" transform="rotate(-10 62 44)"/>
-            <rect x="68" y="50" width="100" height="18" rx="5" fill="#e9e2ff" transform="rotate(-10 68 50)"/>
-            <rect x="52" y="62" width="150" height="86" rx="14" fill="#b79cf7"/>
-            <rect x="52" y="62" width="150" height="86" rx="14" fill="none" stroke="#fff" strokeOpacity=".3" strokeWidth="2"/>
-            <rect x="170" y="86" width="44" height="36" rx="10" fill="#4f2bdc"/>
-            <circle cx="190" cy="104" r="6" fill="#e9e2ff"/>
-            <ellipse cx="34" cy="132" rx="22" ry="7" fill="#9d86f0"/><rect x="12" y="102" width="44" height="30" fill="#c9b8fa"/>
-            <ellipse cx="34" cy="102" rx="22" ry="7" fill="#e6dcff"/>
-            <line x1="12" y1="112" x2="56" y2="112" stroke="#9d86f0" strokeWidth="2"/>
-            <line x1="12" y1="122" x2="56" y2="122" stroke="#9d86f0" strokeWidth="2"/>
+            <rect x="62" y="44" width="110" height="26" rx="8" fill="#380e60" transform="rotate(-10 62 44)"/>
+            <rect x="68" y="50" width="100" height="18" rx="5" fill="#f3ecff" transform="rotate(-10 68 50)"/>
+            <rect x="52" y="62" width="150" height="86" rx="14" fill="#a47ce8"/>
+            <rect x="52" y="62" width="150" height="86" rx="14" fill="none" stroke="#fff" strokeOpacity=".35" strokeWidth="2"/>
+            <rect x="170" y="86" width="44" height="36" rx="10" fill="#380e60"/>
+            <circle cx="190" cy="104" r="6" fill="#f3ecff"/>
+            <ellipse cx="34" cy="132" rx="22" ry="7" fill="#8e5fe0"/><rect x="12" y="102" width="44" height="30" fill="#c3a8f5"/>
+            <ellipse cx="34" cy="102" rx="22" ry="7" fill="#efe7ff"/>
+            <line x1="12" y1="112" x2="56" y2="112" stroke="#8e5fe0" strokeWidth="2"/>
+            <line x1="12" y1="122" x2="56" y2="122" stroke="#8e5fe0" strokeWidth="2"/>
           </svg>
         </div>
       </div>
 
-      {/* CREATIVE GRAPHIC ZONE BUTTON */}
+      {/* CREATIVE GRAPHIC ZONE BUTTON - PHONEPE PURPLE THEME */}
       <div
         onClick={() => onSelectView('graphicZone')}
-        className="group cursor-pointer relative overflow-hidden rounded-[24px] bg-gradient-to-r from-[#03181f] via-[#05252e] to-[#031a21] border border-[#0d4655] shadow-lg shadow-[#021318]/45 p-2 sm:p-2.5 flex items-center justify-between gap-2.5 transition-all hover:border-[#17bfa0]/60 hover:shadow-[#17bfa0]/20 active:scale-[0.99]"
+        className="group cursor-pointer relative overflow-hidden rounded-[24px] bg-gradient-to-r from-[#2c0b4d] via-[#4a177c] to-[#360f5c] border border-purple-500/30 shadow-md shadow-purple-950/20 p-2 sm:p-2.5 flex items-center justify-between gap-2.5 transition-all hover:border-purple-400/60 hover:shadow-purple-900/35 active:scale-[0.99]"
       >
         {/* Left Squircle White Icon Badge */}
         <div className="w-11 h-11 sm:w-13 sm:h-13 rounded-2xl bg-white shadow-md flex items-center justify-center shrink-0 p-1.5 transition-transform group-hover:scale-105">
           <svg viewBox="0 0 100 100" className="w-full h-full">
-            {/* Teal circular 'G' arc */}
+            {/* PhonePe Purple circular 'G' arc */}
             <path
               d="M 50 16 A 34 34 0 1 0 84 50 L 52 50"
               fill="none"
-              stroke="#00a896"
+              stroke="#5f259f"
               strokeWidth="15"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
-            {/* Green upward growth arrow */}
+            {/* Violet growth arrow */}
             <path
               d="M 60 38 L 84 14 L 88 38 Z"
-              fill="#7bc22a"
+              fill="#8e44e8"
             />
           </svg>
         </div>
 
-        {/* Center Typography & Capsule Badges */}
+        {/* Center Typography & Capsule Items */}
         <div className="flex-1 min-w-0 pl-0.5">
-          <div className="text-white font-black text-[17px] sm:text-[19px] tracking-tight leading-none mb-1.5 group-hover:text-[#2fe8c3] transition-colors drop-shadow-sm">
+          <div className="text-white font-black text-[17px] sm:text-[19px] tracking-tight leading-none mb-1.5 group-hover:text-purple-200 transition-colors drop-shadow-sm">
             Graphic Zone
           </div>
-          <div className="flex items-center gap-2 sm:gap-2.5 text-[10px] sm:text-[11px] font-medium text-slate-300/90 whitespace-nowrap overflow-hidden">
+          <div className="flex items-center gap-2 sm:gap-2.5 text-[10px] sm:text-[11px] font-medium text-purple-200/90 whitespace-nowrap overflow-hidden">
             <span className="inline-flex items-center gap-1">
-              <Printer className="w-2.5 h-2.5 text-[#1cd2ad]" />
+              <Printer className="w-2.5 h-2.5 text-purple-300" />
               Jobs ({data.graphicJobs.filter(j => j.status !== 'Delivered' && j.status !== 'Cancel').length})
             </span>
-            <span className="text-[#1cd2ad]/40 font-bold">•</span>
+            <span className="text-purple-400/60 font-bold">•</span>
             <span className="inline-flex items-center gap-1">
-              <Users className="w-2.5 h-2.5 text-[#1cd2ad]" />
+              <Users className="w-2.5 h-2.5 text-purple-300" />
               Customers
             </span>
-            <span className="text-[#1cd2ad]/40 font-bold">•</span>
+            <span className="text-purple-400/60 font-bold">•</span>
             <span className="inline-flex items-center gap-1">
-              <FileText className="w-2.5 h-2.5 text-[#1cd2ad]" />
+              <FileText className="w-2.5 h-2.5 text-purple-300" />
               Invoice
             </span>
           </div>
         </div>
 
-        {/* Right Mint Action Button */}
-        <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-br from-[#1cd2ad] to-[#11b895] shadow-md shadow-[#1cd2ad]/35 flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-[#1cd2ad]/50 transition-all">
+        {/* Right Action Button - PhonePe Royal Purple */}
+        <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-br from-[#8a3ee6] to-[#5f259f] border border-white/20 shadow-md shadow-purple-950/40 flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-purple-700/50 transition-all text-white">
           <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-white stroke-[3] group-hover:translate-x-0.5 transition-transform" />
         </div>
       </div>
@@ -136,46 +207,38 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
 
 
       {/* SECTION 1: QUICK ACTIONS */}
-      <div className="bg-white rounded-3xl p-4.5 shadow-sm border border-slate-100">
-        <div className="flex items-center justify-between mb-3.5 px-1">
-          <div className="flex items-center gap-2 text-base font-black text-slate-800">
-            <div className="p-1.5 rounded-lg bg-indigo-50 text-indigo-600">
-              <Zap className="w-4 h-4" />
-            </div>
+      <div className="bg-white rounded-2xl p-3 sm:p-3.5 shadow-sm border border-slate-100">
+        <div className="flex items-center justify-between mb-2 px-1">
+          <div className="flex items-center gap-1.5 text-sm font-black text-slate-800">
+            <Zap className="w-4 h-4 fill-[#5f259f] text-[#5f259f]" />
             Quick Actions
           </div>
-          <span className="text-xs font-semibold text-slate-400">4 Apps</span>
+          <span className="text-[11px] font-semibold text-slate-400">4 Apps</span>
         </div>
 
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-4 gap-1">
           {/* Run Walk */}
           <button
             onClick={() => onSelectView('runWalk')}
-            className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-slate-50/70 hover:bg-indigo-50/60 active:scale-95 transition-all border border-slate-100 min-h-[72px] group"
+            className="flex flex-col items-center justify-start py-1.5 px-0.5 rounded-xl hover:bg-purple-50/50 active:scale-95 transition-all cursor-pointer group"
           >
-            <div className="w-9 h-9 rounded-xl bg-blue-100/80 text-blue-700 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
-              🏃
+            <div className="h-7 flex items-center justify-center group-hover:scale-110 transition-transform mb-1">
+              <RunnerIcon />
             </div>
-            <span
-              className="text-[11px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
-              style={{ height: '28.6133px' }}
-            >
-              Run Walk
+            <span className="text-[11px] font-bold text-slate-700 group-hover:text-purple-950 text-center leading-tight">
+              Run<br />Walk
             </span>
           </button>
 
           {/* Habit */}
           <button
             onClick={() => onSelectView('habit')}
-            className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-slate-50/70 hover:bg-emerald-50/60 active:scale-95 transition-all border border-slate-100 min-h-[72px] group"
+            className="flex flex-col items-center justify-start py-1.5 px-0.5 rounded-xl hover:bg-purple-50/50 active:scale-95 transition-all cursor-pointer group"
           >
-            <div className="w-9 h-9 rounded-xl bg-emerald-100/80 text-emerald-700 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
-              ✓
+            <div className="h-7 flex items-center justify-center group-hover:scale-110 transition-transform mb-1">
+              <HabitIcon />
             </div>
-            <span
-              className="text-[11px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
-              style={{ height: '28.6133px' }}
-            >
+            <span className="text-[11px] font-bold text-slate-700 group-hover:text-purple-950 text-center leading-tight">
               Habit
             </span>
           </button>
@@ -183,141 +246,118 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
           {/* Quick Note */}
           <button
             onClick={() => onSelectView('quickNote')}
-            className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-slate-50/70 hover:bg-amber-50/60 active:scale-95 transition-all border border-slate-100 min-h-[72px] group"
+            className="flex flex-col items-center justify-start py-1.5 px-0.5 rounded-xl hover:bg-purple-50/50 active:scale-95 transition-all cursor-pointer group"
           >
-            <div className="w-9 h-9 rounded-xl bg-amber-100/80 text-amber-700 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
-              📝
+            <div className="h-7 flex items-center justify-center group-hover:scale-110 transition-transform mb-1">
+              <FileText className="w-6 h-6 text-[#5f259f] stroke-[2.2]" />
             </div>
-            <span
-              className="text-[11px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
-              style={{ height: '28.6133px' }}
-            >
-              Quick Note
+            <span className="text-[11px] font-bold text-slate-700 group-hover:text-purple-950 text-center leading-tight">
+              Quick<br />Note
             </span>
           </button>
 
-          {/* Diary */}
+          {/* Diary Book */}
           <button
             onClick={() => onSelectView('diary')}
-            className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-slate-50/70 hover:bg-purple-50/60 active:scale-95 transition-all border border-slate-100 min-h-[72px] group"
+            className="flex flex-col items-center justify-start py-1.5 px-0.5 rounded-xl hover:bg-purple-50/50 active:scale-95 transition-all cursor-pointer group"
           >
-            <div className="w-9 h-9 rounded-xl bg-purple-100/80 text-purple-700 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
-              📓
+            <div className="h-7 flex items-center justify-center group-hover:scale-110 transition-transform mb-1">
+              <DiaryIcon />
             </div>
-            <span
-              className="text-[11px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
-              style={{ height: '28.6133px' }}
-            >
-              Diary Book
+            <span className="text-[11px] font-bold text-slate-700 group-hover:text-purple-950 text-center leading-tight">
+              Diary<br />Book
             </span>
           </button>
         </div>
       </div>
 
       {/* SECTION 2: MONEY */}
-      <div className="bg-white rounded-3xl p-4.5 shadow-sm border border-slate-100">
-        <div className="flex items-center justify-between mb-3.5 px-1">
-          <div className="flex items-center gap-2 text-base font-black text-slate-800">
-            <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600">
-              <DollarSign className="w-4 h-4" />
-            </div>
-            Money &amp; Assets
+      <div className="bg-white rounded-2xl p-3 sm:p-3.5 shadow-sm border border-slate-100">
+        <div className="flex items-center justify-between mb-2 px-1">
+          <div className="flex items-center gap-1.5 text-sm font-black text-slate-800">
+            <svg viewBox="0 0 24 24" className="w-4 h-4 text-[#5f259f] fill-[#5f259f]">
+              <path d="M12 2a3 3 0 0 0-3 3c0 .3.05.6.14.86C6.18 6.94 4 9.68 4 13c0 4.42 3.58 8 8 8s8-3.58 8-8c0-3.32-2.18-6.06-5.14-7.14.09-.26.14-.56.14-.86a3 3 0 0 0-3-3zm0 2a1 1 0 0 1 1 1c0 .24-.09.46-.22.64A4.01 4.01 0 0 0 12 5.5c-.27 0-.54.04-.78.14A1 1 0 0 1 11 5a1 1 0 0 1 1-1zm0 7c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5.67-1.5 1.5-1.5z"/>
+            </svg>
+            Money
           </div>
-          <span className="text-xs font-semibold text-slate-400">4 Apps</span>
+          <span className="text-[11px] font-semibold text-slate-400">4 Apps</span>
         </div>
 
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-4 gap-1">
           {/* Asset & Liability */}
           <button
             onClick={() => onSelectView('liability')}
-            className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-slate-50/70 hover:bg-rose-50/60 active:scale-95 transition-all border border-slate-100 min-h-[72px] group"
+            className="flex flex-col items-center justify-start py-1.5 px-0.5 rounded-xl hover:bg-purple-50/50 active:scale-95 transition-all cursor-pointer group"
           >
-            <div className="w-9 h-9 rounded-xl bg-rose-100/80 text-rose-700 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
-              📌
+            <div className="h-7 flex items-center justify-center group-hover:scale-110 transition-transform mb-1">
+              <Pin className="w-6 h-6 text-[#5f259f] stroke-[2.2] -rotate-45" />
             </div>
-            <span
-              className="text-[10px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
-              style={{ height: '28.6133px' }}
-            >
-              Asset &amp; Liability
+            <span className="text-[11px] font-bold text-slate-700 group-hover:text-purple-950 text-center leading-tight">
+              Asset &amp;<br />Liability
             </span>
           </button>
 
           {/* Saving Bank */}
           <button
             onClick={() => onSelectView('savingBank')}
-            className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-slate-50/70 hover:bg-teal-50/60 active:scale-95 transition-all border border-slate-100 min-h-[72px] group"
+            className="flex flex-col items-center justify-start py-1.5 px-0.5 rounded-xl hover:bg-purple-50/50 active:scale-95 transition-all cursor-pointer group"
           >
-            <div className="w-9 h-9 rounded-xl bg-teal-100/80 text-teal-700 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
-              🏛️
+            <div className="h-7 flex items-center justify-center group-hover:scale-110 transition-transform mb-1">
+              <Landmark className="w-6 h-6 text-[#5f259f] stroke-[2.2]" />
             </div>
-            <span
-              className="text-[11px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
-              style={{ height: '28.6133px' }}
-            >
-              Saving Bank
+            <span className="text-[11px] font-bold text-slate-700 group-hover:text-purple-950 text-center leading-tight">
+              Saving<br />Bank
             </span>
           </button>
 
           {/* Salary Card */}
           <button
             onClick={() => onSelectView('salary')}
-            className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-slate-50/70 hover:bg-blue-50/60 active:scale-95 transition-all border border-slate-100 min-h-[72px] group"
+            className="flex flex-col items-center justify-start py-1.5 px-0.5 rounded-xl hover:bg-purple-50/50 active:scale-95 transition-all cursor-pointer group"
           >
-            <div className="w-9 h-9 rounded-xl bg-blue-100/80 text-blue-700 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
-              💳
+            <div className="h-7 flex items-center justify-center group-hover:scale-110 transition-transform mb-1">
+              <CreditCard className="w-6 h-6 text-[#5f259f] stroke-[2.2]" />
             </div>
-            <span
-              className="text-[11px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
-              style={{ height: '28.6133px' }}
-            >
-              Salary Card
+            <span className="text-[11px] font-bold text-slate-700 group-hover:text-purple-950 text-center leading-tight">
+              Salary<br />Card
             </span>
           </button>
 
           {/* Bucket List */}
           <button
             onClick={() => onSelectView('bucketList')}
-            className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-slate-50/70 hover:bg-orange-50/60 active:scale-95 transition-all border border-slate-100 min-h-[72px] group"
+            className="flex flex-col items-center justify-start py-1.5 px-0.5 rounded-xl hover:bg-purple-50/50 active:scale-95 transition-all cursor-pointer group"
           >
-            <div className="w-9 h-9 rounded-xl bg-orange-100/80 text-orange-700 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
-              🪣
+            <div className="h-7 flex items-center justify-center group-hover:scale-110 transition-transform mb-1">
+              <BucketIcon />
             </div>
-            <span
-              className="text-[11px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
-              style={{ height: '28.6133px' }}
-            >
-              Bucket List
+            <span className="text-[11px] font-bold text-slate-700 group-hover:text-purple-950 text-center leading-tight">
+              Bucket<br />List
             </span>
           </button>
         </div>
       </div>
 
       {/* SECTION 3: LIFE & WORK */}
-      <div className="bg-white rounded-3xl p-4.5 shadow-sm border border-slate-100">
-        <div className="flex items-center justify-between mb-3.5 px-1">
-          <div className="flex items-center gap-2 text-base font-black text-slate-800">
-            <div className="p-1.5 rounded-lg bg-purple-50 text-purple-600">
-              <Briefcase className="w-4 h-4" />
-            </div>
+      <div className="bg-white rounded-2xl p-3 sm:p-3.5 shadow-sm border border-slate-100">
+        <div className="flex items-center justify-between mb-2 px-1">
+          <div className="flex items-center gap-1.5 text-sm font-black text-slate-800">
+            <Briefcase className="w-4 h-4 fill-[#5f259f] text-[#5f259f]" />
             Life &amp; Work
           </div>
-          <span className="text-xs font-semibold text-slate-400">7 Apps</span>
+          <span className="text-[11px] font-semibold text-slate-400">7 Apps</span>
         </div>
 
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-4 gap-x-1 gap-y-2.5">
           {/* Planning */}
           <button
             onClick={() => onSelectView('planning')}
-            className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-slate-50/70 hover:bg-indigo-50/60 active:scale-95 transition-all border border-slate-100 min-h-[72px] group"
+            className="flex flex-col items-center justify-start py-1.5 px-0.5 rounded-xl hover:bg-purple-50/50 active:scale-95 transition-all cursor-pointer group"
           >
-            <div className="w-9 h-9 rounded-xl bg-indigo-100/80 text-indigo-700 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
-              📅
+            <div className="h-7 flex items-center justify-center group-hover:scale-110 transition-transform mb-1">
+              <PlanningIcon />
             </div>
-            <span
-              className="text-[11px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
-              style={{ height: '28.6133px' }}
-            >
+            <span className="text-[11px] font-bold text-slate-700 group-hover:text-purple-950 text-center leading-tight">
               Planning
             </span>
           </button>
@@ -325,15 +365,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
           {/* Health */}
           <button
             onClick={() => onSelectView('health')}
-            className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-slate-50/70 hover:bg-red-50/60 active:scale-95 transition-all border border-slate-100 min-h-[72px] group"
+            className="flex flex-col items-center justify-start py-1.5 px-0.5 rounded-xl hover:bg-purple-50/50 active:scale-95 transition-all cursor-pointer group"
           >
-            <div className="w-9 h-9 rounded-xl bg-red-100/80 text-red-600 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
-              ❤️
+            <div className="h-7 flex items-center justify-center group-hover:scale-110 transition-transform mb-1">
+              <Heart className="w-6 h-6 text-[#5f259f] stroke-[2.2]" />
             </div>
-            <span
-              className="text-[11px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
-              style={{ height: '28.6133px' }}
-            >
+            <span className="text-[11px] font-bold text-slate-700 group-hover:text-purple-950 text-center leading-tight">
               Health
             </span>
           </button>
@@ -341,79 +378,65 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
           {/* inflow2036 */}
           <button
             onClick={() => onSelectView('inflow2036')}
-            className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-slate-50/70 hover:bg-emerald-50/60 active:scale-95 transition-all border border-slate-100 min-h-[72px] group"
+            className="flex flex-col items-center justify-start py-1.5 px-0.5 rounded-xl hover:bg-purple-50/50 active:scale-95 transition-all cursor-pointer group"
           >
-            <div className="w-9 h-9 rounded-xl bg-emerald-100/80 text-emerald-800 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
-              📈
+            <div className="h-7 flex items-center justify-center group-hover:scale-110 transition-transform mb-1">
+              <BarChart3 className="w-6 h-6 text-[#5f259f] stroke-[2.2]" />
             </div>
-            <span
-              className="text-[11px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
-              style={{ height: '28.6133px' }}
-            >
-              inflow 2036
+            <span className="text-[11px] font-bold text-slate-700 group-hover:text-purple-950 text-center leading-tight">
+              inflow2036
             </span>
           </button>
 
           {/* 5% Club */}
           <button
             onClick={() => onSelectView('fivePercentClub')}
-            className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-slate-50/70 hover:bg-cyan-50/60 active:scale-95 transition-all border border-slate-100 min-h-[72px] group"
+            className="flex flex-col items-center justify-start py-1.5 px-0.5 rounded-xl hover:bg-purple-50/50 active:scale-95 transition-all cursor-pointer group"
           >
-            <div className="w-9 h-9 rounded-xl bg-cyan-100/80 text-cyan-800 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
-              📊
+            <div className="h-7 flex items-center justify-center group-hover:scale-110 transition-transform mb-1">
+              <TrendingUp className="w-6 h-6 text-[#5f259f] stroke-[2.2]" />
             </div>
-            <span
-              className="text-[11px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
-            >
-              5% Club
+            <span className="text-[11px] font-bold text-slate-700 group-hover:text-purple-950 text-center leading-tight">
+              5%<br />Club
             </span>
           </button>
 
           {/* Skill Improve */}
           <button
             onClick={() => onSelectView('skill')}
-            className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-slate-50/70 hover:bg-purple-50/60 active:scale-95 transition-all border border-slate-100 min-h-[72px] group"
+            className="flex flex-col items-center justify-start py-1.5 px-0.5 rounded-xl hover:bg-purple-50/50 active:scale-95 transition-all cursor-pointer group"
           >
-            <div className="w-9 h-9 rounded-xl bg-purple-100/80 text-purple-800 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
-              🗣️
+            <div className="h-7 flex items-center justify-center group-hover:scale-110 transition-transform mb-1">
+              <SkillIcon />
             </div>
-            <span
-              className="text-[11px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
-              style={{ height: '28.6133px' }}
-            >
-              Skill Improve
+            <span className="text-[11px] font-bold text-slate-700 group-hover:text-purple-950 text-center leading-tight">
+              Skill<br />Improve
             </span>
           </button>
 
           {/* Special Days */}
           <button
             onClick={() => onSelectView('specialDays')}
-            className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-slate-50/70 hover:bg-pink-50/60 active:scale-95 transition-all border border-slate-100 min-h-[72px] group"
+            className="flex flex-col items-center justify-start py-1.5 px-0.5 rounded-xl hover:bg-purple-50/50 active:scale-95 transition-all cursor-pointer group"
           >
-            <div className="w-9 h-9 rounded-xl bg-pink-100/80 text-pink-700 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
-              🎂
+            <div className="h-7 flex items-center justify-center group-hover:scale-110 transition-transform mb-1">
+              <CakeIcon />
             </div>
-            <span
-              className="text-[11px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
-              style={{ height: '28.6133px' }}
-            >
-              Special Days
+            <span className="text-[11px] font-bold text-slate-700 group-hover:text-purple-950 text-center leading-tight">
+              Special<br />Days
             </span>
           </button>
 
           {/* Our World */}
           <button
             onClick={() => onSelectView('ourWorld')}
-            className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-slate-50/70 hover:bg-blue-50/60 active:scale-95 transition-all border border-slate-100 min-h-[72px] group"
+            className="flex flex-col items-center justify-start py-1.5 px-0.5 rounded-xl hover:bg-purple-50/50 active:scale-95 transition-all cursor-pointer group"
           >
-            <div className="w-9 h-9 rounded-xl bg-blue-100/80 text-blue-700 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
-              🌍
+            <div className="h-7 flex items-center justify-center group-hover:scale-110 transition-transform mb-1">
+              <Globe className="w-6 h-6 text-[#5f259f] stroke-[2.2]" />
             </div>
-            <span
-              className="text-[11px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
-              style={{ height: '28.6133px' }}
-            >
-              Our World
+            <span className="text-[11px] font-bold text-slate-700 group-hover:text-purple-950 text-center leading-tight">
+              Our<br />World
             </span>
           </button>
         </div>
@@ -423,17 +446,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
       <div className="flex justify-between items-center pt-2 px-1">
         <button
           onClick={logout}
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-rose-500 hover:text-rose-600 transition-colors py-2 px-3 rounded-xl hover:bg-rose-50/50"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-rose-500 hover:text-rose-600 transition-colors py-2 px-2 rounded-xl hover:bg-rose-50/50 cursor-pointer"
         >
-          <LogOut className="w-4 h-4" />
+          <span className="text-sm font-black">↳</span>
           Logout
         </button>
 
         <button
           onClick={() => setShowBackupModal(true)}
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100/80 py-2.5 px-4 rounded-full transition-all shadow-sm active:scale-95"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 bg-[#edf3ff] hover:bg-blue-100/80 py-2 px-4 rounded-full transition-all shadow-sm active:scale-95 cursor-pointer"
         >
-          <span>☁️</span> Backup &amp; Sync
+          <span>☁️</span> Backup all
         </button>
       </div>
 
