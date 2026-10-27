@@ -53,11 +53,11 @@ export class StorageService {
       } else {
         // First time initialization in Firebase with fresh seed data
         const initial = this.loadAppData();
-        await setDoc(docRef, initial);
+        await setDoc(docRef, initial).catch(() => {});
         return initial;
       }
     } catch (e) {
-      console.error('StorageService: Cloud sync failed, using local storage', e);
+      console.warn('StorageService: Cloud sync offline, using local storage');
       return this.loadAppData();
     }
   }
@@ -65,11 +65,11 @@ export class StorageService {
   static saveAppData(data: AppData): void {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-      // Asynchronously push to Firebase
+      // Asynchronously push to Firebase without throwing unhandled error
       const docRef = doc(db, 'workspaces', 'inflow2036_workspace');
-      setDoc(docRef, data).catch(err => console.error('Cloud save failed:', err));
+      setDoc(docRef, data).catch(err => console.warn('Cloud save deferred:', err?.message || err));
     } catch (e) {
-      console.error('StorageService: Error saving data', e);
+      console.warn('StorageService: Error saving local data', e);
     }
   }
 

@@ -2,9 +2,6 @@ import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { PWAInstallButton } from './PWAInstallButton';
 import {
-  Download,
-  Upload,
-  RotateCcw,
   LogOut,
   Calendar,
   Zap,
@@ -23,7 +20,7 @@ interface DashboardViewProps {
 }
 
 export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) => {
-  const { logout, exportBackupJSON, backupToGoogleDrive, importBackupJSON, resetToDefaults, data } = useApp();
+  const { logout, backupToGoogleDrive, data } = useApp();
   const [showBackupModal, setShowBackupModal] = useState(false);
   const [backupMessage, setBackupMessage] = useState('');
   const [isDriveUploading, setIsDriveUploading] = useState(false);
@@ -51,21 +48,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
     month: 'short',
     year: 'numeric'
   }).format(new Date());
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const ok = await importBackupJSON(file);
-    if (ok) {
-      setBackupMessage('✅ Backup successfully restored!');
-      setTimeout(() => {
-        setBackupMessage('');
-        setShowBackupModal(false);
-      }, 1500);
-    } else {
-      setBackupMessage('❌ Failed to restore backup. Invalid JSON format.');
-    }
-  };
 
   return (
     <div className="space-y-4 pb-12 animate-fadeIn">
@@ -157,7 +139,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
             <div className="w-9 h-9 rounded-xl bg-blue-100/80 text-blue-700 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
               🏃
             </div>
-            <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">
+            <span
+              className="text-[11px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
+              style={{ height: '28.6133px' }}
+            >
               Run Walk
             </span>
           </button>
@@ -170,7 +155,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
             <div className="w-9 h-9 rounded-xl bg-emerald-100/80 text-emerald-700 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
               ✓
             </div>
-            <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">
+            <span
+              className="text-[11px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
+              style={{ height: '28.6133px' }}
+            >
               Habit
             </span>
           </button>
@@ -183,7 +171,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
             <div className="w-9 h-9 rounded-xl bg-amber-100/80 text-amber-700 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
               📝
             </div>
-            <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">
+            <span
+              className="text-[11px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
+              style={{ height: '28.6133px' }}
+            >
               Quick Note
             </span>
           </button>
@@ -196,7 +187,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
             <div className="w-9 h-9 rounded-xl bg-purple-100/80 text-purple-700 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
               📓
             </div>
-            <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">
+            <span
+              className="text-[11px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
+              style={{ height: '28.6133px' }}
+            >
               Diary
             </span>
           </button>
@@ -224,7 +218,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
             <div className="w-9 h-9 rounded-xl bg-rose-100/80 text-rose-700 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
               📌
             </div>
-            <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">
+            <span
+              className="text-[11px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
+              style={{ height: '28.6133px' }}
+            >
               Liability
             </span>
           </button>
@@ -237,7 +234,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
             <div className="w-9 h-9 rounded-xl bg-teal-100/80 text-teal-700 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
               🏛️
             </div>
-            <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">
+            <span
+              className="text-[11px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
+              style={{ height: '28.6133px' }}
+            >
               Saving Bank
             </span>
           </button>
@@ -250,7 +250,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
             <div className="w-9 h-9 rounded-xl bg-blue-100/80 text-blue-700 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
               💳
             </div>
-            <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">
+            <span
+              className="text-[11px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
+              style={{ height: '28.6133px' }}
+            >
               Salary Card
             </span>
           </button>
@@ -263,7 +266,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
             <div className="w-9 h-9 rounded-xl bg-orange-100/80 text-orange-700 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
               🪣
             </div>
-            <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">
+            <span
+              className="text-[11px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
+              style={{ height: '28.6133px' }}
+            >
               Bucket List
             </span>
           </button>
@@ -291,7 +297,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
             <div className="w-9 h-9 rounded-xl bg-indigo-100/80 text-indigo-700 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
               📅
             </div>
-            <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">
+            <span
+              className="text-[11px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
+              style={{ height: '28.6133px' }}
+            >
               Planning
             </span>
           </button>
@@ -304,7 +313,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
             <div className="w-9 h-9 rounded-xl bg-red-100/80 text-red-600 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
               ❤️
             </div>
-            <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">
+            <span
+              className="text-[11px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
+              style={{ height: '28.6133px' }}
+            >
               Health
             </span>
           </button>
@@ -317,7 +329,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
             <div className="w-9 h-9 rounded-xl bg-emerald-100/80 text-emerald-800 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
               📈
             </div>
-            <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">
+            <span
+              className="text-[11px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
+              style={{ height: '28.6133px' }}
+            >
               inflow 2036
             </span>
           </button>
@@ -330,7 +345,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
             <div className="w-9 h-9 rounded-xl bg-cyan-100/80 text-cyan-800 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
               📊
             </div>
-            <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">
+            <span
+              className="text-[11px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
+              style={{ height: '28.6133px' }}
+            >
               5% Club
             </span>
           </button>
@@ -343,7 +361,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
             <div className="w-9 h-9 rounded-xl bg-purple-100/80 text-purple-800 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
               🗣️
             </div>
-            <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">
+            <span
+              className="text-[11px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
+              style={{ height: '28.6133px' }}
+            >
               Skill Improve
             </span>
           </button>
@@ -356,7 +377,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
             <div className="w-9 h-9 rounded-xl bg-pink-100/80 text-pink-700 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
               🎂
             </div>
-            <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">
+            <span
+              className="text-[11px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
+              style={{ height: '28.6133px' }}
+            >
               Special Days
             </span>
           </button>
@@ -369,7 +393,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
             <div className="w-9 h-9 rounded-xl bg-blue-100/80 text-blue-700 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
               🌍
             </div>
-            <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">
+            <span
+              className="text-[11px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
+              style={{ height: '28.6133px' }}
+            >
               Our World
             </span>
           </button>
@@ -425,7 +452,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
               <button
                 onClick={handleDriveBackup}
                 disabled={isDriveUploading}
-                className="w-full py-3.5 px-4 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 active:scale-[0.98] text-white font-black rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/25 disabled:opacity-60 transition-all"
+                className="w-full py-3.5 px-4 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 active:scale-[0.98] text-white font-black rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/25 disabled:opacity-60 transition-all cursor-pointer"
               >
                 {isDriveUploading ? (
                   <>
@@ -438,38 +465,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
                     Save to Google Drive (inflow2036_Backups)
                   </>
                 )}
-              </button>
-
-              <button
-                onClick={exportBackupJSON}
-                className="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs flex items-center justify-center gap-2 transition-colors"
-              >
-                <Download className="w-4 h-4" />
-                Download Local JSON File
-              </button>
-
-              <label className="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs flex items-center justify-center gap-2 cursor-pointer transition-colors">
-                <Upload className="w-4 h-4" />
-                Restore from JSON File
-                <input
-                  type="file"
-                  accept=".json,application/json"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
-              </label>
-
-              <button
-                onClick={() => {
-                  if (confirm('Are you sure you want to reset all data to default demo data?')) {
-                    resetToDefaults();
-                    setShowBackupModal(false);
-                  }
-                }}
-                className="w-full py-2 px-4 text-slate-400 hover:text-red-600 text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-colors pt-1"
-              >
-                <RotateCcw className="w-3 h-3" />
-                Reset to Default Data
               </button>
             </div>
 
