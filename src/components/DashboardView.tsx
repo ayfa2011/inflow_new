@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { PWAInstallButton } from './PWAInstallButton';
 import {
   Download,
   Upload,
@@ -70,11 +71,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
     <div className="space-y-4 pb-12 animate-fadeIn">
       {/* HERO BANNER */}
       <div className="relative overflow-hidden rounded-3xl p-5 text-white shadow-xl shadow-indigo-600/20 bg-gradient-to-br from-[#5b35e0] via-[#7a5cf0] to-[#8f7af5]">
-        <div className="flex justify-between items-start mb-2">
+        <div className="flex justify-between items-center mb-3.5 z-10 relative">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-bold tracking-wide">
             <Calendar className="w-3.5 h-3.5" />
             <span>{todayFormatted}</span>
           </div>
+          <PWAInstallButton />
         </div>
 
         <div className="relative z-10 max-w-[65%]">
