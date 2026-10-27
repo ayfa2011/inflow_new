@@ -91,31 +91,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
       <button
         type="button"
         onClick={() => onSelectView('graphicZone')}
-        className="w-full text-left relative overflow-hidden rounded-3xl p-4.5 flex items-center gap-3.5 text-white transition-all transform active:scale-[0.98] shadow-xl shadow-indigo-900/25 bg-gradient-to-r from-[#1e1b4b] via-[#4f2bdc] to-[#a21caf] cursor-pointer"
+        className="w-full relative overflow-hidden rounded-3xl transition-all transform active:scale-[0.98] hover:opacity-95 shadow-lg shadow-teal-950/20 cursor-pointer block p-0 bg-[#031c22] border border-teal-800/30 group"
       >
-        <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#fb923c] to-[#ec4899] flex items-center justify-center text-3xl shadow-lg shadow-pink-500/30 border-2 border-white/30 transform -rotate-6 flex-shrink-0">
-          🎨
-        </div>
-        <div className="flex-1 min-w-0 z-10">
-          <div className="inline-block text-[9px] font-black tracking-widest px-2.5 py-0.5 rounded-full bg-white/20 mb-1">
-            ✨ PRINT &amp; DESIGN STUDIO
-          </div>
-          <div className="text-xl font-black tracking-tight leading-tight">Graphic Zone</div>
-          <div className="flex flex-wrap gap-1.5 mt-2">
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/15 border border-white/20">
-              🖨️ Jobs ({data.graphicJobs.length})
-            </span>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/15 border border-white/20">
-              👥 Customers
-            </span>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/15 border border-white/20">
-              💰 Invoices
-            </span>
-          </div>
-        </div>
-        <div className="w-9 h-9 rounded-full bg-white text-indigo-700 flex items-center justify-center font-bold text-xl shadow-md flex-shrink-0 z-10">
-          <ChevronRight className="w-5 h-5" />
-        </div>
+        <img
+          src="/assets/aistudio/Asset_1_700ea024.png"
+          alt="Graphic Zone"
+          className="w-full h-auto object-cover rounded-3xl block transition-transform duration-300 group-hover:scale-[1.01]"
+        />
       </button>
 
       {/* SECTION 1: QUICK ACTIONS */}
