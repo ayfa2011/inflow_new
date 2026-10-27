@@ -148,29 +148,29 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
           <span className="text-xs font-semibold text-slate-400">4 Apps</span>
         </div>
 
-        <div className="grid grid-cols-4 gap-2.5">
+        <div className="grid grid-cols-4 gap-2">
           {/* Run Walk */}
           <button
             onClick={() => onSelectView('runWalk')}
-            className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-50/70 hover:bg-indigo-50/60 active:scale-95 transition-all border border-slate-100 min-h-[96px] group"
+            className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-slate-50/70 hover:bg-indigo-50/60 active:scale-95 transition-all border border-slate-100 min-h-[72px] group"
           >
-            <div className="w-12 h-12 rounded-xl bg-blue-100/80 text-blue-700 flex items-center justify-center text-2xl mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
+            <div className="w-9 h-9 rounded-xl bg-blue-100/80 text-blue-700 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
               🏃
             </div>
-            <span className="text-xs font-bold text-slate-800 text-center leading-tight">
-              Run<br />Walk
+            <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">
+              Run Walk
             </span>
           </button>
 
           {/* Habit */}
           <button
             onClick={() => onSelectView('habit')}
-            className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-50/70 hover:bg-emerald-50/60 active:scale-95 transition-all border border-slate-100 min-h-[96px] group"
+            className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-slate-50/70 hover:bg-emerald-50/60 active:scale-95 transition-all border border-slate-100 min-h-[72px] group"
           >
-            <div className="w-12 h-12 rounded-xl bg-emerald-100/80 text-emerald-700 flex items-center justify-center text-2xl mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
+            <div className="w-9 h-9 rounded-xl bg-emerald-100/80 text-emerald-700 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
               ✓
             </div>
-            <span className="text-xs font-bold text-slate-800 text-center leading-tight">
+            <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">
               Habit
             </span>
           </button>
@@ -178,25 +178,25 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
           {/* Quick Note */}
           <button
             onClick={() => onSelectView('quickNote')}
-            className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-50/70 hover:bg-amber-50/60 active:scale-95 transition-all border border-slate-100 min-h-[96px] group"
+            className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-slate-50/70 hover:bg-amber-50/60 active:scale-95 transition-all border border-slate-100 min-h-[72px] group"
           >
-            <div className="w-12 h-12 rounded-xl bg-amber-100/80 text-amber-700 flex items-center justify-center text-2xl mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
+            <div className="w-9 h-9 rounded-xl bg-amber-100/80 text-amber-700 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
               📝
             </div>
-            <span className="text-xs font-bold text-slate-800 text-center leading-tight">
-              Quick<br />Note
+            <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">
+              Quick Note
             </span>
           </button>
 
           {/* Diary */}
           <button
             onClick={() => onSelectView('diary')}
-            className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-50/70 hover:bg-purple-50/60 active:scale-95 transition-all border border-slate-100 min-h-[96px] group"
+            className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-slate-50/70 hover:bg-purple-50/60 active:scale-95 transition-all border border-slate-100 min-h-[72px] group"
           >
-            <div className="w-12 h-12 rounded-xl bg-purple-100/80 text-purple-700 flex items-center justify-center text-2xl mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
+            <div className="w-9 h-9 rounded-xl bg-purple-100/80 text-purple-700 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
               📓
             </div>
-            <span className="text-xs font-bold text-slate-800 text-center leading-tight">
+            <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">
               Diary
             </span>
           </button>
@@ -215,16 +215,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
           <span className="text-xs font-semibold text-slate-400">4 Apps</span>
         </div>
 
-        <div className="grid grid-cols-4 gap-2.5">
+        <div className="grid grid-cols-4 gap-2">
           {/* Liability */}
           <button
             onClick={() => onSelectView('liability')}
-            className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-50/70 hover:bg-rose-50/60 active:scale-95 transition-all border border-slate-100 min-h-[96px] group"
+            className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-slate-50/70 hover:bg-rose-50/60 active:scale-95 transition-all border border-slate-100 min-h-[72px] group"
           >
-            <div className="w-12 h-12 rounded-xl bg-rose-100/80 text-rose-700 flex items-center justify-center text-2xl mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
+            <div className="w-9 h-9 rounded-xl bg-rose-100/80 text-rose-700 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
               📌
             </div>
-            <span className="text-xs font-bold text-slate-800 text-center leading-tight">
+            <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">
               Liability
             </span>
           </button>
@@ -232,39 +232,39 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
           {/* Saving Bank */}
           <button
             onClick={() => onSelectView('savingBank')}
-            className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-50/70 hover:bg-teal-50/60 active:scale-95 transition-all border border-slate-100 min-h-[96px] group"
+            className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-slate-50/70 hover:bg-teal-50/60 active:scale-95 transition-all border border-slate-100 min-h-[72px] group"
           >
-            <div className="w-12 h-12 rounded-xl bg-teal-100/80 text-teal-700 flex items-center justify-center text-2xl mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
+            <div className="w-9 h-9 rounded-xl bg-teal-100/80 text-teal-700 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
               🏛️
             </div>
-            <span className="text-xs font-bold text-slate-800 text-center leading-tight">
-              Saving<br />Bank
+            <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">
+              Saving Bank
             </span>
           </button>
 
           {/* Salary Card */}
           <button
             onClick={() => onSelectView('salary')}
-            className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-50/70 hover:bg-blue-50/60 active:scale-95 transition-all border border-slate-100 min-h-[96px] group"
+            className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-slate-50/70 hover:bg-blue-50/60 active:scale-95 transition-all border border-slate-100 min-h-[72px] group"
           >
-            <div className="w-12 h-12 rounded-xl bg-blue-100/80 text-blue-700 flex items-center justify-center text-2xl mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
+            <div className="w-9 h-9 rounded-xl bg-blue-100/80 text-blue-700 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
               💳
             </div>
-            <span className="text-xs font-bold text-slate-800 text-center leading-tight">
-              Salary<br />Card
+            <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">
+              Salary Card
             </span>
           </button>
 
           {/* Bucket List */}
           <button
             onClick={() => onSelectView('bucketList')}
-            className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-50/70 hover:bg-orange-50/60 active:scale-95 transition-all border border-slate-100 min-h-[96px] group"
+            className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-slate-50/70 hover:bg-orange-50/60 active:scale-95 transition-all border border-slate-100 min-h-[72px] group"
           >
-            <div className="w-12 h-12 rounded-xl bg-orange-100/80 text-orange-700 flex items-center justify-center text-2xl mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
+            <div className="w-9 h-9 rounded-xl bg-orange-100/80 text-orange-700 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
               🪣
             </div>
-            <span className="text-xs font-bold text-slate-800 text-center leading-tight">
-              Bucket<br />List
+            <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">
+              Bucket List
             </span>
           </button>
         </div>
@@ -282,16 +282,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
           <span className="text-xs font-semibold text-slate-400">7 Apps</span>
         </div>
 
-        <div className="grid grid-cols-4 gap-2.5">
+        <div className="grid grid-cols-4 gap-2">
           {/* Planning */}
           <button
             onClick={() => onSelectView('planning')}
-            className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-50/70 hover:bg-indigo-50/60 active:scale-95 transition-all border border-slate-100 min-h-[96px] group"
+            className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-slate-50/70 hover:bg-indigo-50/60 active:scale-95 transition-all border border-slate-100 min-h-[72px] group"
           >
-            <div className="w-12 h-12 rounded-xl bg-indigo-100/80 text-indigo-700 flex items-center justify-center text-2xl mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
+            <div className="w-9 h-9 rounded-xl bg-indigo-100/80 text-indigo-700 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
               📅
             </div>
-            <span className="text-xs font-bold text-slate-800 text-center leading-tight">
+            <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">
               Planning
             </span>
           </button>
@@ -299,12 +299,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
           {/* Health */}
           <button
             onClick={() => onSelectView('health')}
-            className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-50/70 hover:bg-red-50/60 active:scale-95 transition-all border border-slate-100 min-h-[96px] group"
+            className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-slate-50/70 hover:bg-red-50/60 active:scale-95 transition-all border border-slate-100 min-h-[72px] group"
           >
-            <div className="w-12 h-12 rounded-xl bg-red-100/80 text-red-600 flex items-center justify-center text-2xl mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
+            <div className="w-9 h-9 rounded-xl bg-red-100/80 text-red-600 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
               ❤️
             </div>
-            <span className="text-xs font-bold text-slate-800 text-center leading-tight">
+            <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">
               Health
             </span>
           </button>
@@ -312,65 +312,65 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
           {/* inflow2036 */}
           <button
             onClick={() => onSelectView('inflow2036')}
-            className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-50/70 hover:bg-emerald-50/60 active:scale-95 transition-all border border-slate-100 min-h-[96px] group"
+            className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-slate-50/70 hover:bg-emerald-50/60 active:scale-95 transition-all border border-slate-100 min-h-[72px] group"
           >
-            <div className="w-12 h-12 rounded-xl bg-emerald-100/80 text-emerald-800 flex items-center justify-center text-2xl mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
+            <div className="w-9 h-9 rounded-xl bg-emerald-100/80 text-emerald-800 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
               📈
             </div>
-            <span className="text-xs font-bold text-slate-800 text-center leading-tight">
-              inflow<br />2036
+            <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">
+              inflow 2036
             </span>
           </button>
 
           {/* 5% Club */}
           <button
             onClick={() => onSelectView('fivePercentClub')}
-            className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-50/70 hover:bg-cyan-50/60 active:scale-95 transition-all border border-slate-100 min-h-[96px] group"
+            className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-slate-50/70 hover:bg-cyan-50/60 active:scale-95 transition-all border border-slate-100 min-h-[72px] group"
           >
-            <div className="w-12 h-12 rounded-xl bg-cyan-100/80 text-cyan-800 flex items-center justify-center text-2xl mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
+            <div className="w-9 h-9 rounded-xl bg-cyan-100/80 text-cyan-800 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
               📊
             </div>
-            <span className="text-xs font-bold text-slate-800 text-center leading-tight">
-              5%<br />Club
+            <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">
+              5% Club
             </span>
           </button>
 
           {/* Skill Improve */}
           <button
             onClick={() => onSelectView('skill')}
-            className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-50/70 hover:bg-purple-50/60 active:scale-95 transition-all border border-slate-100 min-h-[96px] group"
+            className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-slate-50/70 hover:bg-purple-50/60 active:scale-95 transition-all border border-slate-100 min-h-[72px] group"
           >
-            <div className="w-12 h-12 rounded-xl bg-purple-100/80 text-purple-800 flex items-center justify-center text-2xl mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
+            <div className="w-9 h-9 rounded-xl bg-purple-100/80 text-purple-800 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
               🗣️
             </div>
-            <span className="text-xs font-bold text-slate-800 text-center leading-tight">
-              Skill<br />Improve
+            <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">
+              Skill Improve
             </span>
           </button>
 
           {/* Special Days */}
           <button
             onClick={() => onSelectView('specialDays')}
-            className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-50/70 hover:bg-pink-50/60 active:scale-95 transition-all border border-slate-100 min-h-[96px] group"
+            className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-slate-50/70 hover:bg-pink-50/60 active:scale-95 transition-all border border-slate-100 min-h-[72px] group"
           >
-            <div className="w-12 h-12 rounded-xl bg-pink-100/80 text-pink-700 flex items-center justify-center text-2xl mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
+            <div className="w-9 h-9 rounded-xl bg-pink-100/80 text-pink-700 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
               🎂
             </div>
-            <span className="text-xs font-bold text-slate-800 text-center leading-tight">
-              Special<br />Days
+            <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">
+              Special Days
             </span>
           </button>
 
           {/* Our World */}
           <button
             onClick={() => onSelectView('ourWorld')}
-            className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-50/70 hover:bg-blue-50/60 active:scale-95 transition-all border border-slate-100 min-h-[96px] group"
+            className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-slate-50/70 hover:bg-blue-50/60 active:scale-95 transition-all border border-slate-100 min-h-[72px] group"
           >
-            <div className="w-12 h-12 rounded-xl bg-blue-100/80 text-blue-700 flex items-center justify-center text-2xl mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
+            <div className="w-9 h-9 rounded-xl bg-blue-100/80 text-blue-700 flex items-center justify-center text-lg mb-1 shadow-sm group-hover:scale-105 transition-transform">
               🌍
             </div>
-            <span className="text-xs font-bold text-slate-800 text-center leading-tight">
-              Our<br />World
+            <span className="text-[11px] font-bold text-slate-800 text-center leading-tight">
+              Our World
             </span>
           </button>
         </div>
