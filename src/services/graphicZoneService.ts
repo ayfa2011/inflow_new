@@ -19,11 +19,14 @@ export class GraphicZoneService {
   static calculateJobFinancials(qty: number, rate: number, paid: number, printCost: number, otherCost: number) {
     const totalAmount = Math.round((Number(qty || 0) * Number(rate || 0)) * 100) / 100;
     const balanceDue = Math.max(0, Math.round((totalAmount - Number(paid || 0)) * 100) / 100);
-    const estimatedProfit = Math.round((Number(paid || 0) - Number(printCost || 0) - Number(otherCost || 0)) * 100) / 100;
+    const costs = Number(printCost || 0) + Number(otherCost || 0);
+    const estimatedProfit = Math.round((totalAmount - costs) * 100) / 100;
+    const realisedProfit = Math.round((Number(paid || 0) - costs) * 100) / 100;
     return {
       totalAmount,
       balanceDue,
-      estimatedProfit
+      estimatedProfit,
+      realisedProfit
     };
   }
 

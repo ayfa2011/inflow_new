@@ -3,6 +3,8 @@ import { useApp } from '../context/AppContext';
 import { RunWalkService } from '../services';
 import { ArrowLeft, Save, Calendar, Edit3, Trash2 } from 'lucide-react';
 
+import { getLocalDateString } from '../utils/dateUtils';
+
 export const RunWalkView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { data, saveRunWalkEntry, deleteRunWalkEntry } = useApp();
 
@@ -10,8 +12,7 @@ export const RunWalkView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const kannadaMonths = ['ಜನವರಿ', 'ಫೆಬ್ರವರಿ', 'ಮಾರ್ಚ್', 'ಏಪ್ರಿಲ್', 'ಮೇ', 'ಜೂನ್', 'ಜುಲೈ', 'ಆಗಸ್ಟ್', 'ಸೆಪ್ಟೆಂಬರ್', 'ಅಕ್ಟೋಬರ್', 'ನವೆಂಬರ್', 'ಡಿಸೆಂಬರ್'];
 
   const now = new Date();
-  const pad = (n: number) => String(n).padStart(2, '0');
-  const todayStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+  const todayStr = getLocalDateString(now);
 
   const todayDayName = kannadaDays[now.getDay()];
   const todayFormatted = `${now.getDate()} ${kannadaMonths[now.getMonth()]} ${now.getFullYear()}`;

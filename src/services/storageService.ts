@@ -2,7 +2,7 @@ import { initializeApp } from 'firebase/app';
 import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 import { defaultMasterAppData } from '../data/defaultAppData';
 import { AppData } from '../types';
-
+import { getLocalDateString } from '../utils/dateUtils';
 import firebaseConfig from '../../firebase-applet-config.json';
 
 const app = initializeApp({
@@ -17,7 +17,51 @@ const app = initializeApp({
 export const db = getFirestore(app, (firebaseConfig as any).firestoreDatabaseId || '(default)');
 
 const STORAGE_KEY = 'inflow2036_data_v1';
-const FIRESTORE_DOC_PATH = 'workspaces/inflow2036_user_data';
+let cloudSaveTimeout: ReturnType<typeof setTimeout> | null = null;
+
+/**
+ * Validates and sanitizes parsed JSON object into a typed AppData structure.
+ * Ensures array fields are valid Array instances to prevent runtime crashes.
+ */
+function sanitizeAppData(raw: any): AppData {
+  if (!raw || typeof raw !== 'object') {
+    return { ...defaultMasterAppData };
+  }
+
+  const result: AppData = { ...defaultMasterAppData };
+
+  const arrayKeys: (keyof AppData)[] = [
+    'runWalk',
+    'habits',
+    'quickNotes',
+    'diary',
+    'liabilityAssets',
+    'savingBanks',
+    'salaries',
+    'bucketList',
+    'plans',
+    'graphicJobs',
+    'inflowHoldings',
+    'trades',
+    'skills',
+    'specialDays',
+    'health'
+  ];
+
+  for (const key of arrayKeys) {
+    if (Array.isArray(raw[key])) {
+      (result as any)[key] = raw[key];
+    } else {
+      (result as any)[key] = defaultMasterAppData[key] || [];
+    }
+  }
+
+  if (typeof raw.lastModified === 'string') {
+    result.lastModified = raw.lastModified;
+  }
+
+  return result;
+}
 
 export class StorageService {
   static loadAppData(): AppData {
@@ -25,52 +69,76 @@ export class StorageService {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
-        if (parsed && typeof parsed === 'object') {
-          return {
-            ...defaultMasterAppData,
-            ...parsed
-          };
-        }
+        return sanitizeAppData(parsed);
       }
     } catch (e) {
       console.warn('StorageService: Error loading localStorage', e);
     }
-    return defaultMasterAppData;
+    return { ...defaultMasterAppData };
   }
 
   static async syncWithCloud(): Promise<AppData> {
+    const localData = this.loadAppData();
     try {
       const docRef = doc(db, 'workspaces', 'inflow2036_workspace');
       const snap = await getDoc(docRef);
       if (snap.exists()) {
-        const cloudData = snap.data() as AppData;
-        const merged: AppData = {
-          ...defaultMasterAppData,
-          ...cloudData
-        };
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
-        return merged;
+        const cloudRaw = snap.data();
+        const cloudData = sanitizeAppData(cloudRaw);
+
+        // Compare lastModified timestamps to avoid overwriting newer local edits
+        const localTime = new Date(localData.lastModified || 0).getTime();
+        const cloudTime = new Date(cloudData.lastModified || 0).getTime();
+
+        if (cloudTime > localTime) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudData));
+          return cloudData;
+        } else {
+          // Local data is newer or equal, sync local to cloud
+          this.scheduleCloudSave(localData);
+          return localData;
+        }
       } else {
-        // First time initialization in Firebase with fresh seed data
-        const initial = this.loadAppData();
-        await setDoc(docRef, initial).catch(() => {});
-        return initial;
+        // First time cloud initialization
+        this.scheduleCloudSave(localData);
+        return localData;
       }
     } catch (e) {
       console.warn('StorageService: Cloud sync offline, using local storage');
-      return this.loadAppData();
+      return localData;
     }
   }
 
-  static saveAppData(data: AppData): void {
+  static saveAppData(data: AppData): AppData {
+    const dataWithTimestamp: AppData = {
+      ...data,
+      lastModified: new Date().toISOString()
+    };
+
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-      // Asynchronously push to Firebase without throwing unhandled error
-      const docRef = doc(db, 'workspaces', 'inflow2036_workspace');
-      setDoc(docRef, data).catch(err => console.warn('Cloud save deferred:', err?.message || err));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(dataWithTimestamp));
+      this.scheduleCloudSave(dataWithTimestamp);
     } catch (e) {
       console.warn('StorageService: Error saving local data', e);
     }
+
+    return dataWithTimestamp;
+  }
+
+  private static scheduleCloudSave(data: AppData): void {
+    if (cloudSaveTimeout) {
+      clearTimeout(cloudSaveTimeout);
+    }
+
+    // Debounce cloud push by 1500ms to avoid setDoc flooding on fast keystrokes
+    cloudSaveTimeout = setTimeout(() => {
+      try {
+        const docRef = doc(db, 'workspaces', 'inflow2036_workspace');
+        setDoc(docRef, data).catch(err => console.warn('Cloud save deferred:', err?.message || err));
+      } catch (e) {
+        console.warn('StorageService: Cloud save error', e);
+      }
+    }, 1500);
   }
 
   static exportBackup(data: AppData): void {
@@ -78,7 +146,7 @@ export class StorageService {
     const blob = new Blob([jsonStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    const dateStr = new Date().toISOString().split('T')[0];
+    const dateStr = getLocalDateString();
     link.href = url;
     link.download = `inflow2036_backup_${dateStr}.json`;
     document.body.appendChild(link);
@@ -92,12 +160,9 @@ export class StorageService {
       const text = await file.text();
       const parsed = JSON.parse(text);
       if (parsed && typeof parsed === 'object') {
-        const merged: AppData = {
-          ...defaultMasterAppData,
-          ...parsed
-        };
-        this.saveAppData(merged);
-        return merged;
+        const sanitized = sanitizeAppData(parsed);
+        const saved = this.saveAppData(sanitized);
+        return saved;
       }
     } catch (err) {
       console.error('StorageService: Backup import failed', err);
@@ -106,7 +171,7 @@ export class StorageService {
   }
 
   static resetToDefaults(): AppData {
-    this.saveAppData(defaultMasterAppData);
-    return defaultMasterAppData;
+    const saved = this.saveAppData({ ...defaultMasterAppData });
+    return saved;
   }
 }

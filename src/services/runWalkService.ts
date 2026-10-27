@@ -15,6 +15,8 @@ export interface DayHistoryItem {
   isToday: boolean;
 }
 
+import { getLocalDateString } from '../utils/dateUtils';
+
 export class RunWalkService {
   static kannadaDays = ['ಭಾನುವಾರ', 'ಸೋಮವಾರ', 'ಮಂಗಳವಾರ', 'ಬುಧವಾರ', 'ಗುರುವಾರ', 'ಶುಕ್ರವಾರ', 'ಶನಿವಾರ'];
   static kannadaMonths = ['ಜನವರಿ', 'ಫೆಬ್ರವರಿ', 'ಮಾರ್ಚ್', 'ಏಪ್ರಿಲ್', 'ಮೇ', 'ಜೂನ್', 'ಜುಲೈ', 'ಆಗಸ್ಟ್', 'ಸೆಪ್ಟೆಂಬರ್', 'ಅಕ್ಟೋಬರ್', 'ನವೆಂಬರ್', 'ಡಿಸೆಂಬರ್'];
@@ -68,7 +70,7 @@ export class RunWalkService {
     for (let i = 0; i < 7; i++) {
       const d = new Date(now);
       d.setDate(now.getDate() - i);
-      const dStr = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+      const dStr = getLocalDateString(d);
       const dayName = this.kannadaDays[d.getDay()];
       const shortFormatted = `${d.getDate()} ${this.kannadaMonths[d.getMonth()]}`;
       const matches = entries.filter(x => x.date === dStr);

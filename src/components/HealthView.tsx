@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { ArrowLeft, Droplets, Moon, Dumbbell, Scale, Plus, Check } from 'lucide-react';
 
+import { getLocalDateString } from '../utils/dateUtils';
+
 export const HealthView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { data, saveHealthLog } = useApp();
 
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = getLocalDateString();
   const todayEntry = data.health.find(h => h.date === todayStr);
 
   const [water, setWater] = useState<number>(todayEntry?.waterLiters || 3.0);

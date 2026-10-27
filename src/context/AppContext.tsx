@@ -25,6 +25,7 @@ import {
   TradeService,
   GoogleDriveService
 } from '../services';
+import { getLocalDateString, getLocalDateTimeString } from '../utils/dateUtils';
 
 const AUTH_KEY = 'inflow2036_auth_v1';
 const DEFAULT_PASSWORD = 'shanu2';
@@ -130,6 +131,17 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const [loginError, setLoginError] = useState<string>('');
 
+  /**
+   * Pure state updater helper that keeps StorageService calls outside React state updaters.
+   */
+  const updateAppData = (updater: (prev: AppData) => AppData) => {
+    setData(prev => {
+      const nextData = updater(prev);
+      StorageService.saveAppData(nextData);
+      return nextData;
+    });
+  };
+
   const login = (pwd: string): boolean => {
     if (pwd === DEFAULT_PASSWORD) {
       sessionStorage.setItem(AUTH_KEY, 'unlocked');
@@ -176,13 +188,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const resetToDefaults = () => {
-    const defaults = StorageService.resetToDefaults();
-    setData(defaults);
+    if (window.confirm('ಖಂಡಿತ ಡೇಟಾವನ್ನು ರಿಸೆಟ್ ಮಾಡಲು ಬಯಸುವಿರಾ? (Are you sure you want to reset all data to default?)')) {
+      const defaults = StorageService.resetToDefaults();
+      setData(defaults);
+    }
   };
 
   // ================= RUN WALK =================
   const saveRunWalkEntry = (date: string, distance: number, duration?: number, notes?: string) => {
-    setData(prev => {
+    updateAppData(prev => {
       const existingIdx = prev.runWalk.findIndex(e => e.date === date);
       let updatedRunWalk = [...prev.runWalk];
       if (existingIdx >= 0) {
@@ -202,18 +216,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         };
         updatedRunWalk = [newEntry, ...updatedRunWalk];
       }
-      const nextData = { ...prev, runWalk: updatedRunWalk };
-      StorageService.saveAppData(nextData);
-      return nextData;
+      return { ...prev, runWalk: updatedRunWalk };
     });
   };
 
   const deleteRunWalkEntry = (id: string) => {
-    setData(prev => {
-      const nextData = { ...prev, runWalk: prev.runWalk.filter(e => e.id !== id) };
-      StorageService.saveAppData(nextData);
-      return nextData;
-    });
+    updateAppData(prev => ({ ...prev, runWalk: prev.runWalk.filter(e => e.id !== id) }));
   };
 
   // ================= HABITS =================
@@ -222,18 +230,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const newHabit: HabitItem = {
       id: `h_${Date.now()}`,
       title: title.trim(),
-      dateCreated: new Date().toISOString().split('T')[0],
+      dateCreated: getLocalDateString(),
       logs: {}
     };
-    setData(prev => {
-      const nextData = { ...prev, habits: [...prev.habits, newHabit] };
-      StorageService.saveAppData(nextData);
-      return nextData;
-    });
+    updateAppData(prev => ({ ...prev, habits: [...prev.habits, newHabit] }));
   };
 
   const toggleHabitStatus = (habitId: string, dateStr: string) => {
-    setData(prev => {
+    updateAppData(prev => {
       const updated = prev.habits.map(h => {
         if (h.id !== habitId) return h;
         const current = h.logs[dateStr] || '';
@@ -248,65 +252,43 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         }
         return { ...h, logs: newLogs };
       });
-      const nextData = { ...prev, habits: updated };
-      StorageService.saveAppData(nextData);
-      return nextData;
+      return { ...prev, habits: updated };
     });
   };
 
   const deleteHabit = (habitId: string) => {
-    setData(prev => {
-      const nextData = { ...prev, habits: prev.habits.filter(h => h.id !== habitId) };
-      StorageService.saveAppData(nextData);
-      return nextData;
-    });
+    updateAppData(prev => ({ ...prev, habits: prev.habits.filter(h => h.id !== habitId) }));
   };
 
   // ================= QUICK NOTES =================
   const addQuickNote = (content = ''): QuickNote => {
-    const now = new Date();
-    const pad = (n: number) => String(n).padStart(2, '0');
-    const nowStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+    const nowStr = getLocalDateTimeString();
     const newNote: QuickNote = {
       id: `qn_${Date.now()}`,
       content,
       dateTimeStr: nowStr,
       lastModified: nowStr
     };
-    setData(prev => {
-      const nextData = { ...prev, quickNotes: [newNote, ...prev.quickNotes] };
-      StorageService.saveAppData(nextData);
-      return nextData;
-    });
+    updateAppData(prev => ({ ...prev, quickNotes: [newNote, ...prev.quickNotes] }));
     return newNote;
   };
 
   const updateQuickNote = (id: string, content: string) => {
-    const now = new Date();
-    const pad = (n: number) => String(n).padStart(2, '0');
-    const nowStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-    setData(prev => {
-      const nextData = {
-        ...prev,
-        quickNotes: prev.quickNotes.map(n => n.id === id ? { ...n, content, lastModified: nowStr } : n)
-      };
-      StorageService.saveAppData(nextData);
-      return nextData;
-    });
+    const nowStr = getLocalDateTimeString();
+    updateAppData(prev => ({
+      ...prev,
+      quickNotes: prev.quickNotes.map(n => n.id === id ? { ...n, content, lastModified: nowStr } : n)
+    }));
   };
 
   const deleteQuickNote = (id: string) => {
-    setData(prev => {
-      const nextData = { ...prev, quickNotes: prev.quickNotes.filter(n => n.id !== id) };
-      StorageService.saveAppData(nextData);
-      return nextData;
-    });
+    updateAppData(prev => ({ ...prev, quickNotes: prev.quickNotes.filter(n => n.id !== id) }));
   };
 
   // ================= DIARY =================
   const saveDiaryEntry = (entry: Omit<DiaryEntry, 'id'>, existingId?: string) => {
     const now = new Date().toISOString();
-    setData(prev => {
+    updateAppData(prev => {
       let updatedDiary = [...prev.diary];
       if (existingId) {
         updatedDiary = updatedDiary.map(d => d.id === existingId ? { ...entry, id: existingId, lastModified: now } : d);
@@ -314,69 +296,51 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         const newD: DiaryEntry = { ...entry, id: `d_${Date.now()}`, lastModified: now };
         updatedDiary = [newD, ...updatedDiary];
       }
-      const nextData = { ...prev, diary: updatedDiary };
-      StorageService.saveAppData(nextData);
-      return nextData;
+      return { ...prev, diary: updatedDiary };
     });
   };
 
   const deleteDiaryEntry = (id: string) => {
-    setData(prev => {
-      const nextData = { ...prev, diary: prev.diary.filter(d => d.id !== id) };
-      StorageService.saveAppData(nextData);
-      return nextData;
-    });
+    updateAppData(prev => ({ ...prev, diary: prev.diary.filter(d => d.id !== id) }));
   };
 
   // ================= LIABILITY & ASSETS =================
   const saveLiabilityAsset = (item: Omit<LiabilityAssetItem, 'id'>, existingId?: string) => {
-    setData(prev => {
+    updateAppData(prev => {
       let updated = [...prev.liabilityAssets];
       if (existingId) {
         updated = updated.map(a => a.id === existingId ? { ...item, id: existingId } : a);
       } else {
         updated.push({ ...item, id: `la_${Date.now()}` });
       }
-      const nextData = { ...prev, liabilityAssets: updated };
-      StorageService.saveAppData(nextData);
-      return nextData;
+      return { ...prev, liabilityAssets: updated };
     });
   };
 
   const deleteLiabilityAsset = (id: string) => {
-    setData(prev => {
-      const nextData = { ...prev, liabilityAssets: prev.liabilityAssets.filter(a => a.id !== id) };
-      StorageService.saveAppData(nextData);
-      return nextData;
-    });
+    updateAppData(prev => ({ ...prev, liabilityAssets: prev.liabilityAssets.filter(a => a.id !== id) }));
   };
 
   // ================= SAVING BANKS =================
   const saveSavingBank = (bank: Omit<SavingBankItem, 'id'>, existingId?: string) => {
-    setData(prev => {
+    updateAppData(prev => {
       let updated = [...prev.savingBanks];
       if (existingId) {
         updated = updated.map(b => b.id === existingId ? { ...bank, id: existingId } : b);
       } else {
         updated.push({ ...bank, id: `sb_${Date.now()}` });
       }
-      const nextData = { ...prev, savingBanks: updated };
-      StorageService.saveAppData(nextData);
-      return nextData;
+      return { ...prev, savingBanks: updated };
     });
   };
 
   const deleteSavingBank = (id: string) => {
-    setData(prev => {
-      const nextData = { ...prev, savingBanks: prev.savingBanks.filter(b => b.id !== id) };
-      StorageService.saveAppData(nextData);
-      return nextData;
-    });
+    updateAppData(prev => ({ ...prev, savingBanks: prev.savingBanks.filter(b => b.id !== id) }));
   };
 
   // ================= SALARY =================
   const saveSalaryEntry = (salary: Omit<SalaryEntry, 'id'>, existingId?: string) => {
-    setData(prev => {
+    updateAppData(prev => {
       let updated = [...prev.salaries];
       if (existingId) {
         updated = updated.map(s => s.id === existingId ? { ...salary, id: existingId } : s);
@@ -386,41 +350,29 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           ...updated.filter(s => !(s.year === salary.year && s.month === salary.month))
         ];
       }
-      const nextData = { ...prev, salaries: updated };
-      StorageService.saveAppData(nextData);
-      return nextData;
+      return { ...prev, salaries: updated };
     });
   };
 
   const deleteSalaryEntry = (id: string) => {
-    setData(prev => {
-      const nextData = { ...prev, salaries: prev.salaries.filter(s => s.id !== id) };
-      StorageService.saveAppData(nextData);
-      return nextData;
-    });
+    updateAppData(prev => ({ ...prev, salaries: prev.salaries.filter(s => s.id !== id) }));
   };
 
   // ================= BUCKET LIST =================
   const saveBucketPlace = (place: Omit<BucketPlace, 'id'>, existingId?: string) => {
-    setData(prev => {
+    updateAppData(prev => {
       let updated = [...prev.bucketList];
       if (existingId) {
         updated = updated.map(b => b.id === existingId ? { ...place, id: existingId } : b);
       } else {
         updated = [{ ...place, id: `bl_${Date.now()}` }, ...updated];
       }
-      const nextData = { ...prev, bucketList: updated };
-      StorageService.saveAppData(nextData);
-      return nextData;
+      return { ...prev, bucketList: updated };
     });
   };
 
   const deleteBucketPlace = (id: string) => {
-    setData(prev => {
-      const nextData = { ...prev, bucketList: prev.bucketList.filter(b => b.id !== id) };
-      StorageService.saveAppData(nextData);
-      return nextData;
-    });
+    updateAppData(prev => ({ ...prev, bucketList: prev.bucketList.filter(b => b.id !== id) }));
   };
 
   // ================= PLANNING =================
@@ -431,92 +383,68 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       name: planName.trim(),
       items: []
     };
-    setData(prev => {
-      const nextData = { ...prev, plans: [newPlan, ...prev.plans] };
-      StorageService.saveAppData(nextData);
-      return nextData;
-    });
+    updateAppData(prev => ({ ...prev, plans: [newPlan, ...prev.plans] }));
   };
 
   const renamePlan = (planId: string, newName: string) => {
-    setData(prev => {
-      const nextData = {
-        ...prev,
-        plans: prev.plans.map(p => p.id === planId ? { ...p, name: newName.trim() } : p)
-      };
-      StorageService.saveAppData(nextData);
-      return nextData;
-    });
+    updateAppData(prev => ({
+      ...prev,
+      plans: prev.plans.map(p => p.id === planId ? { ...p, name: newName.trim() } : p)
+    }));
   };
 
   const deletePlan = (planId: string) => {
-    setData(prev => {
-      const nextData = { ...prev, plans: prev.plans.filter(p => p.id !== planId) };
-      StorageService.saveAppData(nextData);
-      return nextData;
-    });
+    updateAppData(prev => ({ ...prev, plans: prev.plans.filter(p => p.id !== planId) }));
   };
 
   const savePlanItem = (planId: string, item: Omit<PlanItem, 'id'>, existingId?: string) => {
-    setData(prev => {
-      const nextData = {
-        ...prev,
-        plans: prev.plans.map(p => {
-          if (p.id !== planId) return p;
-          if (existingId) {
-            return {
-              ...p,
-              items: p.items.map(it => it.id === existingId ? { ...item, id: existingId } : it)
-            };
-          }
+    updateAppData(prev => ({
+      ...prev,
+      plans: prev.plans.map(p => {
+        if (p.id !== planId) return p;
+        if (existingId) {
           return {
             ...p,
-            items: [...p.items, { ...item, id: `pi_${Date.now()}` }]
+            items: p.items.map(it => it.id === existingId ? { ...item, id: existingId } : it)
           };
-        })
-      };
-      StorageService.saveAppData(nextData);
-      return nextData;
-    });
+        }
+        return {
+          ...p,
+          items: [...p.items, { ...item, id: `pi_${Date.now()}` }]
+        };
+      })
+    }));
   };
 
   const togglePlanItemTick = (planId: string, itemId: string) => {
-    setData(prev => {
-      const nextData = {
-        ...prev,
-        plans: prev.plans.map(p => {
-          if (p.id !== planId) return p;
-          return {
-            ...p,
-            items: p.items.map(it => it.id === itemId ? { ...it, ticked: !it.ticked } : it)
-          };
-        })
-      };
-      StorageService.saveAppData(nextData);
-      return nextData;
-    });
+    updateAppData(prev => ({
+      ...prev,
+      plans: prev.plans.map(p => {
+        if (p.id !== planId) return p;
+        return {
+          ...p,
+          items: p.items.map(it => it.id === itemId ? { ...it, ticked: !it.ticked } : it)
+        };
+      })
+    }));
   };
 
   const deletePlanItem = (planId: string, itemId: string) => {
-    setData(prev => {
-      const nextData = {
-        ...prev,
-        plans: prev.plans.map(p => {
-          if (p.id !== planId) return p;
-          return {
-            ...p,
-            items: p.items.filter(it => it.id !== itemId)
-          };
-        })
-      };
-      StorageService.saveAppData(nextData);
-      return nextData;
-    });
+    updateAppData(prev => ({
+      ...prev,
+      plans: prev.plans.map(p => {
+        if (p.id !== planId) return p;
+        return {
+          ...p,
+          items: p.items.filter(it => it.id !== itemId)
+        };
+      })
+    }));
   };
 
   // ================= GRAPHIC ZONE =================
   const saveGraphicJob = (jobInput: Omit<GraphicJob, 'id' | 'jobNo' | 'totalAmount' | 'balanceDue' | 'estimatedProfit'> & { id?: string; jobNo?: string }) => {
-    setData(prev => {
+    updateAppData(prev => {
       const financials = GraphicZoneService.calculateJobFinancials(
         jobInput.qty,
         jobInput.rate,
@@ -547,40 +475,26 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         };
         updatedJobs = [newJob, ...updatedJobs];
       }
-      const nextData = { ...prev, graphicJobs: updatedJobs };
-      StorageService.saveAppData(nextData);
-      return nextData;
+      return { ...prev, graphicJobs: updatedJobs };
     });
   };
 
   const markGraphicJobDelivered = (id: string) => {
-    setData(prev => {
-      const nextData = {
-        ...prev,
-        graphicJobs: prev.graphicJobs.map(j => j.id === id ? { ...j, status: 'Delivered' as const } : j)
-      };
-      StorageService.saveAppData(nextData);
-      return nextData;
-    });
+    updateAppData(prev => ({
+      ...prev,
+      graphicJobs: prev.graphicJobs.map(j => j.id === id ? { ...j, status: 'Delivered' as const } : j)
+    }));
   };
 
   const cancelGraphicJob = (id: string) => {
-    setData(prev => {
-      const nextData = {
-        ...prev,
-        graphicJobs: prev.graphicJobs.map(j => j.id === id ? { ...j, status: 'Cancel' as const } : j)
-      };
-      StorageService.saveAppData(nextData);
-      return nextData;
-    });
+    updateAppData(prev => ({
+      ...prev,
+      graphicJobs: prev.graphicJobs.map(j => j.id === id ? { ...j, status: 'Cancel' as const } : j)
+    }));
   };
 
   const deleteGraphicJob = (id: string) => {
-    setData(prev => {
-      const nextData = { ...prev, graphicJobs: prev.graphicJobs.filter(j => j.id !== id) };
-      StorageService.saveAppData(nextData);
-      return nextData;
-    });
+    updateAppData(prev => ({ ...prev, graphicJobs: prev.graphicJobs.filter(j => j.id !== id) }));
   };
 
   const getGraphicCustomers = (): GraphicCustomer[] => {
@@ -589,30 +503,24 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   // ================= INFLOW PORTFOLIO =================
   const saveInflowHolding = (holding: Omit<InflowHolding, 'id'>, existingId?: string) => {
-    setData(prev => {
+    updateAppData(prev => {
       let updated = [...prev.inflowHoldings];
       if (existingId) {
         updated = updated.map(h => h.id === existingId ? { ...holding, id: existingId } : h);
       } else {
         updated.push({ ...holding, id: `inf_${Date.now()}` });
       }
-      const nextData = { ...prev, inflowHoldings: updated };
-      StorageService.saveAppData(nextData);
-      return nextData;
+      return { ...prev, inflowHoldings: updated };
     });
   };
 
   const deleteInflowHolding = (id: string) => {
-    setData(prev => {
-      const nextData = { ...prev, inflowHoldings: prev.inflowHoldings.filter(h => h.id !== id) };
-      StorageService.saveAppData(nextData);
-      return nextData;
-    });
+    updateAppData(prev => ({ ...prev, inflowHoldings: prev.inflowHoldings.filter(h => h.id !== id) }));
   };
 
   // ================= 5% CLUB TRADES =================
   const saveTrade = (trade: Omit<Trade5Pct, 'id'>, existingId?: string) => {
-    setData(prev => {
+    updateAppData(prev => {
       const financials = TradeService.calculateTradeFinancials(
         trade.investment,
         trade.exitPct || 0,
@@ -633,69 +541,51 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       } else {
         updated = [{ ...calculatedTrade, id: `tr_${Date.now()}` }, ...updated];
       }
-      const nextData = { ...prev, trades: updated };
-      StorageService.saveAppData(nextData);
-      return nextData;
+      return { ...prev, trades: updated };
     });
   };
 
   const deleteTrade = (id: string) => {
-    setData(prev => {
-      const nextData = { ...prev, trades: prev.trades.filter(t => t.id !== id) };
-      StorageService.saveAppData(nextData);
-      return nextData;
-    });
+    updateAppData(prev => ({ ...prev, trades: prev.trades.filter(t => t.id !== id) }));
   };
 
   // ================= SKILLS =================
   const saveSkillSentence = (sentence: Omit<SkillSentence, 'id'>, existingId?: string) => {
-    setData(prev => {
+    updateAppData(prev => {
       let updated = [...prev.skills];
       if (existingId) {
         updated = updated.map(s => s.id === existingId ? { ...sentence, id: existingId } : s);
       } else {
         updated.push({ ...sentence, id: `sk_${Date.now()}` });
       }
-      const nextData = { ...prev, skills: updated };
-      StorageService.saveAppData(nextData);
-      return nextData;
+      return { ...prev, skills: updated };
     });
   };
 
   const deleteSkillSentence = (id: string) => {
-    setData(prev => {
-      const nextData = { ...prev, skills: prev.skills.filter(s => s.id !== id) };
-      StorageService.saveAppData(nextData);
-      return nextData;
-    });
+    updateAppData(prev => ({ ...prev, skills: prev.skills.filter(s => s.id !== id) }));
   };
 
   // ================= SPECIAL DAYS =================
   const saveSpecialDay = (day: Omit<SpecialDay, 'id'>, existingId?: string) => {
-    setData(prev => {
+    updateAppData(prev => {
       let updated = [...prev.specialDays];
       if (existingId) {
         updated = updated.map(sd => sd.id === existingId ? { ...day, id: existingId } : sd);
       } else {
         updated.push({ ...day, id: `sd_${Date.now()}` });
       }
-      const nextData = { ...prev, specialDays: updated };
-      StorageService.saveAppData(nextData);
-      return nextData;
+      return { ...prev, specialDays: updated };
     });
   };
 
   const deleteSpecialDay = (id: string) => {
-    setData(prev => {
-      const nextData = { ...prev, specialDays: prev.specialDays.filter(sd => sd.id !== id) };
-      StorageService.saveAppData(nextData);
-      return nextData;
-    });
+    updateAppData(prev => ({ ...prev, specialDays: prev.specialDays.filter(sd => sd.id !== id) }));
   };
 
   // ================= HEALTH =================
   const saveHealthLog = (log: Omit<HealthLog, 'id'>, existingId?: string) => {
-    setData(prev => {
+    updateAppData(prev => {
       let updated = [...prev.health];
       if (existingId) {
         updated = updated.map(h => h.id === existingId ? { ...log, id: existingId } : h);
@@ -707,9 +597,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           updated = [{ ...log, id: `hl_${Date.now()}` }, ...updated];
         }
       }
-      const nextData = { ...prev, health: updated };
-      StorageService.saveAppData(nextData);
-      return nextData;
+      return { ...prev, health: updated };
     });
   };
 

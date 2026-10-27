@@ -108,6 +108,7 @@ export interface GraphicJob {
   printCost: number;
   otherCost: number;
   estimatedProfit: number;
+  realisedProfit?: number;
   status: GraphicJobStatus;
   remarks?: string;
 }
@@ -177,6 +178,7 @@ export interface HealthLog {
 }
 
 export interface AppData {
+  lastModified?: string;
   runWalk: RunWalkEntry[];
   habits: HabitItem[];
   quickNotes: QuickNote[];

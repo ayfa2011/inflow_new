@@ -75,6 +75,7 @@ export const GraphicZoneView: React.FC<{ onBack: () => void }> = ({ onBack }) =>
   let pendingJobs = 0;
   let balanceDue = 0;
   let estimatedProfit = 0;
+  let realisedProfit = 0;
   let deliveredProfit = 0;
 
   jobs.forEach(j => {
@@ -83,6 +84,8 @@ export const GraphicZoneView: React.FC<{ onBack: () => void }> = ({ onBack }) =>
     totalBusiness += j.totalAmount;
     balanceDue += j.balanceDue;
     estimatedProfit += j.estimatedProfit;
+    const itemRealised = j.realisedProfit ?? (j.paid - j.printCost - j.otherCost);
+    realisedProfit += itemRealised;
     if (j.status === 'Delivered') {
       deliveredProfit += j.estimatedProfit;
     } else {
@@ -438,7 +441,7 @@ export const GraphicZoneView: React.FC<{ onBack: () => void }> = ({ onBack }) =>
           </div>
 
           <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-100 text-xs text-slate-600 font-medium leading-relaxed">
-            💡 Estimated profit is calculated as <b>Paid - (Print Cost + Other Cost)</b>. Cancelled jobs are excluded from analytics.
+            💡 Total profit is calculated as <b>Total Amount - (Print Cost + Other Cost)</b>. Realised profit is <b>Paid - (Print Cost + Other Cost)</b>. Cancelled jobs are excluded from analytics.
           </div>
         </div>
       )}

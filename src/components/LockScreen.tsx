@@ -28,7 +28,7 @@ export const LockScreen: React.FC = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password (default: shanu2)"
+              placeholder="Enter Password"
               className="w-full py-3.5 px-4 text-center rounded-xl border border-slate-200 text-base font-semibold focus:outline-none focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 transition-all bg-slate-50/50"
               autoFocus
             />
@@ -48,10 +48,6 @@ export const LockScreen: React.FC = () => {
             Unlock Dashboard
           </button>
         </form>
-
-        <p className="text-[11px] text-slate-400 mt-4">
-          Default password: <span className="font-bold text-slate-600">shanu2</span>
-        </p>
       </div>
     </div>
   );
