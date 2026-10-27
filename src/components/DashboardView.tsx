@@ -51,6 +51,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
 
   return (
     <div className="space-y-4 pb-12 animate-fadeIn">
+
+
       {/* HERO BANNER */}
       <div className="relative overflow-hidden rounded-3xl p-5 text-white shadow-xl shadow-indigo-600/20 bg-gradient-to-br from-[#5b35e0] via-[#7a5cf0] to-[#8f7af5]">
         <div className="flex justify-between items-center mb-3.5 z-10 relative">
@@ -87,18 +89,26 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
         </div>
       </div>
 
-      {/* FEATURED: GRAPHIC ZONE BUTTON */}
-      <button
-        type="button"
+      {/* GRAPHIC ZONE INFO */}
+      <div
         onClick={() => onSelectView('graphicZone')}
-        className="w-full relative overflow-hidden rounded-3xl transition-all transform active:scale-[0.98] hover:opacity-95 shadow-lg shadow-teal-950/20 cursor-pointer block p-0 bg-[#031c22] border border-teal-800/30 group"
+        className="cursor-pointer p-3 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between hover:bg-slate-100 transition-colors"
       >
-        <img
-          src="/assets/aistudio/Asset_1_700ea024.png"
-          alt="Graphic Zone"
-          className="w-full h-auto object-cover rounded-3xl block transition-transform duration-300 group-hover:scale-[1.01]"
-        />
-      </button>
+        <span className="font-bold text-sm text-slate-800">Graphic Zone</span>
+        <div className="flex gap-1.5">
+          <span className="text-[10px] font-bold text-slate-600 bg-slate-200 px-1.5 py-0.5 rounded-md">
+            Jobs ({data.graphicJobs.filter(j => j.status !== 'Delivered' && j.status !== 'Cancel').length})
+          </span>
+          <span className="text-[10px] font-bold text-slate-600 bg-slate-200 px-1.5 py-0.5 rounded-md">
+            Cust
+          </span>
+          <span className="text-[10px] font-bold text-slate-600 bg-slate-200 px-1.5 py-0.5 rounded-md">
+            Inv
+          </span>
+        </div>
+      </div>
+
+
 
       {/* SECTION 1: QUICK ACTIONS */}
       <div className="bg-white rounded-3xl p-4.5 shadow-sm border border-slate-100">
@@ -329,7 +339,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
             </div>
             <span
               className="text-[11px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
-              style={{ height: '28.6133px' }}
             >
               5% Club
             </span>

@@ -18,6 +18,7 @@ import { FivePercentClubView } from './components/FivePercentClubView';
 import { SkillImproveView } from './components/SkillImproveView';
 import { SpecialDaysView } from './components/SpecialDaysView';
 import { OurWorldView } from './components/OurWorldView';
+import { StockScannerView } from './components/StockScannerView';
 
 const MainAppContent: React.FC = () => {
   const { isLocked } = useApp();
@@ -53,10 +54,11 @@ const MainAppContent: React.FC = () => {
         {currentView === 'graphicZone' && <GraphicZoneView onBack={handleBackToDashboard} />}
         {currentView === 'health' && <HealthView onBack={handleBackToDashboard} />}
         {currentView === 'inflow2036' && <Inflow2036View onBack={handleBackToDashboard} />}
-        {currentView === 'fivePercentClub' && <FivePercentClubView onBack={handleBackToDashboard} />}
+        {currentView === 'fivePercentClub' && <FivePercentClubView onBack={handleBackToDashboard} onSelectView={setCurrentView} />}
         {currentView === 'skill' && <SkillImproveView onBack={handleBackToDashboard} />}
         {currentView === 'specialDays' && <SpecialDaysView onBack={handleBackToDashboard} />}
         {currentView === 'ourWorld' && <OurWorldView onBack={handleBackToDashboard} />}
+        {currentView === 'stockScanner' && <StockScannerView onBack={() => { setCurrentView('fivePercentClub'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />}
       </div>
     </div>
   );
