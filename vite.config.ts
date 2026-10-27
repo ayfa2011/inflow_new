@@ -6,6 +6,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig(() => {
   return {
+    base: './',
     plugins: [
       react(),
       tailwindcss(),
@@ -13,30 +14,30 @@ export default defineConfig(() => {
         registerType: 'autoUpdate',
         includeAssets: ['favicon.png', 'apple-touch-icon.png', 'pwa-192x192.png', 'pwa-512x512.png'],
         manifest: {
-          id: '/',
+          id: './',
           name: 'inflow2036',
           short_name: 'inflow2036',
           description: 'Complete personal workspace, finance, habits, ERP and life management dashboard.',
           theme_color: '#5b35e0',
           background_color: '#ffffff',
           display: 'standalone',
-          start_url: '/',
-          scope: '/',
+          start_url: './',
+          scope: './',
           icons: [
             {
-              src: '/pwa-192x192.png',
+              src: 'pwa-192x192.png',
               sizes: '192x192',
               type: 'image/png',
               purpose: 'any',
             },
             {
-              src: '/pwa-512x512.png',
+              src: 'pwa-512x512.png',
               sizes: '512x512',
               type: 'image/png',
               purpose: 'any',
             },
             {
-              src: '/pwa-maskable-512x512.png',
+              src: 'pwa-maskable-512x512.png',
               sizes: '512x512',
               type: 'image/png',
               purpose: 'maskable',
