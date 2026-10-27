@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { PWAInstallButton } from './PWAInstallButton';
 import {
   LogOut,
-  Calendar,
   Zap,
   DollarSign,
   Briefcase,
@@ -12,7 +10,11 @@ import {
   CloudUpload,
   ExternalLink,
   Loader2,
-  FolderCheck
+  FolderCheck,
+  Sparkles,
+  Printer,
+  Users,
+  FileText
 } from 'lucide-react';
 
 interface DashboardViewProps {
@@ -43,37 +45,25 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
     }
   };
 
-  const todayFormatted = new Intl.DateTimeFormat('en-GB', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric'
-  }).format(new Date());
-
   return (
     <div className="space-y-4 pb-12 animate-fadeIn">
 
-
-      {/* HERO BANNER */}
-      <div className="relative overflow-hidden rounded-3xl p-5 text-white shadow-xl shadow-indigo-600/20 bg-gradient-to-br from-[#5b35e0] via-[#7a5cf0] to-[#8f7af5]">
-        <div className="flex justify-between items-center mb-3.5 z-10 relative">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-bold tracking-wide">
-            <Calendar className="w-3.5 h-3.5" />
-            <span>{todayFormatted}</span>
+      {/* CUTE COMPACT HERO CARD */}
+      <div className="relative overflow-hidden rounded-2xl px-4 py-3 sm:px-5 sm:py-3.5 text-white shadow-md shadow-indigo-600/15 bg-gradient-to-r from-[#5b35e0] via-[#7049eb] to-[#8f7af5] flex items-center justify-between">
+        <div className="relative z-10 flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-sm shadow-inner text-amber-300">
+            <Sparkles className="w-4 h-4 fill-amber-300 text-amber-300" />
           </div>
-          <PWAInstallButton />
+          <div>
+            <h1 className="text-xl sm:text-2xl font-black tracking-tight leading-none text-white drop-shadow-sm">
+              inflow2036
+            </h1>
+          </div>
         </div>
 
-        <div className="relative z-10 max-w-[65%]">
-          <span className="text-sm font-medium text-white/90">Welcome Back,</span>
-          <h1 className="text-3xl font-extrabold tracking-tight mt-0.5 mb-1.5">inflow2036</h1>
-          <p className="text-xs text-white/85 leading-relaxed">
-            Manage your money, build better habits and achieve your personal goals.
-          </p>
-        </div>
-
-        {/* Hero Vector Background Graphic */}
-        <div className="absolute right-1 -bottom-2 w-[42%] max-w-[140px] pointer-events-none opacity-90">
-          <svg viewBox="0 0 240 160" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto drop-shadow-md">
+        {/* Cute Petite Vector Graphic */}
+        <div className="relative z-10 w-16 sm:w-20 pointer-events-none opacity-90 flex items-center justify-end">
+          <svg viewBox="0 0 240 160" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto drop-shadow-sm">
             <ellipse cx="130" cy="152" rx="100" ry="6" fill="#000" opacity=".12"/>
             <rect x="62" y="44" width="110" height="26" rx="8" fill="#4f2bdc" transform="rotate(-10 62 44)"/>
             <rect x="68" y="50" width="100" height="18" rx="5" fill="#e9e2ff" transform="rotate(-10 68 50)"/>
@@ -89,22 +79,57 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
         </div>
       </div>
 
-      {/* GRAPHIC ZONE INFO */}
+      {/* CREATIVE GRAPHIC ZONE BUTTON */}
       <div
         onClick={() => onSelectView('graphicZone')}
-        className="cursor-pointer p-3 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between hover:bg-slate-100 transition-colors"
+        className="group cursor-pointer relative overflow-hidden rounded-[24px] bg-gradient-to-r from-[#03181f] via-[#05252e] to-[#031a21] border border-[#0d4655] shadow-lg shadow-[#021318]/45 p-2 sm:p-2.5 flex items-center justify-between gap-2.5 transition-all hover:border-[#17bfa0]/60 hover:shadow-[#17bfa0]/20 active:scale-[0.99]"
       >
-        <span className="font-bold text-sm text-slate-800">Graphic Zone</span>
-        <div className="flex gap-1.5">
-          <span className="text-[10px] font-bold text-slate-600 bg-slate-200 px-1.5 py-0.5 rounded-md">
-            Jobs ({data.graphicJobs.filter(j => j.status !== 'Delivered' && j.status !== 'Cancel').length})
-          </span>
-          <span className="text-[10px] font-bold text-slate-600 bg-slate-200 px-1.5 py-0.5 rounded-md">
-            Cust
-          </span>
-          <span className="text-[10px] font-bold text-slate-600 bg-slate-200 px-1.5 py-0.5 rounded-md">
-            Inv
-          </span>
+        {/* Left Squircle White Icon Badge */}
+        <div className="w-11 h-11 sm:w-13 sm:h-13 rounded-2xl bg-white shadow-md flex items-center justify-center shrink-0 p-1.5 transition-transform group-hover:scale-105">
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            {/* Teal circular 'G' arc */}
+            <path
+              d="M 50 16 A 34 34 0 1 0 84 50 L 52 50"
+              fill="none"
+              stroke="#00a896"
+              strokeWidth="15"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            {/* Green upward growth arrow */}
+            <path
+              d="M 60 38 L 84 14 L 88 38 Z"
+              fill="#7bc22a"
+            />
+          </svg>
+        </div>
+
+        {/* Center Typography & Capsule Badges */}
+        <div className="flex-1 min-w-0 pl-0.5">
+          <div className="text-white font-black text-[17px] sm:text-[19px] tracking-tight leading-none mb-1.5 group-hover:text-[#2fe8c3] transition-colors drop-shadow-sm">
+            Graphic Zone
+          </div>
+          <div className="flex items-center gap-2 sm:gap-2.5 text-[10px] sm:text-[11px] font-medium text-slate-300/90 whitespace-nowrap overflow-hidden">
+            <span className="inline-flex items-center gap-1">
+              <Printer className="w-2.5 h-2.5 text-[#1cd2ad]" />
+              Jobs ({data.graphicJobs.filter(j => j.status !== 'Delivered' && j.status !== 'Cancel').length})
+            </span>
+            <span className="text-[#1cd2ad]/40 font-bold">•</span>
+            <span className="inline-flex items-center gap-1">
+              <Users className="w-2.5 h-2.5 text-[#1cd2ad]" />
+              Customers
+            </span>
+            <span className="text-[#1cd2ad]/40 font-bold">•</span>
+            <span className="inline-flex items-center gap-1">
+              <FileText className="w-2.5 h-2.5 text-[#1cd2ad]" />
+              Invoice
+            </span>
+          </div>
+        </div>
+
+        {/* Right Mint Action Button */}
+        <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-br from-[#1cd2ad] to-[#11b895] shadow-md shadow-[#1cd2ad]/35 flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-[#1cd2ad]/50 transition-all">
+          <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-white stroke-[3] group-hover:translate-x-0.5 transition-transform" />
         </div>
       </div>
 
@@ -183,7 +208,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
               className="text-[11px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
               style={{ height: '28.6133px' }}
             >
-              Diary
+              Diary Book
             </span>
           </button>
         </div>
@@ -202,7 +227,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
         </div>
 
         <div className="grid grid-cols-4 gap-2">
-          {/* Liability */}
+          {/* Asset & Liability */}
           <button
             onClick={() => onSelectView('liability')}
             className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-slate-50/70 hover:bg-rose-50/60 active:scale-95 transition-all border border-slate-100 min-h-[72px] group"
@@ -211,10 +236,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
               📌
             </div>
             <span
-              className="text-[11px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
+              className="text-[10px] font-bold text-slate-800 text-center leading-tight flex items-center justify-center w-full px-0.5"
               style={{ height: '28.6133px' }}
             >
-              Liability
+              Asset &amp; Liability
             </span>
           </button>
 

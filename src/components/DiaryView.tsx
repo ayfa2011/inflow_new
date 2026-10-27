@@ -75,7 +75,7 @@ export const DiaryView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           Dashboard
         </button>
         <span className="text-base font-black text-slate-800 flex items-center gap-1.5">
-          📓 Personal Diary
+          📓 Diary Book
         </span>
         <button
           onClick={openNewModal}

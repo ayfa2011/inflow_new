@@ -65,7 +65,7 @@ export const LiabilityAssetsView: React.FC<{ onBack: () => void }> = ({ onBack }
           Dashboard
         </button>
         <span className="text-base font-black text-slate-800 flex items-center gap-1.5">
-          📌 Liability &amp; Liquid Assets
+          📌 Asset &amp; Liability
         </span>
       </div>
 
