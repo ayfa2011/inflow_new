@@ -1,0 +1,43 @@
+<!-- Special Days Dashboard Container -->
+<div id="specialDaysDashboardContainer" style="display: none;">
+  <div class="nav-header">
+    <button class="btn-back" onclick="closeSpecialDaysView()">← Back</button>
+    <div class="nav-title">Special Days & Birthdays</div>
+    <button class="btn-action" style="margin-left: auto; background: #1a73e8; color: #fff;" onclick="openAddSpecialDayModal()">+ Add New</button>
+  </div>
+
+  <!-- Dashboard Reminder Alert Banner -->
+  <div id="specialDaysReminderBanner" style="display: none; background: #fff3cd; border: 1px solid #ffeeba; color: #856404; padding: 12px; border-radius: 10px; margin-bottom: 15px; font-size: 13px; font-weight: 600;">
+    <!-- Reminder text injected dynamically -->
+  </div>
+
+  <div class="avg-section-title">🎉 Upcoming Special Days (Chronological)</div>
+  <div id="specialDaysList">Loading Special Days...</div>
+</div>
+
+<!-- Add / Edit Special Day Modal -->
+<div id="specialDayModal" class="modal">
+  <div class="modal-content">
+    <h3 id="specialModalTitle">Add Special Day</h3>
+    <input type="hidden" id="specialDayRowIndex">
+    
+    <label style="font-size: 11px; font-weight: bold; color: #555;">Title (Name / Event)</label>
+    <input type="text" id="specialTitleInput" placeholder="e.g. Ramesh Birthday">
+    
+    <label style="font-size: 11px; font-weight: bold; color: #555;">Date</label>
+    <input type="date" id="specialDateInput">
+    
+    <label style="font-size: 11px; font-weight: bold; color: #555;">Category</label>
+    <select id="specialCategoryInput" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; background: #fff;">
+      <option value="Birthday">Birthday</option>
+      <option value="Anniversary">Anniversary</option>
+      <option value="Event">Other Event</option>
+    </select>
+
+    <label style="font-size: 11px; font-weight: bold; color: #555;">WhatsApp Phone Number (with Country Code)</label>
+    <input type="text" id="specialPhoneInput" placeholder="e.g. 919845012345">
+
+    <button type="button" class="btn-save" onclick="saveSpecialDayEntry()">Save Special Day</button>
+    <button type="button" class="btn-close" onclick="closeSpecialDayModal()">Cancel</button>
+  </div>
+</div>

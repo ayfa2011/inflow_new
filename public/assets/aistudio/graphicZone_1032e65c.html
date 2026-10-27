@@ -1,0 +1,896 @@
+<div id="graphicZoneContainer" style="display:none">
+<style>
+/* ============ BASE ============ */
+#graphicZoneContainer{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  background:#f1f5fb;color:#172033;padding:12px;border-radius:16px;min-height:100%;
+  -webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%
+}
+.gz-wrap{max-width:1250px;margin:auto}
+
+/* ============ HEADER ============ */
+.gz-head{background:#fff;border:1px solid #e5eaf1;border-radius:16px;padding:14px 16px;box-shadow:0 1px 2px rgba(16,42,67,.05)}
+.gz-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.gz-left{display:flex;align-items:center;gap:10px;min-width:0}
+.gz-back{
+  display:inline-flex;align-items:center;justify-content:center;gap:5px;
+  background:#eef4ff;color:#1d4ed8;border:1px solid #dbeafe;border-radius:10px;
+  padding:10px 13px;font-weight:800;cursor:pointer;white-space:nowrap;flex:0 0 auto;
+  min-height:44px;font-size:14px;transition:background .15s,transform .1s
+}
+.gz-back:hover{background:#dbeafe}
+.gz-back:active{transform:scale(.96)}
+.gz-title{font-size:21px;font-weight:850;color:#102a43;letter-spacing:-.2px;line-height:1.15}
+.gz-sub{font-size:12px;color:#64748b;margin-top:3px}
+.gz-add,.gz-save{
+  background:#2563eb;color:#fff;border:0;border-radius:11px;padding:12px 16px;
+  font-weight:800;cursor:pointer;min-height:44px;font-size:14px;
+  box-shadow:0 3px 10px -3px rgba(37,99,235,.6);transition:background .15s,transform .1s
+}
+.gz-add:hover,.gz-save:hover{background:#1d4ed8}
+.gz-add:active,.gz-save:active{transform:scale(.97)}
+.gz-save:disabled{opacity:.6;cursor:wait;transform:none}
+
+/* ============ TARGET HIGHLIGHT ============ */
+.gz-target-highlight{
+  margin-top:12px;background:linear-gradient(135deg,#eff6ff,#fff);
+  border:1px solid #bfdbfe;border-radius:16px;padding:16px
+}
+.gz-target-label{font-size:11px;font-weight:850;color:#1d4ed8;text-transform:uppercase;letter-spacing:.5px}
+.gz-target-title{font-size:17px;font-weight:850;color:#102a43;margin-top:3px}
+.gz-target-main{display:flex;align-items:center;gap:12px}
+.gz-target-jobs{font-size:27px;font-weight:900;color:#2563eb;white-space:nowrap}
+.gz-target-jobs small{display:block;font-size:10px;color:#64748b;font-weight:750;text-align:right}
+.gz-target-note{font-size:11px;color:#64748b;margin-top:8px}
+.gz-progress{height:10px;background:#dbeafe;border-radius:99px;overflow:hidden;margin:11px 0 8px}
+.gz-progress div{height:100%;background:linear-gradient(90deg,#3b82f6,#2563eb);border-radius:99px;transition:width .3s ease}
+
+.gz-tp-nums{display:flex;gap:10px;margin:13px 0 4px}
+.gz-tp-num{flex:1;min-width:0;background:#fff;border:1px solid #dbeafe;border-radius:12px;padding:12px 13px}
+.gz-tp-num b{display:block;font-size:26px;line-height:1.1;font-weight:900;color:#2563eb}
+.gz-tp-num.earned b{color:#15803d}
+.gz-tp-num small{display:block;margin-top:5px;font-size:10px;font-weight:800;color:#64748b;letter-spacing:.3px}
+.gz-tp-line{font-size:13px;color:#475569;margin-bottom:12px}
+
+/* ============ TARGET BUTTON ============ */
+.gz-target-btn{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;
+  margin-top:12px;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;
+  border:0;border-radius:16px;padding:16px;cursor:pointer;text-align:left;font-family:inherit;
+  box-shadow:0 10px 22px -10px rgba(37,99,235,.85);
+  transition:transform .12s ease,box-shadow .18s ease
+}
+.gz-target-btn:hover{background:linear-gradient(135deg,#1d4ed8,#1e40af);box-shadow:0 12px 26px -10px rgba(37,99,235,.9)}
+.gz-target-btn:active{transform:scale(.985)}
+.gz-tb-title{font-size:17px;font-weight:850}
+.gz-tb-sub{font-size:12px;opacity:.92;margin-top:3px}
+.gz-tb-arrow{font-size:30px;line-height:1;font-weight:400;opacity:.9}
+
+/* ============ METRICS ============ */
+.gz-metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:12px 0}
+.gz-metric{background:#fff;border:1px solid #e5eaf1;border-radius:14px;padding:13px;box-shadow:0 1px 2px rgba(16,42,67,.04)}
+.gz-metric small{display:block;color:#64748b;font-size:10px;font-weight:800;letter-spacing:.3px;text-transform:uppercase}
+.gz-metric b{display:block;font-size:19px;margin-top:6px;color:#102a43;font-weight:850;line-height:1.2}
+.gz-blue b{color:#2563eb}
+.gz-red b{color:#dc2626}
+.gz-green b{color:#059669}
+.gz-orange b{color:#c2410c}
+
+/* ============ TABS ============ */
+.gz-tabs{
+  display:flex;gap:6px;overflow:auto;margin-bottom:10px;padding:5px;
+  background:#e6edf7;border-radius:13px;scrollbar-width:none;
+  position:sticky;top:0;z-index:40
+}
+.gz-tabs::-webkit-scrollbar{display:none}
+.gz-tab{
+  flex:1 0 auto;background:transparent;border:0;border-radius:10px;
+  padding:11px 14px;font-weight:800;white-space:nowrap;cursor:pointer;
+  color:#475569;font-size:13px;min-height:42px;font-family:inherit;
+  transition:background .15s,color .15s,box-shadow .15s
+}
+.gz-tab.active{background:#fff;color:#1d4ed8;box-shadow:0 2px 6px rgba(16,42,67,.1)}
+.gz-tab:hover:not(.active){color:#1d4ed8}
+
+/* ============ CONTENT ============ */
+.gz-content{background:transparent;border:0;border-radius:0;overflow:visible}
+.gz-scroll{overflow:auto;-webkit-overflow-scrolling:touch}
+.gz-table{width:100%;min-width:1150px;border-collapse:collapse}
+.gz-table th{background:#f1f5f9;color:#475569;font-size:11px;padding:10px;text-align:left;white-space:nowrap}
+.gz-table td{padding:10px;font-size:12px;border-top:1px solid #eef2f7;white-space:nowrap}
+.gz-row{cursor:pointer}
+.gz-row:hover{background:#f8fbff}
+.gz-section{padding:16px;background:#fff;border:1px solid #e5eaf1;border-radius:16px}
+.gz-section h3{margin:0 0 12px;font-size:18px;color:#102a43}
+.gz-info{font-size:12px;color:#64748b}
+
+/* ============ BADGES ============ */
+.gz-badge{padding:4px 8px;border-radius:7px;font-size:10px;font-weight:800;letter-spacing:.2px;display:inline-block}
+.pending{background:#fff7ed;color:#c2410c}
+.printing{background:#e0f2fe;color:#0369a1}
+.ready{background:#ecfdf5;color:#047857}
+.delivered{background:#dcfce7;color:#15803d}
+.cancelled{background:#fee2e2;color:#b91c1c}
+
+/* ============ INPUTS ============ */
+.gz-search,.gz-input,.gz-select{
+  width:100%;padding:12px 13px;border:1px solid #cbd5e1;border-radius:11px;
+  background:#fff;font-size:16px;outline:none;font-family:inherit;min-height:46px;
+  transition:border-color .15s,box-shadow .15s;color:#172033
+}
+.gz-search:focus,.gz-input:focus,.gz-select:focus{border-color:#2563eb;box-shadow:0 0 0 3px #2563eb1f}
+.gz-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2364748b' d='M6 8 0 0h12z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+
+/* ============ JOB CARD (separate cards) ============ */
+#gzTabContentArea{display:flex;flex-direction:column;gap:10px}
+#gzTabContentArea:has(.gz-section){gap:0}
+
+.gz-job{
+  display:block;padding:14px 15px;
+  cursor:pointer;transition:background .12s,box-shadow .15s,transform .12s;
+  position:relative;background:#fff;
+  border:1px solid #e2e8f0;border-radius:14px;
+  box-shadow:0 1px 3px rgba(15,23,42,.06);
+  margin:0
+}
+.gz-job:hover{background:#fbfdff;box-shadow:0 4px 14px -4px rgba(15,23,42,.14);border-color:#cbd5e1}
+.gz-job:active{transform:scale(.995);background:#eff6ff}
+
+.gz-jtop{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.gz-jname{
+  font-size:18px;font-weight:900;color:#0f172a;line-height:1.25;
+  letter-spacing:-.2px;min-width:0;overflow-wrap:anywhere;flex:1
+}
+.gz-jprofit{
+  font-size:21px;font-weight:900;color:#059669;
+  white-space:nowrap;line-height:1.2;flex:0 0 auto
+}
+.gz-jprofit.neg{color:#dc2626}
+
+.gz-jdesc{
+  font-size:13.5px;color:#64748b;margin-top:6px;
+  line-height:1.45;overflow-wrap:anywhere
+}
+
+.gz-jmeta{
+  display:flex;flex-wrap:wrap;align-items:center;gap:0;margin-top:11px;
+  font-size:13px;color:#64748b
+}
+.gz-jmeta span{
+  position:relative;padding-right:12px;margin-right:12px;
+  display:inline-flex;align-items:baseline;gap:5px
+}
+.gz-jmeta span:not(:last-child)::after{
+  content:"";position:absolute;right:0;top:50%;transform:translateY(-50%);
+  width:1px;height:14px;background:#cbd5e1
+}
+.gz-jmeta b{color:#0f172a;font-weight:850}
+
+.gz-jstatus-line{
+  display:flex;flex-wrap:wrap;align-items:center;gap:0;margin-top:9px;
+  font-size:13px;color:#64748b
+}
+.gz-jstatus-line > span{
+  position:relative;padding-right:12px;margin-right:12px;
+  display:inline-flex;align-items:baseline;gap:5px
+}
+.gz-jstatus-line > span:not(:last-child)::after{
+  content:"";position:absolute;right:0;top:50%;transform:translateY(-50%);
+  width:1px;height:14px;background:#cbd5e1
+}
+.gz-jstatus-line .gz-st{font-weight:900;color:#64748b}
+.gz-jstatus-line .gz-st.delivered{color:#059669}
+.gz-jstatus-line .gz-st.pending{color:#c2410c}
+.gz-jstatus-line .gz-st.printing{color:#0369a1}
+.gz-jstatus-line .gz-st.ready{color:#047857}
+.gz-jstatus-line .gz-st.cancelled{color:#b91c1c}
+
+.gz-jinvoice-link{
+  color:#2563eb;font-weight:800;cursor:pointer;
+  background:none;border:0;padding:0;font-family:inherit;font-size:13px
+}
+.gz-jinvoice-link:hover{text-decoration:underline}
+
+.gz-jnote{
+  font-size:12.5px;color:#475569;margin-top:10px;
+  background:#f8fafc;border-left:3px solid #cbd5e1;border-radius:6px;
+  padding:7px 11px;overflow-wrap:anywhere
+}
+
+.gz-job.done .gz-jname{color:#475569}
+.gz-job.done .gz-jdesc{color:#94a3b8}
+.gz-job.canc{opacity:.82}
+.gz-job.canc .gz-jprofit{text-decoration:line-through;color:#94a3b8}
+
+/* Section headers as separators */
+.gz-sec-h{
+  padding:8px 4px 2px;background:transparent;
+  font-size:11.5px;font-weight:900;color:#64748b;
+  border:0;letter-spacing:.5px;text-transform:uppercase;
+  margin-top:4px;display:flex;align-items:center;gap:8px
+}
+.gz-sec-h:first-child{margin-top:0}
+.gz-sec-h::after{
+  content:"";flex:1;height:1px;background:#dbe3ec;border-radius:1px
+}
+.gz-sec-h span{color:#94a3b8;font-weight:800;text-transform:none;letter-spacing:0}
+
+.gz-empty{
+  padding:32px 20px;text-align:center;color:#64748b;font-size:13px;
+  background:#fff;border:1px dashed #cbd5e1;border-radius:14px;margin:0
+}
+
+@media(max-width:650px){
+  .gz-job{padding:13px 14px;border-radius:13px}
+  .gz-jname{font-size:16px}
+  .gz-jprofit{font-size:19px}
+  .gz-jdesc{font-size:12.5px;margin-top:5px}
+  .gz-jmeta,.gz-jstatus-line{font-size:12px;margin-top:8px}
+  .gz-jmeta span,.gz-jstatus-line > span{padding-right:10px;margin-right:10px}
+  .gz-jinvoice-link{font-size:12px}
+  #gzTabContentArea{gap:8px}
+}
+
+/* ============ CUSTOMER DIRECTORY ============ */
+.gz-customer-list{margin-top:12px;border:1px solid #e5eaf1;border-radius:14px;overflow:hidden;background:#fff}
+.gz-customer-row{
+  display:grid;
+  grid-template-columns:minmax(180px,1.4fr) minmax(130px,1fr) 130px 100px 130px 110px 100px;
+  align-items:center;gap:8px;padding:12px;border-bottom:1px solid #eef2f7;
+  cursor:pointer;transition:background .12s
+}
+.gz-customer-row:last-child{border-bottom:0}
+.gz-customer-row:hover{background:#f8fbff}
+.gz-customer-row:active{background:#eff6ff}
+.gz-customer-name{font-weight:850;color:#172033}
+.gz-customer-meta{font-size:11px;color:#64748b;margin-top:2px}
+.gz-dir-head{
+  display:grid;grid-template-columns:minmax(180px,1.4fr) minmax(130px,1fr) 130px 100px 130px 110px 100px;
+  gap:8px;padding:10px 12px;background:#f8fafc;color:#64748b;font-size:10px;
+  font-weight:850;text-transform:uppercase;letter-spacing:.3px
+}
+.gz-customer-row>div:not(:first-child){font-size:11.5px;color:#475569}
+.gz-customer-row .gz-name-col{min-width:0}
+.gz-customer-row .gz-name-col .gz-customer-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gz-wa{
+  display:inline-flex;justify-content:center;align-items:center;background:#16a34a;color:#fff;
+  text-decoration:none;border-radius:8px;padding:7px 9px;font-size:11px;font-weight:800;
+  transition:background .15s
+}
+.gz-wa:hover{background:#15803d}
+
+/* ============ INLINE ACTION BUTTONS ============ */
+.gz-actions-inline{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.gz-small-btn{
+  border:0;border-radius:9px;padding:9px 11px;font-weight:800;font-size:11.5px;
+  cursor:pointer;min-height:38px;transition:filter .15s,transform .1s;font-family:inherit
+}
+.gz-small-btn:active{transform:scale(.96)}
+.gz-deliver{background:#16a34a;color:#fff}
+.gz-deliver:hover{filter:brightness(1.08)}
+.gz-cancel-job{background:#fee2e2;color:#b91c1c}
+.gz-cancel-job:hover{filter:brightness(.97)}
+.gz-edit{background:#eef4ff;color:#1d4ed8}
+.gz-edit:hover{background:#dbeafe}
+.gz-invoice-btn{background:#7c3aed;color:#fff}
+.gz-invoice-btn:hover{filter:brightness(1.08)}
+
+/* ============ TARGET VIEW ============ */
+.gz-target{padding:18px}
+.gz-target-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0}
+.gz-target-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:12px}
+.gz-target-card small{display:block;color:#64748b;font-size:10px;font-weight:800;letter-spacing:.3px}
+.gz-target-card b{display:block;font-size:20px;margin-top:5px;color:#102a43}
+.gz-delivered-list{margin-top:14px;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;background:#fff}
+.gz-delivered-item{
+  display:grid;grid-template-columns:100px 1fr 110px;gap:10px;
+  padding:11px 13px;border-bottom:1px solid #eef2f7;align-items:center
+}
+.gz-delivered-item:last-child{border-bottom:0}
+.gz-point{font-weight:900;color:#2563eb;text-align:right}
+
+/* ============ MODAL (JOB) ============ */
+.gz-modal{
+  display:none;position:fixed;inset:0;background:#0f172aa8;z-index:99999;
+  align-items:center;justify-content:center;padding:18px;
+  backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)
+}
+.gz-modal-card{
+  background:#fff;width:min(720px,96vw);max-height:94vh;overflow:auto;
+  border-radius:18px;padding:22px;box-shadow:0 24px 60px -12px rgba(15,23,42,.4);
+  animation:gzPop .18s ease
+}
+@keyframes gzPop{from{opacity:0;transform:translateY(12px) scale(.985)}to{opacity:1;transform:none}}
+.gz-modal-card h2{margin:0;color:#172033;font-size:20px}
+.gz-form{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-top:18px}
+.gz-field.full{grid-column:1/-1}
+.gz-label{display:block;font-size:12px;font-weight:800;color:#475569;margin-bottom:6px}
+.gz-swrap{position:relative}
+.gz-suggest{
+  display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:100001;background:#fff;
+  border:1px solid #cbd5e1;max-height:240px;overflow:auto;border-radius:12px;
+  box-shadow:0 16px 32px -8px rgba(15,23,42,.25)
+}
+.gz-suggest-item{padding:11px 13px;border-bottom:1px solid #f1f5f9;cursor:pointer;transition:background .12s}
+.gz-suggest-item:last-child{border-bottom:0}
+.gz-suggest-item:hover,.gz-suggest-item:active{background:#eff6ff}
+.gz-suggest-item b{font-size:13px;color:#172033}
+.gz-suggest-item small{display:block;color:#64748b;margin-top:2px;font-size:11px}
+.gz-selected{font-size:11.5px;color:#059669;font-weight:750;margin-top:6px}
+.gz-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+.gz-cancel{
+  background:#e2e8f0;border:0;border-radius:11px;padding:12px 18px;font-weight:800;
+  cursor:pointer;min-height:44px;font-size:14px;font-family:inherit;color:#334155;
+  transition:background .15s,transform .1s
+}
+.gz-cancel:hover{background:#cbd5e1}
+.gz-cancel:active{transform:scale(.97)}
+
+/* ============ REPORT ============ */
+.gz-rpt-linkrow{text-align:right;margin:8px 2px 0}
+.gz-rpt-link{
+  background:#fff;border:1px solid #e2e8f0;color:#2563eb;font-weight:800;font-size:13px;
+  cursor:pointer;padding:9px 14px;border-radius:10px;min-height:42px;font-family:inherit;
+  transition:background .15s
+}
+.gz-rpt-link:hover{background:#eff6ff}
+.gz-rpt-filters{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px}
+.gz-rpt-filters select{flex:1;min-width:130px}
+.gz-rpt-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:8px 0 16px}
+.gz-rpt-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:13px;padding:12px}
+.gz-rpt-card small{display:block;color:#64748b;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.3px}
+.gz-rpt-card b{display:block;font-size:20px;margin-top:5px;color:#102a43}
+.gz-rpt-h{font-size:14px;font-weight:900;margin:16px 0 8px;color:#102a43}
+.gz-rpt-sel td{background:#eff6ff}
+.gz-rpt-tot td{font-weight:900;background:#f1f5f9}
+
+/* ============ INVOICE MODAL ============ */
+.gz-inv-modal{
+  display:none;position:fixed;inset:0;background:#0f172ab8;z-index:100005;
+  align-items:center;justify-content:center;padding:12px;
+  backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)
+}
+.gz-inv-card{
+  background:#fff;width:min(480px,100vw);max-height:96vh;overflow:auto;
+  border-radius:16px;padding:16px;box-shadow:0 24px 60px -12px rgba(15,23,42,.45);
+  animation:gzPop .18s ease
+}
+.gz-invoice-box{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px;font-family:inherit;color:#1e293b;width:100%}
+.gz-inv-header-img{width:100%;max-height:110px;object-fit:contain;border-radius:8px;margin-bottom:8px;display:block}
+.gz-inv-comp-info{text-align:center;font-size:11px;color:#475569;margin-bottom:12px;border-bottom:1px solid #cbd5e1;padding-bottom:8px;line-height:1.5}
+.gz-inv-title{text-align:center;font-size:15px;font-weight:900;color:#1e293b;margin-bottom:10px;text-transform:uppercase;letter-spacing:.6px}
+.gz-inv-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px 12px;font-size:12px;margin-bottom:12px;background:#f8fafc;padding:11px;border-radius:9px}
+.gz-inv-grid div span{color:#64748b;font-weight:700}
+.gz-inv-table{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:12px}
+.gz-inv-table th{background:#f1f5f9;color:#334155;padding:9px;text-align:left;border-bottom:1px solid #cbd5e1;font-size:11px;font-weight:800}
+.gz-inv-table td{padding:9px;border-bottom:1px solid #f1f5f9}
+.gz-inv-totals{margin-left:auto;width:210px;font-size:12px;margin-bottom:14px}
+.gz-inv-totals div{display:flex;justify-content:space-between;padding:4px 0}
+.gz-inv-totals div.grand{font-weight:900;font-size:13px;border-top:1px solid #cbd5e1;border-bottom:1px solid #cbd5e1;padding:6px 0;margin-top:3px}
+.gz-inv-pay{background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:11px;font-size:11px;margin-top:8px;line-height:1.6}
+.gz-inv-pay b{color:#0f172a}
+.gz-inv-actions{display:flex;gap:8px;margin-top:14px}
+.gz-inv-btn-dl{
+  flex:1;background:#2563eb;color:#fff;border:0;border-radius:10px;padding:12px;
+  font-weight:800;cursor:pointer;font-size:13px;text-align:center;min-height:46px;
+  font-family:inherit;transition:background .15s,transform .1s
+}
+.gz-inv-btn-dl:hover{background:#1d4ed8}
+.gz-inv-btn-dl:active{transform:scale(.97)}
+.gz-inv-btn-wa{
+  flex:1;background:#16a34a;color:#fff;border:0;border-radius:10px;padding:12px;
+  font-weight:800;cursor:pointer;font-size:13px;text-align:center;text-decoration:none;
+  display:inline-flex;align-items:center;justify-content:center;min-height:46px;
+  transition:background .15s,transform .1s
+}
+.gz-inv-btn-wa:hover{background:#15803d}
+.gz-inv-btn-wa:active{transform:scale(.97)}
+.gz-inv-close{
+  background:#e2e8f0;border:0;border-radius:10px;padding:12px 16px;font-weight:800;
+  cursor:pointer;min-height:46px;font-size:13px;font-family:inherit;color:#334155;
+  transition:background .15s
+}
+.gz-inv-close:hover{background:#cbd5e1}
+
+/* ============ TABLET ============ */
+@media(max-width:1050px){
+  .gz-metrics{grid-template-columns:repeat(3,1fr)}
+  .gz-customer-row,.gz-dir-head{grid-template-columns:1.4fr 1fr 100px 80px 110px 100px 90px;min-width:850px}
+  .gz-customer-list{overflow:auto}
+  .gz-target-grid{grid-template-columns:repeat(2,1fr)}
+}
+
+/* ============ MOBILE ============ */
+@media(max-width:760px){
+  .gz-dir-head{display:none}
+  .gz-customer-list{
+    border:0;background:transparent;border-radius:0;display:grid;gap:10px;
+    margin-top:12px;overflow:visible
+  }
+  .gz-customer-row{
+    display:grid;grid-template-columns:repeat(6,1fr);gap:9px 10px;
+    padding:13px;background:#fff;border:1px solid #e5eaf1;border-radius:14px;
+    align-items:center;min-width:0
+  }
+  .gz-customer-row:last-child{border-bottom:1px solid #e5eaf1}
+  .gz-customer-row>div:nth-child(1){grid-column:1/-1}
+  .gz-customer-row>div:nth-child(2){grid-column:1/4;font-size:12px;color:#475569}
+  .gz-customer-row>div:nth-child(3){grid-column:4/7;font-size:12px;color:#475569;text-align:right}
+  .gz-customer-row>div:nth-child(4),
+  .gz-customer-row>div:nth-child(5),
+  .gz-customer-row>div:nth-child(6){
+    grid-column:span 2;text-align:center;background:#f8fafc;border-radius:10px;
+    padding:8px 4px;font-size:12.5px;font-weight:850;color:#172033;line-height:1.25
+  }
+  .gz-customer-row>div:nth-child(4)::before{content:"Orders";display:block;font-size:9px;font-weight:850;color:#94a3b8;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+  .gz-customer-row>div:nth-child(5)::before{content:"Business";display:block;font-size:9px;font-weight:850;color:#94a3b8;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+  .gz-customer-row>div:nth-child(6)::before{content:"Balance";display:block;font-size:9px;font-weight:850;color:#94a3b8;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+  .gz-customer-row>div:nth-child(7){grid-column:1/-1}
+  .gz-customer-row>div:nth-child(7) .gz-wa{width:100%;padding:10px;font-size:12px}
+}
+
+@media(max-width:650px){
+  #graphicZoneContainer{padding:9px}
+  .gz-head{padding:13px;border-radius:14px}
+  .gz-top{flex-direction:column;align-items:stretch;gap:11px}
+  .gz-left{justify-content:space-between;gap:9px}
+  .gz-back{padding:10px 12px;font-size:13px}
+  .gz-title{font-size:18px}
+  .gz-sub{font-size:10.5px}
+  .gz-add{width:100%;display:flex;align-items:center;justify-content:center}
+
+  .gz-metrics{grid-template-columns:repeat(2,1fr);gap:9px}
+  .gz-metric{padding:12px}
+  .gz-metric b{font-size:18px}
+  .gz-metric:nth-child(5){grid-column:1/-1}
+
+  .gz-tp-num b{font-size:22px}
+
+  .gz-target-top{flex-direction:column}
+  .gz-target-main{width:100%;justify-content:space-between}
+
+  /* Modal → bottom sheet */
+  .gz-modal{align-items:flex-end;padding:0}
+  .gz-modal-card{
+    width:100%;max-height:93vh;border-radius:22px 22px 0 0;padding:20px 16px calc(20px + env(safe-area-inset-bottom));
+    animation:gzSheet .22s cubic-bezier(.2,.8,.3,1)
+  }
+  @keyframes gzSheet{from{transform:translateY(28px);opacity:.6}to{transform:none;opacity:1}}
+  .gz-modal-card h2{font-size:18px}
+  .gz-form{grid-template-columns:1fr;gap:12px;margin-top:16px}
+  .gz-field.full{grid-column:auto}
+  .gz-label{font-size:12.5px}
+  .gz-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+  .gz-actions .gz-cancel,.gz-actions .gz-save{width:100%;padding:14px;font-size:15px}
+
+  /* Invoice modal → bottom sheet */
+  .gz-inv-modal{align-items:flex-end;padding:0}
+  .gz-inv-card{
+    width:100%;max-height:94vh;border-radius:22px 22px 0 0;
+    padding:16px 14px calc(18px + env(safe-area-inset-bottom));
+    animation:gzSheet .22s cubic-bezier(.2,.8,.3,1)
+  }
+  .gz-inv-actions{flex-wrap:wrap}
+  .gz-inv-btn-dl,.gz-inv-btn-wa{flex:1 1 calc(50% - 4px);font-size:12.5px;padding:13px 8px}
+  .gz-inv-close{flex:1 1 100%;order:3;padding:13px}
+
+  .gz-delivered-item{grid-template-columns:70px 1fr auto;gap:8px;padding:11px}
+  .gz-point{font-size:12px}
+  .gz-target,.gz-section{padding:14px}
+
+  .gz-rpt-filters{flex-direction:column}
+  .gz-rpt-filters select{min-width:0}
+}
+
+@media(max-width:400px){
+  .gz-title{font-size:16.5px}
+  .gz-metric b{font-size:16.5px}
+  .gz-tp-num b{font-size:20px}
+}
+</style>
+
+<div class="gz-wrap">
+  <div class="gz-head">
+    <div class="gz-top">
+      <div class="gz-left">
+        <button type="button" class="gz-back" onclick="gzBack()" aria-label="Back">← <span>Back</span></button>
+        <div><div class="gz-title">🎨 Graphic Zone</div><div class="gz-sub">Designing | Branding | Printing</div></div>
+      </div>
+      <button class="gz-add" type="button" onclick="openGzJobModal()">＋ Add Job</button>
+    </div>
+  </div>
+
+  <div id="gzMainView">
+    <button type="button" id="gzTargetBtn" class="gz-target-btn" onclick="showGzTarget()"><div><div class="gz-tb-title">🎯 Target ₹3 Lakh</div><div class="gz-tb-sub" id="gzTargetBtnSub">View points progress</div></div><div class="gz-tb-arrow">›</div></button>
+    <div class="gz-rpt-linkrow"><button type="button" class="gz-rpt-link" onclick="showGzReport()">📈 Report</button></div>
+
+  <div class="gz-metrics">
+    <div class="gz-metric gz-blue"><small>Total Business</small><b id="gzBusiness">₹0</b></div>
+    <div class="gz-metric"><small>Total Orders</small><b id="gzOrders">0</b></div>
+    <div class="gz-metric gz-orange"><small>Pending Jobs</small><b id="gzPending">0</b></div>
+    <div class="gz-metric gz-red"><small>Balance Due</small><b id="gzBalance">₹0</b></div>
+    <div class="gz-metric gz-green"><small>Est. Profit</small><b id="gzProfit">₹0</b></div>
+  </div>
+
+  <div class="gz-tabs">
+    <button id="btnTabSheet" class="gz-tab active" onclick="switchGzTab('sheet')">📊 Production Sheet</button>
+    <button id="btnTabPending" class="gz-tab" onclick="switchGzTab('pending')">⏳ Pending Jobs</button>
+    <button id="btnTabCustomers" class="gz-tab" onclick="switchGzTab('customers')">👥 Customers</button>
+  </div>
+    <div id="gzTabContentArea" class="gz-content"></div>
+  </div>
+
+  <div id="gzTargetView" style="display:none">
+    <div id="gzTargetHighlight" class="gz-target-highlight"></div>
+    <div id="gzTargetContent" class="gz-content"></div>
+  </div>
+
+  <div id="gzReportView" style="display:none">
+    <div id="gzReportContent" class="gz-content"></div>
+  </div>
+</div>
+
+<!-- JOB MODAL -->
+<div id="gzJobModal" class="gz-modal" onclick="if(event.target===this)closeGzJobModal()">
+  <div class="gz-modal-card">
+    <h2 id="gzModalTitle">Add New Job</h2>
+    <div class="gz-info" style="margin-top:6px">Existing customer select ಮಾಡಿದರೆ Place ಮತ್ತು Mobile Number automatic ಆಗಿ fill ಆಗುತ್ತದೆ.</div>
+    <input type="hidden" id="gzRowIndex">
+    <div class="gz-form">
+      <div class="gz-field"><label class="gz-label">Date</label><input class="gz-input" type="date" id="gzDateInput"></div>
+      <div class="gz-field"><label class="gz-label">Job No</label><input class="gz-input" id="gzJobNoInput" placeholder="G315" readonly aria-readonly="true"></div>
+      <div class="gz-field full"><label class="gz-label">Customer Name</label><div class="gz-swrap"><input class="gz-input" id="gzCustNameInput" autocomplete="off" placeholder="Type customer name..."><div id="gzSuggest" class="gz-suggest"></div></div><div id="gzSelected" class="gz-selected"></div></div>
+      <div class="gz-field"><label class="gz-label">Place</label><input class="gz-input" id="gzPlaceInput" placeholder="Place"></div>
+      <div class="gz-field"><label class="gz-label">Mobile Number</label><input class="gz-input" id="gzPhoneInput" placeholder="919876543210"></div>
+      <div class="gz-field full"><label class="gz-label">Item Description</label><input class="gz-input" id="gzItemInput" placeholder="Visiting Card, Certificate, Banner..."></div>
+      <div class="gz-field"><label class="gz-label">Qty</label><input class="gz-input" type="number" id="gzQtyInput" placeholder="100"></div>
+      <div class="gz-field"><label class="gz-label">Rate (₹)</label><input class="gz-input" type="number" id="gzRateInput" placeholder="10"></div>
+      <div class="gz-field"><label class="gz-label">Advance Paid (₹)</label><input class="gz-input" type="number" id="gzPaidInput" placeholder="1000"></div>
+      <div class="gz-field"><label class="gz-label">Print Cost (₹)</label><input class="gz-input" type="number" id="gzPrintCostInput" placeholder="500"></div>
+      <div class="gz-field"><label class="gz-label">Other Cost (₹)</label><input class="gz-input" type="number" id="gzOtherCostInput" placeholder="0"></div>
+      <div class="gz-field"><label class="gz-label">Status</label><select class="gz-select" id="gzStatusInput"><option>Design Pending</option><option>Printing</option><option>Ready for Delivery</option><option>Delivered</option><option>Cancel</option></select></div>
+      <div class="gz-field full"><label class="gz-label">Remarks</label><input class="gz-input" id="gzRemarksInput" placeholder="Delivery to Shop / urgent / etc."></div>
+    </div>
+    <div class="gz-actions"><button class="gz-cancel" type="button" onclick="closeGzJobModal()">Cancel</button><button id="gzSaveBtn" class="gz-save" type="button" onclick="submitGzJobForm()">Save Job</button></div>
+  </div>
+</div>
+
+<!-- INVOICE PREVIEW MODAL -->
+<div id="gzInvoiceModal" class="gz-inv-modal" onclick="if(event.target===this)closeGzInvoiceModal()">
+  <div class="gz-inv-card">
+    <div id="gzInvoicePrintArea" class="gz-invoice-box">
+      <img src="https://lh3.googleusercontent.com/d/1wJRqEeOv026YqDdMBp6uV0zba3EWz_Th" crossorigin="anonymous" class="gz-inv-header-img" alt="Graphic Zone Header">
+      <div class="gz-inv-comp-info">
+        <b>Designing | Branding | Printing</b><br>
+        Mob: 720 429 6418<br>
+        gzone.sullia@gmail.com
+      </div>
+      <div class="gz-inv-title">Invoice / Bill</div>
+      <div class="gz-inv-grid">
+        <div><span>Job No:</span> <b id="invJobNo">-</b></div>
+        <div><span>Date:</span> <b id="invDate">-</b></div>
+        <div><span>Name:</span> <b id="invName">-</b></div>
+        <div><span>Place:</span> <b id="invPlace">-</b></div>
+        <div style="grid-column:1/-1"><span>Mobile:</span> <b id="invPhone">-</b></div>
+      </div>
+      <table class="gz-inv-table">
+        <thead>
+          <tr><th>Item Description</th><th>Qty</th><th>Price</th><th>Total</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td id="invItem">-</td>
+            <td id="invQty">0</td>
+            <td id="invRate">₹0</td>
+            <td id="invTotal">₹0</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="gz-inv-totals">
+        <div><span>Total Amount:</span> <b id="invGrandTotal">₹0</b></div>
+        <div><span>Advance Paid:</span> <b id="invPaid">₹0</b></div>
+        <div class="grand"><span>Balance Due:</span> <b id="invBalance" style="color:#dc2626">₹0</b></div>
+      </div>
+      <div class="gz-inv-pay">
+        <b>Payment Details:</b><br>
+        Ahammad Kabeer A M<br>
+        Mob: 7204296418<br>
+        UPI ID: <b>limra@ybl</b>
+      </div>
+    </div>
+    <div class="gz-inv-actions">
+      <button type="button" class="gz-inv-close" onclick="closeGzInvoiceModal()">Close</button>
+      <button type="button" class="gz-inv-btn-dl" onclick="downloadGzInvoiceJPG()">📥 Download JPG</button>
+      <a id="gzInvWhatsAppBtn" href="#" target="_blank" class="gz-inv-btn-wa" onclick="shareInvoiceWhatsApp(event)">💬 WhatsApp</a>
+    </div>
+  </div>
+</div>
+
+<!-- Load html2canvas library for JPG generation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script>
+var currentGzJobs=[],currentGzCustomers=[],currentGzTab='sheet',gzCustomerSearchBound=false;
+var GZ_TARGET=300000,GZ_POINT=250;
+var activeInvoiceJob = null;
+
+function gzFmt(n){return Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2})}
+function gzPts(a){return Math.round((Number(a)||0)/GZ_POINT*100)/100}
+
+function gzDeliveredStats(){
+  var d = currentGzJobs.filter(function(j){ return String(j.status).toLowerCase() === 'delivered'; }),
+      totalProfit = 0;
+  d.forEach(function(j){ 
+    totalProfit += Number(j.estimatedProfit) || 0; 
+  });
+  return { list: d, count: d.length, amount: totalProfit, points: gzPts(totalProfit) };
+}
+
+function gzHideAllSub(){['gzMainView','gzTargetView','gzReportView'].forEach(function(id){var e=document.getElementById(id);if(e)e.style.display='none'})}
+function showGzTarget(){gzHideAllSub();var t=document.getElementById('gzTargetView');if(t)t.style.display='block';window.scrollTo(0,0)}
+function showGzMain(){gzHideAllSub();var m=document.getElementById('gzMainView');if(m)m.style.display='block';window.scrollTo(0,0)}
+function showGzReport(){gzHideAllSub();var r=document.getElementById('gzReportView');if(r)r.style.display='block';renderGzReport();window.scrollTo(0,0)}
+function gzReportOpen(){var r=document.getElementById('gzReportView');return !!r&&r.style.display!=='none'}
+function gzBack(){var t=document.getElementById('gzTargetView'),r=document.getElementById('gzReportView');if((t&&t.style.display!=='none')||(r&&r.style.display!=='none'))showGzMain();else closeGraphicZoneView()}
+function eGz(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
+function mGz(v){return '₹'+Number(v||0).toLocaleString('en-IN',{maximumFractionDigits:2})}
+function closeGraphicZoneView(){
+  showGzMain();
+  var gz=document.getElementById('graphicZoneContainer');
+  var dashboard=document.getElementById('dashboardView');
+  var modal=document.getElementById('gzJobModal');
+  var invModal=document.getElementById('gzInvoiceModal');
+  if(modal) modal.style.display='none';
+  if(invModal) invModal.style.display='none';
+  if(gz) gz.style.display='none';
+  if(dashboard) dashboard.style.display='block';
+  window.scrollTo(0,0);
+}
+
+
+/* ===== REPORT (Year / Month filter) ===== */
+var gzRptYear=String(new Date().getFullYear()),gzRptMonth=0;
+var GZ_MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function gzRptJobs(){return currentGzJobs.filter(function(j){var st=String(j.status||'').toLowerCase();return st!=='cancel'&&st!=='cancelled'&&/^\d{4}-\d{2}/.test(j.date||'')})}
+function gzRptSum(list){var t={orders:0,business:0,profit:0,paid:0,balance:0};list.forEach(function(j){t.orders++;t.business+=Number(j.totalAmount)||0;t.profit+=Number(j.estimatedProfit)||0;t.paid+=Number(j.paid)||0;t.balance+=Number(j.balanceDue)||0});return t}
+function gzElapsedMonths(y){var n=new Date(),cy=n.getFullYear();y=Number(y);if(y===cy)return n.getMonth()+1;return y<cy?12:1}
+function gzRptCard(label,val,color){return '<div class="gz-rpt-card"><small>'+label+'</small><b'+(color?' style="color:'+color+'"':'')+'>'+val+'</b></div>'}
+function gzRptSet(y,m){if(y!==null&&y!==undefined)gzRptYear=String(y);if(m!==null&&m!==undefined)gzRptMonth=Number(m)||0;renderGzReport()}
+function gzRptPickMonth(m){gzRptSet(null,gzRptMonth===m?0:m)}
+function renderGzReport(){
+  var box=document.getElementById('gzReportContent');if(!box)return;
+  var all=gzRptJobs(),cy=String(new Date().getFullYear()),yset={};
+  all.forEach(function(j){yset[j.date.substr(0,4)]=1});yset[cy]=1;
+  var years=Object.keys(yset).sort().reverse();
+  if(!yset[gzRptYear])gzRptYear=cy;
+  var yJobs=all.filter(function(j){return j.date.substr(0,4)===gzRptYear});
+  var sel=gzRptMonth?yJobs.filter(function(j){return Number(j.date.substr(5,2))===gzRptMonth}):yJobs;
+  var st=gzRptSum(sel);
+
+  var yRows=years.map(function(y){return {y:y,t:gzRptSum(all.filter(function(j){return j.date.substr(0,4)===y})),m:gzElapsedMonths(y)}});
+  var wd=yRows.filter(function(r){return r.t.orders>0}),n=wd.length||1,sB=0,sP=0,sO=0,sM=0;
+  wd.forEach(function(r){sB+=r.t.business;sP+=r.t.profit;sO+=r.t.orders;sM+=r.m});
+  var mTot=sM||1;
+
+  var h='<div class="gz-section"><h3>📈 Report</h3>';
+  h+='<div class="gz-rpt-h">Yearly Average ('+wd.length+' year'+(wd.length===1?'':'s')+')</div><div class="gz-rpt-cards">'
+    +gzRptCard('Avg Business / Year',mGz(sB/n),'#2563eb')+gzRptCard('Avg Profit / Year',mGz(sP/n),'#059669')
+    +gzRptCard('Avg Orders / Year',gzFmt(sO/n))+gzRptCard('Avg Monthly Profit',mGz(sP/mTot),'#059669')+'</div>';
+
+  h+='<div class="gz-rpt-filters"><select class="gz-select" onchange="gzRptSet(this.value,null)">'
+    +years.map(function(y){return '<option value="'+y+'"'+(y===gzRptYear?' selected':'')+'>'+y+'</option>'}).join('')+'</select>'
+    +'<select class="gz-select" onchange="gzRptSet(null,this.value)"><option value="0"'+(gzRptMonth?'':' selected')+'>All Months</option>'
+    +GZ_MONTHS.map(function(m,i){return '<option value="'+(i+1)+'"'+(gzRptMonth===i+1?' selected':'')+'>'+m+'</option>'}).join('')+'</select></div>';
+
+  var label=gzRptMonth?GZ_MONTHS[gzRptMonth-1]+' '+gzRptYear:gzRptYear+' · Full Year';
+  h+='<div class="gz-rpt-h">'+label+'</div><div class="gz-rpt-cards">'
+    +gzRptCard('Business',mGz(st.business),'#2563eb')+gzRptCard('Profit',mGz(st.profit),'#059669')
+    +gzRptCard('Orders',gzFmt(st.orders))+gzRptCard('Collected',mGz(st.paid))+gzRptCard('Balance Due',mGz(st.balance),'#dc2626');
+  if(gzRptMonth){h+=gzRptCard('Profit Margin',(st.business?(st.profit/st.business*100).toFixed(1):'0.0')+'%')}
+  else{var em=gzElapsedMonths(gzRptYear);h+=gzRptCard('Avg Monthly Business',mGz(st.business/em),'#2563eb')+gzRptCard('Avg Monthly Profit',mGz(st.profit/em),'#059669')}
+  h+='</div>';
+
+  h+='<div class="gz-rpt-h">'+gzRptYear+' · Month-wise (tap a month)</div><div class="gz-scroll"><table class="gz-table"><thead><tr><th>Month</th><th>Orders</th><th>Business</th><th>Profit</th></tr></thead><tbody>';
+  var yt=gzRptSum(yJobs);
+  for(var m=1;m<=12;m++){
+    var t=gzRptSum(yJobs.filter(function(j){return Number(j.date.substr(5,2))===m}));
+    h+='<tr class="gz-row'+(gzRptMonth===m?' gz-rpt-sel':'')+'" onclick="gzRptPickMonth('+m+')"><td><b>'+GZ_MONTHS[m-1]+'</b></td><td>'+t.orders+'</td><td>'+mGz(t.business)+'</td><td style="color:#059669">'+mGz(t.profit)+'</td></tr>';
+  }
+  h+='<tr class="gz-rpt-tot"><td>Total</td><td>'+yt.orders+'</td><td>'+mGz(yt.business)+'</td><td>'+mGz(yt.profit)+'</td></tr></tbody></table></div>';
+
+  h+='<div class="gz-rpt-h">Year-wise Comparison</div><div class="gz-scroll"><table class="gz-table"><thead><tr><th>Year</th><th>Orders</th><th>Business</th><th>Profit</th><th>Avg Month Business</th><th>Avg Month Profit</th></tr></thead><tbody>'
+    +yRows.map(function(r){return '<tr class="gz-row'+(r.y===gzRptYear?' gz-rpt-sel':'')+'" onclick="gzRptSet(\''+r.y+'\',0)"><td><b>'+r.y+'</b></td><td>'+r.t.orders+'</td><td>'+mGz(r.t.business)+'</td><td style="color:#059669">'+mGz(r.t.profit)+'</td><td>'+mGz(r.t.business/r.m)+'</td><td>'+mGz(r.t.profit/r.m)+'</td></tr>'}).join('')
+    +'</tbody></table></div>';
+  h+='<div class="gz-info" style="margin-top:8px">Cancelled jobs excluded. Monthly average = total ÷ 12 (current year: ÷ months elapsed so far).</div></div>';
+  box.innerHTML=h;
+}
+
+function gzApplyData(d){d=d||{};currentGzJobs=d.jobs||[];currentGzCustomers=d.customers||[];updateGzMetrics(d.summary||{});renderGzTargetHighlight(d.summary||{});renderGzTab()}
+
+function initGraphicZone(){showGzMain();setupGzCustomerSearch();var gzC=window.appDataCache&&window.appDataCache.all&&window.appDataCache.all.graphicZone;if(gzC&&gzC.jobs){gzApplyData(gzC)}google.script.run.withSuccessHandler(function(d){d=d||{};currentGzJobs=d.jobs||[];currentGzCustomers=d.customers||[];updateGzMetrics(d.summary||{});renderGzTargetHighlight(d.summary||{});renderGzTab()}).withFailureHandler(function(e){document.getElementById('gzTabContentArea').innerHTML='<div class="gz-empty">Error loading Graphic Zone: '+eGz(e.message||e)+'</div>'}).getGraphicZoneData()}
+function updateGzMetrics(s){document.getElementById('gzBusiness').innerText=mGz(s.totalBusiness);document.getElementById('gzOrders').innerText=s.totalOrders||0;document.getElementById('gzPending').innerText=s.pendingJobs||0;document.getElementById('gzBalance').innerText=mGz(s.balanceDue);document.getElementById('gzProfit').innerText=mGz(s.estimatedProfit)}
+function renderGzTargetHighlight(s){var st=gzDeliveredStats(),remaining=Math.max(0,GZ_TARGET-st.amount),pct=Math.min(100,st.amount/GZ_TARGET*100);document.getElementById('gzTargetHighlight').innerHTML='<div class="gz-target-label">🎯 Target Progress</div><div class="gz-target-title">₹3 Lakh Goal</div><div class="gz-tp-nums"><div class="gz-tp-num earned"><b>'+gzFmt(st.points)+'</b><small>POINTS EARNED</small></div><div class="gz-tp-num"><b>'+gzFmt(gzPts(remaining))+'</b><small>POINTS NEEDED</small></div></div><div class="gz-progress"><div style="width:'+pct+'%"></div></div>';var tc=document.getElementById('gzTargetContent');if(tc)tc.innerHTML=renderTarget();var bs=document.getElementById('gzTargetBtnSub');if(bs)bs.innerText=gzFmt(st.points)+' of '+gzFmt(GZ_TARGET/GZ_POINT)+' Points · '+pct.toFixed(1)+'%'}
+function switchGzTab(t){currentGzTab=t;['sheet','pending','customers','target'].forEach(function(x){var b=document.getElementById(x==='sheet'?'btnTabSheet':x==='pending'?'btnTabPending':x==='customers'?'btnTabCustomers':'btnTabTarget');if(b)b.classList.toggle('active',x===t)});renderGzTab()}
+function renderGzTab(){if(gzReportOpen())renderGzReport();var c=document.getElementById('gzTabContentArea');if(!c)return;if(currentGzTab==='pending')c.innerHTML=renderPending();else if(currentGzTab==='customers')c.innerHTML=renderCustomers();else c.innerHTML=renderSheet()}
+function sClass(s){s=String(s||'').toLowerCase();if(s==='delivered')return'delivered';if(s==='cancel'||s==='cancelled')return'cancelled';if(s.indexOf('printing')>=0)return'printing';if(s.indexOf('ready')>=0)return'ready';return'pending'}
+
+function gzIsDone(j){var t=String(j.status||'').toLowerCase();return t==='delivered'||t==='cancel'||t==='cancelled'}
+
+/* ====== JOB CARD (separate cards) ====== */
+function gzJobRow(j){
+  var t=String(j.status||'').toLowerCase(),
+      done=gzIsDone(j),
+      canc=(t==='cancel'||t==='cancelled');
+  var pr  = Number(j.estimatedProfit)||0;
+  var exp = (Number(j.printCost)||0) + (Number(j.otherCost)||0);
+  return '<div class="gz-job'+(done?' done':'')+(canc?' canc':'')+'" onclick="openEditGzJob('+j.rowIndex+')">'
+    +'<div class="gz-jtop">'
+      +'<div class="gz-jname">'+eGz(j.jobNo)+' · '+eGz(j.customerName)+'</div>'
+      +'<div class="gz-jprofit'+(pr<0?' neg':'')+'">'+mGz(pr)+'</div>'
+    +'</div>'
+    +'<div class="gz-jdesc">'+eGz(j.item||'-')+'</div>'
+    +'<div class="gz-jmeta">'
+      +'<span>Qty: <b>'+(j.qty||0)+'</b></span>'
+      +'<span>Exp : <b>'+mGz(exp)+'</b></span>'
+      +'<span>Invoice : <b>'+mGz(j.totalAmount)+'</b></span>'
+      +'<span>Paid : <b>'+mGz(j.paid)+'</b></span>'
+    +'</div>'
+    +'<div class="gz-jstatus-line">'
+      +'<span>Status : <b class="gz-st '+sClass(j.status)+'">'+eGz(j.status)+'</b></span>'
+      +(canc?'':'<span class="gz-jinvoice-link" onclick="event.stopPropagation();openGzInvoice('+j.rowIndex+')">Click to Generate Invoice</span>')
+    +'</div>'
+    +(j.remarks?'<div class="gz-jnote">📝 '+eGz(j.remarks)+'</div>':'')
+    +'</div>';
+}
+
+function renderSheet(){
+  var active=currentGzJobs.filter(function(j){return !gzIsDone(j)});
+  var finished=currentGzJobs.filter(gzIsDone).sort(function(a,b){return String(b.date).localeCompare(String(a.date))||(b.rowIndex-a.rowIndex)});
+  if(!currentGzJobs.length)return '<div class="gz-empty">No jobs found. Click + Add Job.</div>';
+  var h='';
+  h+='<div class="gz-sec-h">🛠 In Progress <span>('+active.length+')</span></div>';
+  h+=active.length
+    ? active.map(gzJobRow).join('')
+    : '<div class="gz-empty">No active jobs 🎉</div>';
+  h+='<div class="gz-sec-h" style="margin-top:14px">✅ Delivered &amp; Cancelled <span>('+finished.length+')</span></div>';
+  h+=finished.length
+    ? finished.map(gzJobRow).join('')
+    : '<div class="gz-empty">Nothing here yet.</div>';
+  return h;
+}
+
+function renderPending(){var a=currentGzJobs.filter(function(j){var s=String(j.status).toLowerCase();return s!=='delivered'&&s!=='cancel'&&s!=='cancelled'});return '<div class="gz-section"><h3>Pending Workflow Jobs ('+a.length+')</h3>'+(a.map(function(j){return '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid #eef2f7;padding:12px 0;flex-wrap:wrap"><div style="min-width:0;flex:1"><b>'+eGz(j.jobNo)+' - '+eGz(j.customerName)+'</b><div class="gz-info">'+eGz(j.item)+' · '+eGz(j.status)+' · Balance '+mGz(j.balanceDue)+'</div></div><div class="gz-actions-inline"><button class="gz-small-btn gz-invoice-btn" onclick="event.stopPropagation();openGzInvoice('+j.rowIndex+')">Invoice</button><button class="gz-small-btn gz-edit" onclick="event.stopPropagation();openEditGzJob('+j.rowIndex+')">Edit</button><button class="gz-small-btn gz-cancel-job" onclick="event.stopPropagation();setGzCancelled('+j.rowIndex+');">Cancel</button><button class="gz-small-btn gz-deliver" onclick="event.stopPropagation();markGzDelivered('+j.rowIndex+')">✓ Deliver</button></div></div>'}).join('')||'<div class="gz-empty">No pending jobs.</div>')+'</div>'}
+
+function renderCustomers(){return '<div class="gz-section"><h3>Customer Directory</h3><input class="gz-search" id="gzDirSearch" oninput="filterGzDir()" placeholder="Search customer name, place or mobile..."><div class="gz-customer-list" id="gzCustomerList">'+customerRows(currentGzCustomers)+'</div></div>'}
+function customerRows(list){if(!list.length)return'<div class="gz-empty">No customers found.</div>';var head='<div class="gz-dir-head"><div>Customer</div><div>Place</div><div>Mobile</div><div>Orders</div><div>Business</div><div>Balance</div><div>WhatsApp</div></div>';var body=list.map(function(c){var wa=String(c.phone||'').replace(/\D/g,'');return '<div class="gz-customer-row" onclick="openCustomerOrders('+JSON.stringify(c.name)+')"><div class="gz-name-col"><div class="gz-customer-name">'+eGz(c.name)+'</div><div class="gz-customer-meta">Last order: '+eGz(c.lastOrderDate||'-')+'</div></div><div>'+eGz(c.place||'-')+'</div><div>'+eGz(c.phone||'-')+'</div><div>'+c.totalOrders+'</div><div>'+mGz(c.totalBusiness)+'</div><div>'+mGz(c.balanceDue)+'</div><div>'+ (wa?'<a class="gz-wa" href="https://wa.me/'+wa+'" target="_blank" onclick="event.stopPropagation()">WhatsApp</a>':'-') +'</div></div>'}).join('');return head+body}
+function filterGzDir(){var q=(document.getElementById('gzDirSearch').value||'').toLowerCase();document.getElementById('gzCustomerList').innerHTML=customerRows(currentGzCustomers.filter(function(c){return (c.name+' '+c.place+' '+c.phone).toLowerCase().indexOf(q)>=0}))}
+function openCustomerOrders(name){var c=currentGzCustomers.find(function(x){return x.name===name}),a=currentGzJobs.filter(function(j){return j.customerName===name});var wa=c?String(c.phone||'').replace(/\D/g,''):'';document.getElementById('gzTabContentArea').innerHTML='<div class="gz-section"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><div style="min-width:0"><h3 style="margin-bottom:4px">'+eGz(name)+'</h3><div class="gz-info">📍 '+eGz(c?c.place:'')+' · 📱 '+eGz(c?c.phone:'')+' · '+(c?c.totalOrders:0)+' Total Orders</div></div>'+(wa?'<a class="gz-wa" href="https://wa.me/'+wa+'" target="_blank">💬 WhatsApp</a>':'')+'</div><div class="gz-scroll" style="margin-top:12px"><table class="gz-table"><thead><tr><th>Date</th><th>Job No</th><th>Item</th><th>Total</th><th>Paid</th><th>Balance</th><th>Status</th><th>Invoice</th></tr></thead><tbody>'+a.map(function(j){return '<tr class="gz-row" onclick="openEditGzJob('+j.rowIndex+')"><td>'+eGz(j.date)+'</td><td>'+eGz(j.jobNo)+'</td><td>'+eGz(j.item)+'</td><td>'+mGz(j.totalAmount)+'</td><td>'+mGz(j.paid)+'</td><td>'+mGz(j.balanceDue)+'</td><td><span class="gz-badge '+sClass(j.status)+'">'+eGz(j.status)+'</span></td><td><button class="gz-small-btn gz-invoice-btn" onclick="event.stopPropagation();openGzInvoice('+j.rowIndex+')">Invoice</button></td></tr>'}).join('')+'</tbody></table></div></div>'}
+
+function renderTarget(){
+  var st = gzDeliveredStats(),
+      pct = Math.min(100, st.amount / GZ_TARGET * 100);
+  var list = st.list.slice().reverse().map(function(j){
+    return '<div class="gz-delivered-item"><div><b>'+eGz(j.jobNo)+'</b></div><div><b>'+eGz(j.customerName)+'</b><div class="gz-info">'+eGz(j.item)+'</div></div><div class="gz-point">+'+gzFmt(gzPts(j.estimatedProfit))+' Points</div></div>';
+  }).join('');
+  return '<div class="gz-target"><div class="gz-tp-line">'+pct.toFixed(1)+'% complete · '+mGz(st.amount)+' of ₹3,00,000 Profit</div><div class="gz-delivered-list"><div style="padding:11px 13px;background:#f8fafc;font-weight:850;font-size:12px">Delivered Jobs — Profit Points</div>'+(list||'<div class="gz-empty">No delivered jobs yet.</div>')+'</div></div>';
+}
+
+function todayGz(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function clearGzCustomerFields(){document.getElementById('gzPlaceInput').value='';document.getElementById('gzPhoneInput').value='';document.getElementById('gzSelected').innerText=''}
+function getNextGzJobNo(){var maxNo=0;(currentGzJobs||[]).forEach(function(j){var m=String(j.jobNo||'').trim().match(/^G\s*(\d+)$/i);if(m)maxNo=Math.max(maxNo,Number(m[1])||0)});return 'G'+(maxNo+1)}
+function openGzJobModal(){document.getElementById('gzModalTitle').innerText='Add New Job';document.getElementById('gzRowIndex').value='';document.getElementById('gzDateInput').value=todayGz();['gzCustNameInput','gzPhoneInput','gzPlaceInput','gzItemInput','gzQtyInput','gzRateInput','gzPaidInput','gzPrintCostInput','gzOtherCostInput','gzRemarksInput'].forEach(function(id){document.getElementById(id).value=''});document.getElementById('gzJobNoInput').value=getNextGzJobNo();document.getElementById('gzStatusInput').value='Design Pending';document.getElementById('gzSuggest').style.display='none';document.getElementById('gzSelected').innerText='';document.getElementById('gzJobModal').style.display='flex';setTimeout(function(){document.getElementById('gzCustNameInput').focus()},80)}
+function renderGzSuggestions(list){var box=document.getElementById('gzSuggest');box.innerHTML=list.map(function(c,idx){return '<div class="gz-suggest-item" data-customer-index="'+idx+'"><b>'+eGz(c.name)+'</b><small>'+eGz(c.place||'N/A')+' · '+eGz(c.phone||'N/A')+' · '+c.totalOrders+' order(s)</small></div>'}).join('');box.style.display=list.length?'block':'none';Array.prototype.forEach.call(box.querySelectorAll('.gz-suggest-item'),function(el){el.addEventListener('mousedown',function(ev){ev.preventDefault();var c=list[Number(el.getAttribute('data-customer-index'))];if(c)selectGzCustomer(c)})})}
+function setupGzCustomerSearch(){if(gzCustomerSearchBound)return;var x=document.getElementById('gzCustNameInput');if(!x)return;gzCustomerSearchBound=true;x.addEventListener('input',function(){var q=x.value.trim().toLowerCase();if(!q){clearGzCustomerFields();renderGzSuggestions(currentGzCustomers.slice(0,10));return}var a=currentGzCustomers.filter(function(c){return c.name.toLowerCase().indexOf(q)>=0}).slice(0,10);renderGzSuggestions(a)});x.addEventListener('focus',function(){var q=x.value.trim().toLowerCase();var a=q?currentGzCustomers.filter(function(c){return c.name.toLowerCase().indexOf(q)>=0}).slice(0,10):currentGzCustomers.slice(0,10);renderGzSuggestions(a)});document.addEventListener('click',function(ev){var box=document.getElementById('gzSuggest');if(box&&ev.target!==x&&!box.contains(ev.target))box.style.display='none'})}
+function selectGzCustomer(c){if(!c)return;document.getElementById('gzCustNameInput').value=c.name||'';document.getElementById('gzPlaceInput').value=c.place||'';document.getElementById('gzPhoneInput').value=c.phone||'';document.getElementById('gzSelected').innerText='✓ Existing customer selected · '+(c.totalOrders||0)+' previous order(s)';document.getElementById('gzSuggest').style.display='none'}
+function openEditGzJob(i){var j=currentGzJobs.find(function(x){return Number(x.rowIndex)===Number(i)});if(!j)return;document.getElementById('gzModalTitle').innerText='Edit Job · '+j.jobNo;document.getElementById('gzRowIndex').value=j.rowIndex;document.getElementById('gzDateInput').value=j.date||'';document.getElementById('gzJobNoInput').value=j.jobNo||'';document.getElementById('gzCustNameInput').value=j.customerName||'';document.getElementById('gzPhoneInput').value=j.phone||'';document.getElementById('gzPlaceInput').value=j.place||'';document.getElementById('gzItemInput').value=j.item||'';document.getElementById('gzQtyInput').value=j.qty||'';document.getElementById('gzRateInput').value=j.rate||'';document.getElementById('gzPaidInput').value=j.paid||'';document.getElementById('gzPrintCostInput').value=j.printCost||'';document.getElementById('gzOtherCostInput').value=j.otherCost||'';document.getElementById('gzStatusInput').value=j.status||'Design Pending';document.getElementById('gzRemarksInput').value=j.remarks||'';document.getElementById('gzSelected').innerText='';document.getElementById('gzSuggest').style.display='none';document.getElementById('gzJobModal').style.display='flex'}
+function closeGzJobModal(){document.getElementById('gzJobModal').style.display='none'}
+
+function submitGzJobForm(){var p={rowIndex:document.getElementById('gzRowIndex').value,date:document.getElementById('gzDateInput').value,jobNo:document.getElementById('gzJobNoInput').value.trim(),customerName:document.getElementById('gzCustNameInput').value.trim(),phone:document.getElementById('gzPhoneInput').value.trim(),place:document.getElementById('gzPlaceInput').value.trim(),item:document.getElementById('gzItemInput').value.trim(),qty:document.getElementById('gzQtyInput').value,rate:document.getElementById('gzRateInput').value,paid:document.getElementById('gzPaidInput').value,printCost:document.getElementById('gzPrintCostInput').value,otherCost:document.getElementById('gzOtherCostInput').value,status:document.getElementById('gzStatusInput').value,remarks:document.getElementById('gzRemarksInput').value.trim()};if(!p.jobNo||!p.customerName){alert('Customer Name and Job No are required.');return}var b=document.getElementById('gzSaveBtn');b.disabled=true;b.innerText='Saving...';google.script.run.withSuccessHandler(function(d){b.disabled=false;b.innerText='Save Job';currentGzJobs=d.jobs||[];currentGzCustomers=d.customers||[];updateGzMetrics(d.summary||{});renderGzTargetHighlight(d.summary||{});closeGzJobModal();renderGzTab()}).withFailureHandler(function(e){b.disabled=false;b.innerText='Save Job';alert('Save failed: '+(e.message||e))}).saveGraphicZoneJobFromUI(p)}
+function markGzDelivered(i){if(!confirm('ಈ Job ಅನ್ನು Delivered ಎಂದು ಬದಲಾಯಿಸಬೇಕೇ?'))return;google.script.run.withSuccessHandler(function(d){currentGzJobs=d.jobs||[];currentGzCustomers=d.customers||[];updateGzMetrics(d.summary||{});renderGzTargetHighlight(d.summary||{});renderGzTab()}).withFailureHandler(function(e){alert(e.message||e)}).markGraphicZoneDelivered(i)}
+function setGzCancelled(i){if(!confirm('ಈ Job ಅನ್ನು Cancel ಎಂದು mark ಮಾಡಬೇಕೇ?'))return;google.script.run.withSuccessHandler(function(d){currentGzJobs=d.jobs||[];currentGzCustomers=d.customers||[];updateGzMetrics(d.summary||{});renderGzTargetHighlight(d.summary||{});renderGzTab()}).withFailureHandler(function(e){alert(e.message||e)}).cancelGraphicZoneJob(i)}
+
+/* INVOICE FUNCTIONS */
+function openGzInvoice(i){
+  var j=currentGzJobs.find(function(x){return Number(x.rowIndex)===Number(i)});
+  if(!j)return;
+  activeInvoiceJob = j;
+  document.getElementById('invJobNo').innerText=j.jobNo||'-';
+  document.getElementById('invDate').innerText=j.date||'-';
+  document.getElementById('invName').innerText=j.customerName||'-';
+  document.getElementById('invPlace').innerText=j.place||'-';
+  document.getElementById('invPhone').innerText=j.phone||'-';
+  document.getElementById('invItem').innerText=j.item||'-';
+  document.getElementById('invQty').innerText=j.qty||0;
+  document.getElementById('invRate').innerText=mGz(j.rate);
+  document.getElementById('invTotal').innerText=mGz(j.totalAmount);
+  document.getElementById('invGrandTotal').innerText=mGz(j.totalAmount);
+  document.getElementById('invPaid').innerText=mGz(j.paid);
+  document.getElementById('invBalance').innerText=mGz(j.balanceDue);
+  document.getElementById('gzInvoiceModal').style.display='flex';
+}
+function closeGzInvoiceModal(){
+  document.getElementById('gzInvoiceModal').style.display='none';
+}
+function downloadGzInvoiceJPG(){
+  var el = document.getElementById('gzInvoicePrintArea');
+  html2canvas(el, {scale:2, useCORS:true}).then(function(canvas){
+    var link = document.createElement('a');
+    link.download = 'Invoice_'+(activeInvoiceJob ? activeInvoiceJob.jobNo : 'Bill')+'.jpg';
+    link.href = canvas.toDataURL('image/jpeg', 0.9);
+    link.click();
+  }).catch(function(err){
+    alert('Invoice download failed: '+(err.message||err));
+  });
+}
+function shareInvoiceWhatsApp(e){
+  e.preventDefault();
+  var j = activeInvoiceJob;
+  if(!j) return;
+  var phone = String(j.phone||'').replace(/\D/g,'');
+  var text = "Hello *"+j.customerName+"*,\nHere is your Graphic Zone Invoice for Job No: *"+j.jobNo+"*\nItem: "+j.item+"\nTotal: "+mGz(j.totalAmount)+"\nPaid: "+mGz(j.paid)+"\nBalance Due: "+mGz(j.balanceDue)+"\n\nThank you for choosing Graphic Zone!";
+  var url = "https://api.whatsapp.com/send?" + (phone ? "phone="+phone+"&" : "") + "text=" + encodeURIComponent(text);
+  window.open(url, '_blank');
+}
+
+/* ============================================================
+   UX ENHANCEMENTS (no logic change):
+   • Enter  → next field / submit on last field
+   • Enter on Customer Name → picks first suggestion
+   • Escape → close open modal
+   ============================================================ */
+(function(){
+  document.addEventListener('keydown', function(e){
+    var jobModal = document.getElementById('gzJobModal');
+    var invModal = document.getElementById('gzInvoiceModal');
+
+    /* ---- Escape closes whichever modal is open ---- */
+    if(e.key === 'Escape' || e.key === 'Esc'){
+      if(jobModal && jobModal.style.display === 'flex'){ e.preventDefault(); closeGzJobModal(); return; }
+      if(invModal && invModal.style.display === 'flex'){ e.preventDefault(); closeGzInvoiceModal(); return; }
+      return;
+    }
+
+    /* ---- Enter navigation inside Job modal ---- */
+    if(e.key !== 'Enter') return;
+    if(!jobModal || jobModal.style.display !== 'flex') return;
+    var t = e.target;
+    if(!t || !jobModal.contains(t)) return;
+    if(t.tagName === 'BUTTON' || t.tagName === 'SELECT' || t.tagName === 'A' || t.tagName === 'TEXTAREA') return;
+
+    /* Customer name: Enter → choose first suggestion if visible */
+    if(t.id === 'gzCustNameInput'){
+      var box = document.getElementById('gzSuggest');
+      if(box && box.style.display !== 'none'){
+        var first = box.querySelector('.gz-suggest-item');
+        if(first){
+          e.preventDefault();
+          first.dispatchEvent(new MouseEvent('mousedown', {bubbles:true, cancelable:true}));
+          var item = document.getElementById('gzItemInput');
+          if(item) item.focus();
+          return;
+        }
+      }
+    }
+
+    if(t.tagName !== 'INPUT') return;
+
+    /* Move to next visible field; submit if last */
+    e.preventDefault();
+    var fields = Array.prototype.slice.call(
+      jobModal.querySelectorAll('input:not([type="hidden"]), select')
+    ).filter(function(el){ return el.offsetParent !== null; });
+
+    var idx = fields.indexOf(t);
+    if(idx >= 0 && idx < fields.length - 1){
+      var nx = fields[idx + 1];
+      nx.focus();
+      try{
+        if(nx.type !== 'date' && nx.select) nx.select();
+      }catch(_){}
+    } else {
+      submitGzJobForm();
+    }
+  });
+})();
+</script>
+</div>

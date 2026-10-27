@@ -1,0 +1,181 @@
+<!-- Quick Note UI View -->
+<style>
+  #quickNoteContainer {
+    display: none;
+    width: 100%;
+  }
+
+  .qn-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+
+  .qn-add-btn {
+    background-color: #f39c12;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    font-size: 22px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
+
+  .qn-add-btn:active {
+    transform: scale(0.92);
+  }
+
+  .qn-notes-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .qn-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 12px;
+    border: 1px solid #eef2f5;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    position: relative;
+  }
+
+  .qn-textarea {
+    width: 100%;
+    min-height: 80px;
+    border: none;
+    outline: none;
+    resize: vertical;
+    font-size: 14px;
+    color: #2c3e50;
+    line-height: 1.4;
+    background: transparent;
+    font-family: inherit;
+  }
+
+  .qn-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 6px;
+    border-top: 1px solid #f8f9fa;
+    padding-top: 6px;
+  }
+
+  .qn-save-status {
+    font-size: 10px;
+    color: #95a5a6;
+  }
+
+  .qn-delete-btn {
+    background: transparent;
+    border: none;
+    color: #e74c3c;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 2px 6px;
+  }
+</style>
+
+<div id="quickNoteContainer">
+  <div class="qn-header">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <button class="btn-back" onclick="closeQuickNoteView()">← Back</button>
+      <span class="nav-title">Quick Notes</span>
+    </div>
+    <button class="qn-add-btn" onclick="addNewNoteCard()">+</button>
+  </div>
+
+  <div id="quickNotesList" class="qn-notes-grid">
+    <div style="text-align:center; padding:20px; color:#888;">Loading Notes...</div>
+  </div>
+</div>
+
+<script>
+  var autoSaveTimeoutMap = {};
+
+  function loadQuickNotesData() {
+    var container = document.getElementById('quickNotesList');
+    if (container) {
+      container.innerHTML = '<div style="text-align:center; padding:20px; color:#888;">Loading Notes...</div>';
+    }
+
+    google.script.run
+      .withSuccessHandler(renderQuickNotesUI)
+      .withFailureHandler(function(err) {
+        if (container) {
+          container.innerHTML = '<div style="text-align:center; padding:20px; color:red;">Error: ' + err.message + '</div>';
+        }
+      })
+      .getQuickNotesData();
+  }
+
+  function renderQuickNotesUI(notes) {
+    var container = document.getElementById('quickNotesList');
+    
+    if (!notes || notes.length === 0) {
+      container.innerHTML = '<div style="text-align:center; padding:30px; color:#888;">ಯಾವುದೇ Quick Note ಇಲ್ಲ. "+" ಬಟನ್ ಬಳಸಿ ಹೊಸ Note ಸೇರಿಸಿ.</div>';
+      return;
+    }
+
+    var html = '';
+    notes.slice().reverse().forEach(function(note) {
+      html += '<div class="qn-card">' +
+                '<textarea class="qn-textarea" id="note_txt_' + note.rowIndex + '" ' +
+                  'placeholder="ಇಲ್ಲಿ ಬರೆಯಿರಿ..." ' +
+                  'oninput="handleNoteAutoSave(' + note.rowIndex + ')">' + note.content + '</textarea>' +
+                '<div class="qn-card-footer">' +
+                  '<span class="qn-save-status" id="note_status_' + note.rowIndex + '">Auto Saved</span>' +
+                  '<button class="qn-delete-btn" onclick="confirmDeleteNote(' + note.rowIndex + ')">🗑️</button>' +
+                '</div>' +
+              '</div>';
+    });
+
+    container.innerHTML = html;
+  }
+
+  function closeQuickNoteView() {
+    var qnContainer = document.getElementById('quickNoteContainer');
+    if (qnContainer) qnContainer.style.display = 'none';
+    document.getElementById('dashboardView').style.display = 'block';
+  }
+
+  function addNewNoteCard() {
+    google.script.run
+      .withSuccessHandler(renderQuickNotesUI)
+      .createNewQuickNote();
+  }
+
+  function handleNoteAutoSave(rowIndex) {
+    var statusElem = document.getElementById('note_status_' + rowIndex);
+    if (statusElem) statusElem.innerText = "Saving...";
+
+    if (autoSaveTimeoutMap[rowIndex]) {
+      clearTimeout(autoSaveTimeoutMap[rowIndex]);
+    }
+
+    autoSaveTimeoutMap[rowIndex] = setTimeout(function() {
+      var content = document.getElementById('note_txt_' + rowIndex).value;
+      google.script.run
+        .withSuccessHandler(function() {
+          if (statusElem) statusElem.innerText = "Saved";
+        })
+        .updateQuickNoteContent(rowIndex, content);
+    }, 800);
+  }
+
+  function confirmDeleteNote(rowIndex) {
+    if (confirm("ಈ Quick Note ಡಿಲೀಟ್ ಮಾಡಬೇಕೆ?")) {
+      google.script.run
+        .withSuccessHandler(renderQuickNotesUI)
+        .deleteQuickNote(rowIndex);
+    }
+  }
+</script>

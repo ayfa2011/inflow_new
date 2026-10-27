@@ -1,0 +1,314 @@
+<!-- Diary Module View -->
+<style>
+  #diaryContainer {
+    display: none;
+    width: 100%;
+  }
+
+  .diary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+
+  .diary-add-btn {
+    background-color: #8e44ad;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    font-size: 22px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
+
+  .diary-add-btn:active {
+    transform: scale(0.92);
+  }
+
+  .diary-card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .diary-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 14px;
+    border: 1px solid #eef2f5;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    cursor: pointer;
+    transition: transform 0.1s ease;
+  }
+
+  .diary-card:active {
+    transform: scale(0.99);
+  }
+
+  .diary-card-date {
+    font-size: 11px;
+    color: #888;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .diary-card-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: #2c3e50;
+    margin-bottom: 6px;
+  }
+
+  .diary-card-preview {
+    font-size: 13px;
+    color: #555;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* 2-3 salu preview */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Full Screen Expansion Modal */
+  .diary-modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+  }
+
+  .diary-modal-content {
+    background: #fff;
+    margin: 10% auto;
+    padding: 18px;
+    border-radius: 14px;
+    width: 90%;
+    max-width: 440px;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  .diary-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+  }
+
+  .diary-input-field {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+  }
+
+  .diary-textarea-field {
+    width: 100%;
+    min-height: 150px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.4;
+    resize: vertical;
+    box-sizing: border-box;
+    font-family: inherit;
+  }
+
+  .diary-btn-group {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .btn-diary-save {
+    flex: 1;
+    background: #8e44ad;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .btn-diary-delete {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+</style>
+
+<div id="diaryContainer">
+  <div class="diary-header">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <button class="btn-back" onclick="closeDiaryView()">← Back</button>
+      <span class="nav-title">Diary</span>
+    </div>
+    <button class="diary-add-btn" onclick="openDiaryModalForAdd()">+</button>
+  </div>
+
+  <div id="diaryEntriesList" class="diary-card-list">
+    <div style="text-align:center; padding:20px; color:#888;">Loading Diary...</div>
+  </div>
+</div>
+
+<!-- Diary Add / Edit / Full View Modal -->
+<div id="diaryModal" class="diary-modal">
+  <div class="diary-modal-content">
+    <div class="diary-modal-header">
+      <span id="diaryModalHeaderTitle" style="font-weight: bold; font-size: 16px; color: #2c3e50;">Diary Entry</span>
+      <button onclick="closeDiaryModal()" style="background:none; border:none; font-size:20px; cursor:pointer;">✕</button>
+    </div>
+
+    <input type="hidden" id="diaryRowIndex" value="">
+    <label style="font-size: 11px; color: #666; font-weight: bold;">Date</label>
+    <input type="date" id="diaryDateInput" class="diary-input-field">
+
+    <label style="font-size: 11px; color: #666; font-weight: bold;">Title</label>
+    <input type="text" id="diaryTitleInput" class="diary-input-field" placeholder="Enter title...">
+
+    <label style="font-size: 11px; color: #666; font-weight: bold;">Journal Notes</label>
+    <textarea id="diaryNotesInput" class="diary-textarea-field" placeholder="Write full journal story..."></textarea>
+
+    <div class="diary-btn-group">
+      <button class="btn-diary-save" id="btnSaveDiary" onclick="submitDiaryForm()">Save Entry</button>
+      <button class="btn-diary-delete" id="btnDeleteDiary" onclick="deleteCurrentDiaryEntry()" style="display:none;">🗑️ Delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  var diaryGlobalData = [];
+
+  function loadDiaryEntriesData() {
+    var container = document.getElementById('diaryEntriesList');
+    if (container) {
+      container.innerHTML = '<div style="text-align:center; padding:20px; color:#888;">Loading Diary...</div>';
+    }
+
+    google.script.run
+      .withSuccessHandler(renderDiaryUI)
+      .withFailureHandler(function(err) {
+        if (container) {
+          container.innerHTML = '<div style="text-align:center; padding:20px; color:red;">Error: ' + err.message + '</div>';
+        }
+      })
+      .getDiaryEntries();
+  }
+
+  function renderDiaryUI(entries) {
+    diaryGlobalData = entries || [];
+    var container = document.getElementById('diaryEntriesList');
+
+    if (!entries || entries.length === 0) {
+      container.innerHTML = '<div style="text-align:center; padding:30px; color:#888;">ಯಾವುದೇ Diary ಎಂಟ್ರಿ ಇಲ್ಲ. "+" ಬಟನ್ ಬಳಸಿ ಹೊಸ ಕಥೆ/ವಿವರಣೆ ಸೇರಿಸಿ.</div>';
+      return;
+    }
+
+    var html = '';
+    entries.slice().reverse().forEach(function(item) {
+      html += '<div class="diary-card" onclick="expandDiaryModal(' + item.rowIndex + ')">' +
+                '<div class="diary-card-date">' + item.dateFormatted + '</div>' +
+                '<div class="diary-card-title">' + item.title + '</div>' +
+                '<div class="diary-card-preview">' + item.notes + '</div>' +
+              '</div>';
+    });
+
+    container.innerHTML = html;
+  }
+
+  function closeDiaryView() {
+    document.getElementById('diaryContainer').style.display = 'none';
+    document.getElementById('dashboardView').style.display = 'block';
+  }
+
+  function openDiaryModalForAdd() {
+    document.getElementById('diaryRowIndex').value = "";
+    document.getElementById('diaryDateInput').value = new Date().toISOString().split('T')[0];
+    document.getElementById('diaryTitleInput').value = "";
+    document.getElementById('diaryNotesInput').value = "";
+    document.getElementById('btnDeleteDiary').style.display = "none";
+    document.getElementById('diaryModalHeaderTitle').innerText = "New Diary Entry";
+    document.getElementById('diaryModal').style.display = "block";
+  }
+
+  function expandDiaryModal(rowIndex) {
+    var entry = diaryGlobalData.find(function(e) { return e.rowIndex === rowIndex; });
+    if (!entry) return;
+
+    document.getElementById('diaryRowIndex').value = entry.rowIndex;
+    document.getElementById('diaryDateInput').value = entry.dateIso || new Date().toISOString().split('T')[0];
+    document.getElementById('diaryTitleInput').value = entry.title;
+    document.getElementById('diaryNotesInput').value = entry.notes;
+    document.getElementById('btnDeleteDiary').style.display = "block";
+    document.getElementById('diaryModalHeaderTitle').innerText = "View & Edit Entry";
+    document.getElementById('diaryModal').style.display = "block";
+  }
+
+  function closeDiaryModal() {
+    document.getElementById('diaryModal').style.display = "none";
+  }
+
+  function submitDiaryForm() {
+    var rowIndex = document.getElementById('diaryRowIndex').value;
+    var dateVal = document.getElementById('diaryDateInput').value;
+    var titleVal = document.getElementById('diaryTitleInput').value;
+    var notesVal = document.getElementById('diaryNotesInput').value;
+
+    if (!titleVal && !notesVal) {
+      alert("Dayavittu Title athava Notes narmudisi!");
+      return;
+    }
+
+    var saveBtn = document.getElementById('btnSaveDiary');
+    saveBtn.innerText = "Saving...";
+    saveBtn.disabled = true;
+
+    google.script.run
+      .withSuccessHandler(function(updatedEntries) {
+        saveBtn.innerText = "Save Entry";
+        saveBtn.disabled = false;
+        closeDiaryModal();
+        renderDiaryUI(updatedEntries);
+      })
+      .withFailureHandler(function(err) {
+        saveBtn.innerText = "Save Entry";
+        saveBtn.disabled = false;
+        alert("Error: " + err.message);
+      })
+      .saveOrUpdateDiaryEntry(rowIndex, dateVal, titleVal, notesVal);
+  }
+
+  function deleteCurrentDiaryEntry() {
+    var rowIndex = document.getElementById('diaryRowIndex').value;
+    if (confirm("Ee Diary Entry delete madabeke?")) {
+      google.script.run
+        .withSuccessHandler(function(updatedEntries) {
+          closeDiaryModal();
+          renderDiaryUI(updatedEntries);
+        })
+        .deleteDiaryEntry(rowIndex);
+    }
+  }
+</script>

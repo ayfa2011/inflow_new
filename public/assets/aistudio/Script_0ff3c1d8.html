@@ -1,0 +1,40 @@
+// 1. Run Walk ಬಟನ್ ಕ್ಲಿಕ್ ಮಾಡಿದಾಗ Modal ಓಪನ್ ಮಾಡುವ ಫಂಕ್ಷನ್
+function openRunWalk() {
+  document.getElementById('runWalkModal').style.display = 'block';
+  // ಇಂದಿನ ದಿನಾಂಕ Auto-fill ಮಾಡಲು
+  document.getElementById('runDate').valueAsDate = new Date();
+}
+
+function closeRunWalkModal() {
+  document.getElementById('runWalkModal').style.display = 'none';
+}
+
+// 2. Data ವನ್ನು Google Apps Script Backend ಗೆ ಕಳುಹಿಸಿ Sheet ಗೆ Save ಮಾಡುವುದು
+function saveRunWalkData() {
+  var runData = {
+    date: document.getElementById('runDate').value,
+    distance: document.getElementById('runDistance').value,
+    duration: document.getElementById('runDuration').value,
+    notes: document.getElementById('runNotes').value
+  };
+
+  if(!runData.date || !runData.distance) {
+    alert("ದಯವಿಟ್ಟು Date ಮತ್ತು Distance ಭರ್ತಿ ಮಾಡಿ!");
+    return;
+  }
+
+  // Google Apps Script Backend Call
+  google.script.run
+    .withSuccessHandler(function(response) {
+      alert("Run/Walk data successfully saved!");
+      closeRunWalkModal();
+      // Form reset
+      document.getElementById('runDistance').value = '';
+      document.getElementById('runDuration').value = '';
+      document.getElementById('runNotes').value = '';
+    })
+    .withFailureHandler(function(error) {
+      alert("Error saving data: " + error);
+    })
+    .addRunWalkEntry(runData);
+}

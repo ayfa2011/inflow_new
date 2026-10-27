@@ -1,0 +1,290 @@
+<script>
+let globalInflowData = [];
+let currentCategoryFilter = 'stocks';
+let activeUploadRowIndex = null;
+
+const categoryMeta = {
+  core: { title: 'Core Fund', subtitle: 'Long term foundational wealth', header: 'Your Core Funds' },
+  mf: { title: 'Mutual Funds', subtitle: 'Disciplined wealth creation through SIPs', header: 'Your Mutual Funds' },
+  stocks: { title: 'Stocks', subtitle: 'Grow your wealth, one stock at a time', header: 'Your Stocks' }
+};
+
+// PROCESS SHEET DATA & UPDATE SUMMARY CARDS
+function processAndRenderInflowData(items) {
+  globalInflowData = items || [];
+  
+  let totalInvested = 0;
+  let totalCurrent = 0;
+
+  let catTotals = {
+    core: { invested: 0, current: 0 },
+    mf: { invested: 0, current: 0 },
+    stocks: { invested: 0, current: 0 }
+  };
+
+  globalInflowData.forEach(item => {
+    const inv = Number(item.investedAmount || 0);
+    const cur = Number(item.currentValue || 0);
+    const cat = (item.category || 'stocks').toLowerCase();
+
+    totalInvested += inv;
+    totalCurrent += cur;
+
+    if (catTotals[cat]) {
+      catTotals[cat].invested += inv;
+      catTotals[cat].current += cur;
+    }
+  });
+
+  const totalGain = totalCurrent - totalInvested;
+  const totalGainPct = totalInvested > 0 ? ((totalGain / totalInvested) * 100).toFixed(2) : '0.00';
+  
+  document.getElementById('inflowTotalVal').innerText = '₹ ' + totalCurrent.toLocaleString();
+  document.getElementById('inflowInvestedVal').innerText = '₹ ' + totalInvested.toLocaleString();
+  document.getElementById('inflowReturnsVal').innerText = (totalGain >= 0 ? '+₹ ' : '-₹ ') + Math.abs(totalGain).toLocaleString() + ' (' + totalGainPct + '%)';
+  document.getElementById('inflowTotalPct').innerText = (totalGain >= 0 ? '▲ +' : '▼ ') + totalGainPct + '% All Time';
+
+  ['core', 'mf', 'stocks'].forEach(cat => {
+    const inv = catTotals[cat].invested;
+    const cur = catTotals[cat].current;
+    const ret = cur - inv;
+    const retPct = inv > 0 ? ((ret / inv) * 100).toFixed(2) : '0.00';
+
+    document.getElementById(cat + 'CardVal').innerText = '₹ ' + cur.toLocaleString();
+    document.getElementById(cat + 'CardInv').innerText = '₹ ' + inv.toLocaleString();
+    document.getElementById(cat + 'CardRet').innerText = (ret >= 0 ? '+₹ ' : '-₹ ') + Math.abs(ret).toLocaleString() + ' (' + retPct + '%)';
+  });
+
+  if (document.getElementById('inflowDetailView').style.display === 'block') {
+    renderDetailHoldingsList(currentCategoryFilter);
+  }
+}
+
+// OPEN CATEGORY HOLDINGS DETAIL VIEW
+function openInflowDetailView(category) {
+  currentCategoryFilter = category;
+  document.getElementById('inflowCategoryView').style.display = 'none';
+  document.getElementById('inflowDetailView').style.display = 'block';
+
+  const meta = categoryMeta[category] || categoryMeta['stocks'];
+  document.getElementById('detailTitle').innerText = meta.title;
+  document.getElementById('detailSubtitle').innerText = meta.subtitle;
+  document.getElementById('detailSectionHeader').innerText = meta.header;
+  document.getElementById('inflowCategoryHidden').value = category;
+
+  renderDetailHoldingsList(category);
+}
+
+function backToCategoryView() {
+  document.getElementById('inflowDetailView').style.display = 'none';
+  document.getElementById('inflowCategoryView').style.display = 'block';
+}
+
+// RENDER HOLDINGS LIST WITH CORRECT CURRENT VALUE LABELS
+function renderDetailHoldingsList(category) {
+  const container = document.getElementById('inflowHoldingsList');
+  const items = globalInflowData.filter(i => (i.category || '').toLowerCase() === category);
+
+  let invSum = 0;
+  let curSum = 0;
+  let html = '';
+
+  if (!items || items.length === 0) {
+    container.innerHTML = `
+      <div style="text-align: center; padding: 30px; background: #fff; border-radius: 18px; color: #64748b; font-size: 14px;">
+        📌 No holdings found in this category.<br>
+        <span style="font-size: 12px; color: #94a3b8;">Click "+ Add New Item" to create.</span>
+      </div>`;
+  } else {
+    items.forEach(item => {
+      const inv = Number(item.investedAmount || 0);
+      const cur = Number(item.currentValue || 0);
+      const gain = cur - inv;
+      const gainPct = inv > 0 ? ((gain / inv) * 100).toFixed(2) : '0.00';
+      const isPositive = gain >= 0;
+
+      invSum += inv;
+      curSum += cur;
+
+      let logoMarkup = '';
+      if (item.logoUrl) {
+        logoMarkup = `<img src="${item.logoUrl}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+      } else {
+        const firstLetter = item.name ? item.name.charAt(0).toUpperCase() : 'A';
+        logoMarkup = `<span style="font-weight: 800; font-size: 18px; color: #0f172a;">${firstLetter}</span>`;
+      }
+
+      html += `
+        <div style="background: #ffffff; padding: 16px; border-radius: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); border: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <!-- Tap on M / B Circle triggers phone gallery upload -->
+            <div onclick="triggerLogoUpload(${item.rowIndex})" title="Tap to upload logo from gallery" style="width: 44px; height: 44px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; border: 2px solid #e2e8f0; flex-shrink: 0;">
+              ${logoMarkup}
+            </div>
+            <div>
+              <div style="font-weight: 800; font-size: 15px; color: #0f172a;">${item.name}</div>
+              <div style="font-size: 11px; font-weight: 600; color: #64748b; margin-top: 2px;">
+                Qty/Avg: ₹${item.sipAmount || 0}
+              </div>
+              
+              <div style="display: flex; gap: 12px; margin-top: 6px;">
+                <span onclick="openEditInflowModal(${item.rowIndex})" style="font-size: 12px; font-weight: 700; color: #0284c7; cursor: pointer;">✏️ Edit</span>
+                <span onclick="deleteInflowHolding(${item.rowIndex})" style="font-size: 12px; font-weight: 700; color: #dc2626; cursor: pointer;">🗑️ Delete</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- FIXED RIGHT SIDE: DISPLAYS CURRENT VALUE & PROFIT/LOSS -->
+          <div style="text-align: right;">
+            <div style="font-size: 11px; color: #64748b; font-weight: 600;">Current Val</div>
+            <div style="font-weight: 800; font-size: 16px; color: #0f172a;">₹ ${cur.toLocaleString()}</div>
+            <div style="font-size: 11px; font-weight: 700; color: ${isPositive ? '#16a34a' : '#dc2626'}; margin-top: 2px;">
+              ${isPositive ? '▲ +' : '▼ '}₹ ${Math.abs(gain).toLocaleString()} (${gainPct}%)
+            </div>
+          </div>
+        </div>`;
+    });
+
+    container.innerHTML = html;
+  }
+
+  const netGain = curSum - invSum;
+  const netGainPct = invSum > 0 ? ((netGain / invSum) * 100).toFixed(2) : '0.00';
+
+  document.getElementById('detailTotalInvested').innerText = '₹ ' + invSum.toLocaleString();
+  document.getElementById('detailCurrentValue').innerText = '₹ ' + curSum.toLocaleString();
+  document.getElementById('detailHoldingsCount').innerText = items.length + ' Holdings';
+  document.getElementById('detailOverallGain').innerText = (netGain >= 0 ? '+₹ ' : '-₹ ') + Math.abs(netGain).toLocaleString() + ' (' + netGainPct + '%)';
+}
+
+// MODAL CONTROL: ADD NEW ITEM
+function openAddModal() {
+  document.getElementById('inflowEditRowIndex').value = '';
+  document.getElementById('inflowModalTitle').innerText = 'Add Holding';
+  document.getElementById('inflowSubmitBtn').innerText = '＋ Save Holding';
+
+  document.getElementById('inflowNameInput').value = '';
+  document.getElementById('inflowInvestedInput').value = '';
+  document.getElementById('inflowCurrentValInput').value = '';
+  document.getElementById('inflowSipQtyInput').value = '';
+  document.getElementById('inflowNotesInput').value = '';
+
+  document.getElementById('inflowFormModal').style.display = 'flex';
+}
+
+// MODAL CONTROL: EDIT EXISTING ITEM (PRE-FILLS INPUT VALUES)
+function openEditInflowModal(rowIndex) {
+  const item = globalInflowData.find(i => Number(i.rowIndex) === Number(rowIndex));
+  if (!item) return;
+
+  document.getElementById('inflowEditRowIndex').value = item.rowIndex;
+  document.getElementById('inflowModalTitle').innerText = 'Edit Holding';
+  document.getElementById('inflowSubmitBtn').innerText = '💾 Update Holding';
+
+  document.getElementById('inflowNameInput').value = item.name || '';
+  document.getElementById('inflowInvestedInput').value = item.investedAmount || '';
+  document.getElementById('inflowCurrentValInput').value = item.currentValue || '';
+  document.getElementById('inflowSipQtyInput').value = item.sipAmount || '';
+  document.getElementById('inflowNotesInput').value = item.notes || '';
+
+  document.getElementById('inflowFormModal').style.display = 'flex';
+}
+
+function closeInflowModal() {
+  document.getElementById('inflowFormModal').style.display = 'none';
+}
+
+// DELETE ITEM
+function deleteInflowHolding(rowIndex) {
+  if (confirm("Ee stock/holding delete madala?")) {
+    google.script.run
+      .withSuccessHandler(function(response) {
+        if (response && response.items) {
+          processAndRenderInflowData(response.items);
+        }
+      })
+      .deleteInflowItem(rowIndex);
+  }
+}
+
+// LOGO UPLOAD HANDLER: OPENS PHONE GALLERY VIA HIDDEN INPUT
+function triggerLogoUpload(rowIndex) {
+  activeUploadRowIndex = rowIndex;
+  const fileInput = document.getElementById('inflowLogoFileInput');
+  if (fileInput) {
+    fileInput.value = ''; // Reset to allow choosing same image again
+    fileInput.click();
+  }
+}
+
+// DOM INITIALIZATION & FORM LISTENERS
+document.addEventListener("DOMContentLoaded", function() {
+  const fileInput = document.getElementById('inflowLogoFileInput');
+  if (fileInput) {
+    fileInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file || !activeUploadRowIndex) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const base64Data = evt.target.result;
+
+        document.getElementById('inflowHoldingsList').insertAdjacentHTML('afterbegin', '<div id="uploadLoader" style="text-align:center; padding:10px; background:#e0f2fe; color:#0284c7; font-weight:bold; border-radius:12px; margin-bottom:10px;">Uploading logo to Drive...</div>');
+
+        google.script.run
+          .withSuccessHandler(function(res) {
+            const loader = document.getElementById('uploadLoader');
+            if (loader) loader.remove();
+            
+            if (res.success) {
+              fetchInflowDataFromSheet();
+            } else {
+              alert('Upload failed: ' + res.error);
+            }
+          })
+          .uploadStockLogo(base64Data, file.type, file.name, activeUploadRowIndex);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  const form = document.getElementById('inflowHoldingForm');
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const itemData = {
+        rowIndex: document.getElementById('inflowEditRowIndex')?.value || null,
+        category: document.getElementById('inflowCategoryHidden')?.value || 'stocks',
+        name: document.getElementById('inflowNameInput')?.value || '',
+        investedAmount: Number(document.getElementById('inflowInvestedInput')?.value || 0),
+        currentValue: Number(document.getElementById('inflowCurrentValInput')?.value || 0),
+        sipAmount: Number(document.getElementById('inflowSipQtyInput')?.value || 0),
+        notes: document.getElementById('inflowNotesInput')?.value || ''
+      };
+
+      google.script.run
+        .withSuccessHandler(function(response) {
+          closeInflowModal();
+          if (response && response.items) {
+            processAndRenderInflowData(response.items);
+          }
+        })
+        .saveInflowItem(itemData);
+    });
+  }
+});
+
+// FETCH DATA FROM GOOGLE SHEET
+function fetchInflowDataFromSheet() {
+  if (typeof google !== 'undefined' && google.script && google.script.run) {
+    google.script.run
+      .withSuccessHandler(function(response) {
+        if (response && response.items) {
+          processAndRenderInflowData(response.items);
+        }
+      })
+      .getInflowData();
+  }
+}
+</script>

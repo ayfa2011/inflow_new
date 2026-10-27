@@ -1,0 +1,668 @@
+<!-- Planning Module View with Exact UI Matching Sample Photo -->
+<style>
+  #planningContainer {
+    display: none;
+    width: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    box-sizing: border-box;
+  }
+
+  /* Header Section Matching Sample Photo */
+  .p-nav-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+    padding: 12px 16px;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  }
+
+  .btn-p-back {
+    background: none;
+    border: none;
+    color: #1a73e8;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 4px 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .p-nav-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: #0b3c5d;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn-p-new-top {
+    background: #dbeafe;
+    color: #1d4ed8;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-p-new-top:hover { background: #bfdbfe; }
+
+  /* Plan tiles: 2-column grid matching image */
+  .p-card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  @media (min-width: 640px) {
+    .p-card-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+
+  .p-tile {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    color: #0f172a;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 62px;
+    box-sizing: border-box;
+  }
+  .p-tile:active { background: #f8fafc; border-color: #cbd5e1; transform: scale(0.98); }
+
+  .p-tile-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .p-tile-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .p-tile-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .p-tile-go {
+    flex-shrink: 0;
+    color: #cbd5e1;
+    font-size: 15px;
+    font-weight: bold;
+    margin-left: 4px;
+  }
+
+  /* Large Add New Plan Banner Card at bottom */
+  .p-banner-new {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f8fafc;
+    border: 1.5px dashed #bfdbfe;
+    border-radius: 16px;
+    padding: 14px 16px;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: background 0.15s, border-color 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .p-banner-new:active, .p-banner-new:hover {
+    background: #eff6ff;
+    border-color: #3b82f6;
+  }
+
+  .p-banner-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .p-banner-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #dbeafe;
+    color: #1d4ed8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+    flex-shrink: 0;
+  }
+
+  .p-banner-text .title {
+    font-size: 14px;
+    font-weight: 800;
+    color: #0f172a;
+  }
+  .p-banner-text .subtitle {
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 2px;
+  }
+
+  .p-banner-arrow {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #e0f2fe;
+    color: #0284c7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+  }
+
+  /* Detailed Plan Single View */
+  #planDetailView { display: none; }
+
+  .p-detail-title-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    padding: 14px 18px;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 14px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+  }
+
+  /* Compact Section Cards */
+  .p-sec-card {
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 14px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+  }
+
+  .p-inc-head { background-color: #0e8353; color: white; }
+  .p-exp-head { background-color: #334155; color: white; }
+
+  .p-sec-header {
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .p-sec-title { font-size: 13px; font-weight: 800; }
+
+  .btn-add-p {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-add-p:hover { background: rgba(255, 255, 255, 0.3); }
+
+  .p-data-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 12px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 13px;
+    background: #fff;
+  }
+
+  .p-item-left { display: flex; align-items: center; gap: 10px; }
+  .chk-tick { width: 16px; height: 16px; cursor: pointer; accent-color: #10b981; }
+  .item-done { text-decoration: line-through; color: #94a3b8 !important; }
+  .p-item-name { font-weight: 600; color: #1e293b; }
+  .p-item-amt { font-weight: 700; color: #334155; font-size: 13px; }
+
+  .p-total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: #f8fafc;
+    font-size: 12px;
+    font-weight: 800;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  .btn-p-edit {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 3px 6px;
+    border-radius: 6px;
+    margin-left: 6px;
+  }
+
+  .btn-plan-action {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    color: #334155;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  /* Create/Add Item Modal */
+  .p-modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(2px);
+  }
+
+  .p-modal-content {
+    background: #fff;
+    margin: 25% auto;
+    padding: 20px;
+    border-radius: 16px;
+    width: 88%;
+    max-width: 380px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    border: 1px solid #e2e8f0;
+  }
+
+  .p-input {
+    width: 100%;
+    padding: 10px;
+    margin: 6px 0 14px 0;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+    background: #f8fafc;
+  }
+
+  .btn-modal-del {
+    width: 100%;
+    padding: 10px;
+    background: #fff5f5;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    font-weight: bold;
+    margin-top: 8px;
+    cursor: pointer;
+  }
+</style>
+
+<div id="planningContainer">
+  <!-- Top Navigation Bar -->
+  <div class="p-nav-header">
+    <button class="btn-p-back" id="btnPlanMainBack" onclick="closePlanningView()">← Dashboard</button>
+    <div class="p-nav-title" id="pNavTitle">📅 Planning</div>
+    <button class="btn-p-new-top" onclick="openNewPlanModal()">+ New Plan</button>
+  </div>
+
+  <!-- VIEW 1: Main Cards List View -->
+  <div id="planCardsListView" class="p-card-grid">
+    <div style="text-align:center; padding:20px; color:#888; grid-column: 1 / -1;">Loading Plans...</div>
+  </div>
+
+  <!-- VIEW 2: Selected Card Details View -->
+  <div id="planDetailView">
+    <div class="p-detail-title-bar">
+      <div>
+        <span style="font-size:11px; color:#64748b; font-weight:600;">Active Plan:</span>
+        <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px;">
+          <div id="pSelectedPlanTitle" style="font-size:18px; font-weight:800; color:#0f172a;"></div>
+          <button class="btn-plan-action" style="padding: 2px 8px; font-size: 11px;" onclick="promptEditPlanTitle()">✏️ Edit</button>
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <span style="font-size:11px; color:#64748b; font-weight:600;">Net Balance:</span>
+        <div id="pSelectedPlanBalance" style="font-size:15px; font-weight:800; color:#1a73e8;"></div>
+      </div>
+    </div>
+
+    <div id="pDetailsContent"></div>
+  </div>
+</div>
+
+<!-- Add / Edit Item Modal -->
+<div id="pItemModal" class="p-modal">
+  <div class="p-modal-content">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <h4 id="pModalTitle" style="margin:0; color:#1e293b; font-size:15px;">Add / Edit Item</h4>
+      <button onclick="closePModal()" style="background:#f1f5f9; border:none; width:28px; height:28px; border-radius:50%; font-size:14px; cursor:pointer; color:#64748b; display:flex; align-items:center; justify-content:center;">✕</button>
+    </div>
+
+    <input type="hidden" id="pTargetPlan">
+    <input type="hidden" id="pType">
+    <input type="hidden" id="pRowIndex">
+
+    <label style="font-size:11px; font-weight:bold; color:#475569;">Particular / Item Name</label>
+    <input type="text" id="pInputName" class="p-input" placeholder="e.g. Hall Rent / Food">
+
+    <label style="font-size:11px; font-weight:bold; color:#475569;">Amount (₹)</label>
+    <input type="number" id="pInputAmount" class="p-input" placeholder="e.g. 10000">
+
+    <button class="btn-save" id="btnSavePItem" onclick="submitPItem()" style="width:100%; padding:10px; background:#1a73e8; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer; box-shadow: 0 2px 4px rgba(26,115,232,0.2);">Save Item</button>
+    <button class="btn-modal-del" id="btnDeletePItem" onclick="deletePItemFromModal()" style="display:none;">🗑️ Delete Item</button>
+  </div>
+</div>
+
+<script>
+  var allPlanningData = [];
+  var currentOpenPlanName = null;
+
+  // Preset Card Icon Styles matching sample photo
+  var P_ICON_PRESETS = [
+    { bg: '#e0f2fe', color: '#0284c7', icon: '✈️' }, // Travel/Flight
+    { bg: '#f3e8ff', color: '#7e22ce', icon: '📅' }, // December
+    { bg: '#dcfce7', color: '#15803d', icon: '🗓️' }, // November
+    { bg: '#ffedd5', color: '#c2410c', icon: '📋' }, // October
+    { bg: '#ffe4e6', color: '#e11d48', icon: '💍' }, // Wedding
+    { bg: '#cff4fc', color: '#087990', icon: '📆' }  // September
+  ];
+
+  function loadPlanningData() {
+    google.script.run
+      .withSuccessHandler(renderPlanningCards)
+      .withFailureHandler(function(err) { alert("Error: " + err.message); })
+      .getPlanningDashboardData();
+  }
+
+  function formatPVal(num) {
+    return '₹' + Number(num).toLocaleString('en-IN');
+  }
+
+  function pEsc(v) {
+    return String(v == null ? '' : v)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+  }
+  function pJsArg(v) {
+    return pEsc(String(v == null ? '' : v).replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
+  }
+
+  function getPlanPresetIcon_(planName, index) {
+    var lower = String(planName || '').toLowerCase();
+    if (lower.indexOf('travel') !== -1 || lower.indexOf('india') !== -1 || lower.indexOf('flight') !== -1 || lower.indexOf('trip') !== -1) {
+      return { bg: '#e0f2fe', color: '#0284c7', icon: '✈️' };
+    }
+    if (lower.indexOf('wedding') !== -1 || lower.indexOf('marriage') !== -1) {
+      return { bg: '#ffe4e6', color: '#e11d48', icon: '💍' };
+    }
+    return P_ICON_PRESETS[index % P_ICON_PRESETS.length];
+  }
+
+  function renderPlanningCards(data) {
+    allPlanningData = (data.plans || []).slice().reverse();
+    var container = document.getElementById('planCardsListView');
+
+    container.style.display = 'grid';
+    document.getElementById('planDetailView').style.display = 'none';
+    document.getElementById('pNavTitle').innerText = "📅 Planning";
+    document.getElementById('btnPlanMainBack').setAttribute('onclick', 'closePlanningView()');
+    document.getElementById('btnPlanMainBack').innerText = '← Dashboard';
+
+    var html = '';
+    allPlanningData.forEach(function(plan, i) {
+      var preset = getPlanPresetIcon_(plan.name, i);
+      html += '<div class="p-tile" role="button" onclick="openPlanByIndex(' + i + ')">' +
+                '<div class="p-tile-left">' +
+                  '<div class="p-tile-icon" style="background:' + preset.bg + '; color:' + preset.color + ';">' + preset.icon + '</div>' +
+                  '<div class="p-tile-name">' + pEsc(plan.name) + '</div>' +
+                '</div>' +
+                '<div class="p-tile-go">›</div>' +
+              '</div>';
+    });
+
+    // Bottom Banner Card: "Add New Plan"
+    html += '<div class="p-banner-new" role="button" onclick="openNewPlanModal()">' +
+              '<div class="p-banner-left">' +
+                '<div class="p-banner-icon">+</div>' +
+                '<div class="p-banner-text">' +
+                  '<div class="title">Add New Plan</div>' +
+                  '<div class="subtitle">Create your next goal</div>' +
+                '</div>' +
+              '</div>' +
+              '<div class="p-banner-arrow">→</div>' +
+            '</div>';
+
+    container.innerHTML = html;
+
+    if (currentOpenPlanName) {
+      openPlanDetails(currentOpenPlanName);
+    }
+  }
+
+  function openPlanByIndex(i) {
+    if (allPlanningData[i]) openPlanDetails(allPlanningData[i].name);
+  }
+
+  function openPlanDetails(planName) {
+    var plan = allPlanningData.find(function(p) { return p.name === planName; });
+    if (!plan) return;
+
+    currentOpenPlanName = planName;
+
+    document.getElementById('planCardsListView').style.display = 'none';
+    document.getElementById('planDetailView').style.display = 'block';
+    document.getElementById('pNavTitle').innerText = "📌 " + planName;
+    
+    var backBtn = document.getElementById('btnPlanMainBack');
+    backBtn.innerText = '← All Plans';
+    backBtn.setAttribute('onclick', 'showAllPlansList()');
+
+    document.getElementById('pSelectedPlanTitle').innerText = plan.name;
+    document.querySelector('#planDetailView .p-detail-title-bar').style.borderLeft = '5px solid #1a73e8';
+    document.getElementById('pSelectedPlanBalance').innerText = formatPVal(plan.balance);
+
+    var detailsHtml = 
+      '<!-- Income Section -->' +
+      '<div class="p-sec-card">' +
+        '<div class="p-sec-header p-inc-head">' +
+          '<span class="p-sec-title">💰 Income Details</span>' +
+          '<button class="btn-add-p" onclick="openPItemModal(\'' + pJsArg(plan.name) + '\', \'INCOME\')">+ Add Income</button>' +
+        '</div>' +
+        renderPItemsList(plan.incomes, 'INCOME', plan.totalIncome) +
+      '</div>' +
+
+      '<!-- Expense Section -->' +
+      '<div class="p-sec-card">' +
+        '<div class="p-sec-header p-exp-head">' +
+          '<span class="p-sec-title">💸 Expense Details</span>' +
+          '<button class="btn-add-p" onclick="openPItemModal(\'' + pJsArg(plan.name) + '\', \'EXPENSE\')">+ Add Expense</button>' +
+        '</div>' +
+        renderPItemsList(plan.expenses, 'EXPENSE', plan.totalExpenses) +
+      '</div>';
+
+    document.getElementById('pDetailsContent').innerHTML = detailsHtml;
+  }
+
+  function renderPItemsList(items, type, totalSum) {
+    var isInc = (type === 'INCOME');
+    var totalLabel = isInc ? 'Total Income' : 'Total Expense';
+    var totalColor = isInc ? '#0e8353' : '#e74c3c';
+
+    if (!items || items.length === 0) {
+      return '<div style="padding:8px 12px; font-size:12px; color:#888; text-align:center;">No items added</div>' +
+             '<div class="p-total-row"><span>' + totalLabel + '</span><span style="color:' + totalColor + ';">' + formatPVal(0) + '</span></div>';
+    }
+
+    var listHtml = '';
+    items.forEach(function(item) {
+      var isDoneClass = item.ticked ? 'item-done' : '';
+      var chkState = item.ticked ? 'checked' : '';
+      var escapedName = pJsArg(item.name);
+
+      listHtml += '<div class="p-data-row">' +
+                    '<div class="p-item-left">' +
+                      '<input type="checkbox" class="chk-tick" ' + chkState + ' onclick="toggleTick(' + item.rowIndex + ', ' + item.ticked + ')">' +
+                      '<span class="p-item-name ' + isDoneClass + '">' + pEsc(item.name) + '</span>' +
+                    '</div>' +
+                    '<div style="display:flex; align-items:center; gap:8px;">' +
+                      '<span class="p-item-amt ' + isDoneClass + '">' + formatPVal(item.amount) + '</span>' +
+                      '<button class="btn-p-edit" onclick="openEditPItemModal(\'' + pJsArg(currentOpenPlanName) + '\', \'' + type + '\', \'' + escapedName + '\', ' + item.amount + ', ' + item.rowIndex + ')">✏️</button>' +
+                    '</div>' +
+                  '</div>';
+    });
+
+    listHtml += '<div class="p-total-row">' +
+                  '<span>' + totalLabel + '</span>' +
+                  '<span style="color:' + totalColor + ';">' + formatPVal(totalSum) + '</span>' +
+                '</div>';
+
+    return listHtml;
+  }
+
+  function showAllPlansList() {
+    currentOpenPlanName = null;
+    document.getElementById('planDetailView').style.display = 'none';
+    document.getElementById('planCardsListView').style.display = 'grid';
+    document.getElementById('pNavTitle').innerText = "📅 Planning";
+    
+    var backBtn = document.getElementById('btnPlanMainBack');
+    backBtn.innerText = '← Dashboard';
+    backBtn.setAttribute('onclick', 'closePlanningView()');
+  }
+
+  function promptEditPlanTitle() {
+    var oldName = currentOpenPlanName;
+    var newName = prompt("Enter new title for this plan:", oldName);
+    if (newName && newName.trim() !== "" && newName.trim() !== oldName) {
+      google.script.run
+        .withSuccessHandler(function(res) {
+          currentOpenPlanName = newName.trim();
+          renderPlanningCards(res);
+        })
+        .withFailureHandler(function(err) { alert("Error: " + err.message); })
+        .renamePlanningTitle(oldName, newName.trim());
+    }
+  }
+
+  function toggleTick(rowIndex, currentStatus) {
+    google.script.run
+      .withSuccessHandler(renderPlanningCards)
+      .togglePlanningItemTick(rowIndex, currentStatus);
+  }
+
+  function openNewPlanModal() {
+    var pName = prompt("Enter Plan Title (e.g. Wedding Plan / Car Purchase / Next Month Expense):");
+    if (pName && pName.trim() !== "") {
+      openPItemModal(pName.trim(), 'INCOME');
+    }
+  }
+
+  function openPItemModal(planName, type) {
+    document.getElementById('pTargetPlan').value = planName;
+    document.getElementById('pType').value = type;
+    document.getElementById('pRowIndex').value = '';
+    document.getElementById('pInputName').value = '';
+    document.getElementById('pInputAmount').value = '';
+    document.getElementById('pModalTitle').innerText = (type === 'INCOME' ? 'Add Income to ' : 'Add Expense to ') + planName;
+    document.getElementById('btnDeletePItem').style.display = 'none';
+    document.getElementById('pItemModal').style.display = 'block';
+  }
+
+  function openEditPItemModal(planName, type, name, amount, rowIndex) {
+    document.getElementById('pTargetPlan').value = planName;
+    document.getElementById('pType').value = type;
+    document.getElementById('pRowIndex').value = rowIndex;
+    document.getElementById('pInputName').value = name;
+    document.getElementById('pInputAmount').value = amount;
+    document.getElementById('pModalTitle').innerText = 'Edit Item Details';
+    document.getElementById('btnDeletePItem').style.display = 'block';
+    document.getElementById('pItemModal').style.display = 'block';
+  }
+
+  function closePModal() {
+    document.getElementById('pItemModal').style.display = 'none';
+  }
+
+  function submitPItem() {
+    var planName = document.getElementById('pTargetPlan').value;
+    var type = document.getElementById('pType').value;
+    var rowIndex = document.getElementById('pRowIndex').value;
+    var name = document.getElementById('pInputName').value.trim();
+    var amt = document.getElementById('pInputAmount').value;
+
+    if (!name || amt === "") {
+      alert("Name & Amount required!");
+      return;
+    }
+
+    var btn = document.getElementById('btnSavePItem');
+    btn.disabled = true;
+    btn.innerText = "Saving...";
+
+    google.script.run
+      .withSuccessHandler(function(res) {
+        btn.disabled = false;
+        btn.innerText = "Save Item";
+        closePModal();
+        currentOpenPlanName = planName;
+        renderPlanningCards(res);
+      })
+      .withFailureHandler(function(err) {
+        btn.disabled = false;
+        btn.innerText = "Save Item";
+        alert("Error: " + err.message);
+      })
+      .savePlanningEntry(planName, type, name, amt, rowIndex);
+  }
+
+  function deletePItemFromModal() {
+    var rowIndex = document.getElementById('pRowIndex').value;
+    if (rowIndex && confirm("Ee item delete madabeke?")) {
+      closePModal();
+      google.script.run
+        .withSuccessHandler(renderPlanningCards)
+        .deletePlanningItem(parseInt(rowIndex));
+    }
+  }
+
+  function closePlanningView() {
+    currentOpenPlanName = null;
+    document.getElementById('planningContainer').style.display = 'none';
+    document.getElementById('dashboardView').style.display = 'block';
+  }
+</script>

@@ -1,0 +1,202 @@
+<!-- Habit Tracker Mobile UI Component -->
+<style>
+  #habitTrackerContainer {
+    display: none; /* ಆರಂಭದಲ್ಲಿ ಈ ಪೇಜ್ ಹೈಡ್ ಆಗಿರುತ್ತದೆ */
+    width: 100%;
+  }
+  
+  .habit-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .habit-add-btn {
+    background-color: #1a73e8;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    font-size: 22px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
+
+  .habit-add-btn:active {
+    transform: scale(0.92);
+  }
+
+  .habit-table-container {
+    width: 100%;
+    overflow-x: auto;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border: 1px solid #eef2f5;
+  }
+
+  .habit-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .habit-table th, .habit-table td {
+    padding: 10px 4px;
+    text-align: center;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .habit-table th {
+    background-color: #5c2782;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .habit-table th:first-child {
+    text-align: left;
+    padding-left: 10px;
+    border-top-left-radius: 10px;
+  }
+
+  .habit-table th:last-child {
+    border-top-right-radius: 10px;
+  }
+
+  .habit-title-cell {
+    text-align: left !important;
+    padding-left: 10px !important;
+    font-weight: 600;
+    color: #2c3e50;
+    max-width: 110px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .habit-status-btn {
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    user-select: none;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    border: 1px solid #e2e8f0;
+  }
+
+  .habit-status-btn:active {
+    transform: scale(0.88);
+  }
+
+  .is-today-col {
+    background-color: #f3ebff;
+  }
+</style>
+
+<div id="habitTrackerContainer">
+  <div class="habit-header">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <button class="btn-back" onclick="closeHabitView()">← Back</button>
+      <span class="nav-title">Habit Tracker</span>
+    </div>
+    <button class="habit-add-btn" onclick="promptNewHabit()">+</button>
+  </div>
+
+  <div class="habit-table-container">
+    <table class="habit-table">
+      <thead>
+        <tr id="habitTableHeader">
+          <th>Habit Title</th>
+          <!-- Dynamically Loaded Header Days -->
+        </tr>
+      </thead>
+      <tbody id="habitTableBody">
+        <tr><td colspan="8" style="padding:20px; color:#888;">Loading Habits...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  // NOTE: openHabitView() lives in index.html (do not redefine here)
+  function closeHabitView() {
+    var c = document.getElementById('habitTrackerContainer');
+    if (c) c.style.display = 'none';
+    document.getElementById('dashboardView').style.display = 'block';
+  }
+
+  function habitEsc(t) {
+    return String(t == null ? '' : t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function loadHabitTrackerData() {
+    google.script.run
+      .withSuccessHandler(function(data) {
+        window.appDataCache = window.appDataCache || {};
+        window.appDataCache.habits = data;
+        renderHabitTrackerUI(data);
+      })
+      .withFailureHandler(function(err) { alert("Error: " + err.message); })
+      .getHabitTrackerData();
+  }
+
+  function renderHabitTrackerUI(data) {
+    if (!data || !data.daysHeader) return;
+    window.appDataCache = window.appDataCache || {};
+    window.appDataCache.habits = data;
+
+    var headerRowHtml = '<th style="width: 32%;">Habit Title</th>';
+    data.daysHeader.forEach(function(dayObj) {
+      headerRowHtml += '<th' + (dayObj.isToday ? ' class="is-today-col"' : '') + '>' + dayObj.dayName + '</th>';
+    });
+    document.getElementById('habitTableHeader').innerHTML = headerRowHtml;
+
+    if (!data.habits || data.habits.length === 0) {
+      document.getElementById('habitTableBody').innerHTML = '<tr><td colspan="8" style="padding:20px; color:#888;">ಯಾವುದೇ Habit ಇಲ್ಲ. "+" ಬಟನ್ ಬಳಸಿ ಸೇರಿಸಿ.</td></tr>';
+      return;
+    }
+
+    var bodyHtml = '';
+    data.habits.forEach(function(habit) {
+      var t = habitEsc(habit.title);
+      bodyHtml += '<tr><td class="habit-title-cell" title="' + t + '">' + t + '</td>';
+      data.daysHeader.forEach(function(dayObj) {
+        var status = (habit.logs && habit.logs[dayObj.dateStr]) ? habit.logs[dayObj.dateStr] : '';
+        bodyHtml += '<td' + (dayObj.isToday ? ' class="is-today-col"' : '') + '>' +
+          '<div class="habit-status-btn" onclick="toggleStatus(' + habit.rowIndex + ',\'' + dayObj.dateStr + '\',\'' + status + '\')">' + status + '</div></td>';
+      });
+      bodyHtml += '</tr>';
+    });
+    document.getElementById('habitTableBody').innerHTML = bodyHtml;
+  }
+
+  function promptNewHabit() {
+    var habitName = prompt("ಹೊಸ Habit ಹೆಸರು ನಮೂದಿಸಿ (eg: Water, Exercise):");
+    if (habitName && habitName.trim() !== "") {
+      google.script.run
+        .withSuccessHandler(renderHabitTrackerUI)
+        .withFailureHandler(function(err) { alert("Error: " + err.message); })
+        .addNewHabit(habitName.trim());
+    }
+  }
+
+  function toggleStatus(rowIndex, dateStr, currentStatus) {
+    google.script.run
+      .withSuccessHandler(renderHabitTrackerUI)
+      .withFailureHandler(function(err) { alert("Error: " + err.message); })
+      .toggleHabitStatus(rowIndex, dateStr, currentStatus);
+  }
+</script>

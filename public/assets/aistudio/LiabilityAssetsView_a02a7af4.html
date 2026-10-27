@@ -1,0 +1,399 @@
+<!-- Liability & Liquid Assets Module View (Compact Rows) -->
+<style>
+  #liabilityAssetsContainer {
+    display: none;
+    width: 100%;
+  }
+
+  /* Summary Card */
+  .summary-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    border: 1px solid #eef2f5;
+  }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .summary-row.border-top {
+    border-top: 1px dashed #e0e0e0;
+    margin-top: 2px;
+    padding-top: 6px;
+  }
+
+  .txt-green { color: #27ae60; }
+  .txt-red { color: #e74c3c; }
+
+  /* Compact Table Cards */
+  .section-card {
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  }
+
+  .asset-head { background-color: #0e8353; color: white; }
+  .liab-head { background-color: #34495e; color: white; }
+
+  .sec-header {
+    padding: 6px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .sec-title {
+    font-size: 14px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn-add-item {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .sub-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 12px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    opacity: 0.9;
+  }
+
+  /* Table Content - Super Compact Row Spacing */
+  .data-list {
+    background: #ffffff;
+  }
+
+  .data-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 12px;
+    border-bottom: 1px solid #f2f4f7;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .data-row:active {
+    background-color: #f8f9fa;
+  }
+
+  .item-name {
+    font-weight: 600;
+    color: #2c3e50;
+  }
+
+  .item-amount {
+    font-weight: 800;
+    color: #111;
+  }
+
+  .total-row {
+    background: #fafafa;
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 12px;
+    font-weight: 800;
+    font-size: 13px;
+    border-top: 1px solid #eee;
+  }
+
+  /* Compact Modal Form */
+  .la-modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+  }
+
+  .la-modal-content {
+    background: #fff;
+    margin: 25% auto;
+    padding: 18px;
+    border-radius: 14px;
+    width: 88%;
+    max-width: 380px;
+  }
+
+  .la-input {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0 12px 0;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+  }
+
+  .la-btn-group {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn-la-save {
+    flex: 1;
+    background: #1a73e8;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .btn-la-del {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+</style>
+
+<div id="liabilityAssetsContainer">
+  <div class="nav-header">
+    <button class="btn-back" onclick="closeLiabilityAssetsView()">← Back</button>
+    <div class="nav-title">📌 Liability & Liquid Assets</div>
+  </div>
+
+  <!-- Summary Card -->
+  <div class="summary-card">
+    <div class="summary-row">
+      <span>Total Liquid Assets</span>
+      <span class="txt-green" id="laTotalAssets">₹0</span>
+    </div>
+    <div class="summary-row">
+      <span>Total Liabilities</span>
+      <span class="txt-red" id="laTotalLiabilities">₹0</span>
+    </div>
+    <div class="summary-row border-top">
+      <span>Networth</span>
+      <span id="laNetworth">₹0</span>
+    </div>
+  </div>
+
+  <!-- Assets Section -->
+  <div class="section-card">
+    <div class="sec-header asset-head">
+      <div class="sec-title">💰 Liquid Assets (<span id="assetCount">0</span>)</div>
+      <button class="btn-add-item" onclick="openLAModal('ASSET')">+ Add Asset</button>
+    </div>
+    <div class="sub-header asset-head">
+      <span>PARTICULAR / SOURCE</span>
+      <span>AMOUNT</span>
+    </div>
+    <div class="data-list" id="assetsList">
+      <div style="text-align:center; padding:10px; color:#888;">Loading Assets...</div>
+    </div>
+    <div class="total-row">
+      <span>Total Liquid Assets</span>
+      <span class="txt-green" id="assetFooterTotal">₹0</span>
+    </div>
+  </div>
+
+  <!-- Liabilities Section -->
+  <div class="section-card">
+    <div class="sec-header liab-head">
+      <div class="sec-title">💳 Liabilities (<span id="liabCount">0</span>)</div>
+      <button class="btn-add-item" onclick="openLAModal('LIABILITY')">+ Add Liability</button>
+    </div>
+    <div class="sub-header liab-head">
+      <span>PARTICULAR / PAYEE</span>
+      <span>AMOUNT</span>
+    </div>
+    <div class="data-list" id="liabilitiesList">
+      <div style="text-align:center; padding:10px; color:#888;">Loading Liabilities...</div>
+    </div>
+    <div class="total-row">
+      <span>Total Liabilities</span>
+      <span class="txt-red" id="liabFooterTotal">₹0</span>
+    </div>
+  </div>
+</div>
+
+<!-- Add / Edit Modal -->
+<div id="laModal" class="la-modal">
+  <div class="la-modal-content">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <h4 id="laModalTitle" style="margin:0; color:#2c3e50;">Item Details</h4>
+      <button onclick="closeLAModal()" style="background:none; border:none; font-size:18px; cursor:pointer;">✕</button>
+    </div>
+
+    <input type="hidden" id="laItemType">
+    <input type="hidden" id="laRowIndex">
+
+    <label style="font-size:11px; font-weight:bold; color:#555;">Particular / Name</label>
+    <input type="text" id="laInputName" class="la-input" placeholder="e.g. Sabith / Taj Print">
+
+    <label style="font-size:11px; font-weight:bold; color:#555;">Amount (₹)</label>
+    <input type="number" id="laInputAmount" class="la-input" placeholder="e.g. 5000">
+
+    <div class="la-btn-group">
+      <button class="btn-la-save" id="btnSaveLA" onclick="submitLAForm()">Save Item</button>
+      <button class="btn-la-del" id="btnDelLA" onclick="deleteLAItem()" style="display:none;">🗑️</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  var globalLAData = { assets: [], liabilities: [] };
+
+  function loadLiabilityAssetsData() {
+    google.script.run
+      .withSuccessHandler(renderLAUI)
+      .withFailureHandler(function(err) { alert("Error: " + err.message); })
+      .getLiabilityAssetsData();
+  }
+
+  function formatCurrency(num) {
+    return '₹' + Number(num).toLocaleString('en-IN');
+  }
+
+  function renderLAUI(data) {
+    globalLAData = data;
+
+    // Render Summary
+    document.getElementById('laTotalAssets').innerText = formatCurrency(data.totalAssets);
+    document.getElementById('laTotalLiabilities').innerText = formatCurrency(data.totalLiabilities);
+    
+    var netEl = document.getElementById('laNetworth');
+    netEl.innerText = formatCurrency(data.netWorth);
+    netEl.className = data.netWorth < 0 ? 'txt-red' : 'txt-green';
+
+    document.getElementById('assetFooterTotal').innerText = formatCurrency(data.totalAssets);
+    document.getElementById('liabFooterTotal').innerText = formatCurrency(data.totalLiabilities);
+    document.getElementById('assetCount').innerText = data.assets.length;
+    document.getElementById('liabCount').innerText = data.liabilities.length;
+
+    // Render Assets List
+    var assetHtml = '';
+    if (data.assets.length === 0) {
+      assetHtml = '<div style="text-align:center; padding:10px; color:#888;">No Liquid Assets</div>';
+    } else {
+      data.assets.forEach(function(item) {
+        assetHtml += '<div class="data-row" onclick="editLAItem(\'ASSET\', ' + item.rowIndex + ')">' +
+                       '<span class="item-name">' + item.name + '</span>' +
+                       '<span class="item-amount">' + formatCurrency(item.amount) + '</span>' +
+                     '</div>';
+      });
+    }
+    document.getElementById('assetsList').innerHTML = assetHtml;
+
+    // Render Liabilities List
+    var liabHtml = '';
+    if (data.liabilities.length === 0) {
+      liabHtml = '<div style="text-align:center; padding:10px; color:#888;">No Liabilities</div>';
+    } else {
+      data.liabilities.forEach(function(item) {
+        liabHtml += '<div class="data-row" onclick="editLAItem(\'LIABILITY\', ' + item.rowIndex + ')">' +
+                      '<span class="item-name">' + item.name + '</span>' +
+                      '<span class="item-amount">' + formatCurrency(item.amount) + '</span>' +
+                    '</div>';
+      });
+    }
+    document.getElementById('liabilitiesList').innerHTML = liabHtml;
+  }
+
+  function closeLiabilityAssetsView() {
+    document.getElementById('liabilityAssetsContainer').style.display = 'none';
+    document.getElementById('dashboardView').style.display = 'block';
+  }
+
+  function openLAModal(type) {
+    document.getElementById('laItemType').value = type;
+    document.getElementById('laRowIndex').value = '';
+    document.getElementById('laInputName').value = '';
+    document.getElementById('laInputAmount').value = '';
+    document.getElementById('btnDelLA').style.display = 'none';
+    document.getElementById('laModalTitle').innerText = (type === 'ASSET' ? 'Add Liquid Asset' : 'Add Liability');
+    document.getElementById('laModal').style.display = 'block';
+  }
+
+  function editLAItem(type, rowIndex) {
+    var list = (type === 'ASSET') ? globalLAData.assets : globalLAData.liabilities;
+    var item = list.find(function(x) { return x.rowIndex === rowIndex; });
+    if (!item) return;
+
+    document.getElementById('laItemType').value = type;
+    document.getElementById('laRowIndex').value = rowIndex;
+    document.getElementById('laInputName').value = item.name;
+    document.getElementById('laInputAmount').value = item.amount;
+    document.getElementById('btnDelLA').style.display = 'block';
+    document.getElementById('laModalTitle').innerText = (type === 'ASSET' ? 'Edit Asset' : 'Edit Liability');
+    document.getElementById('laModal').style.display = 'block';
+  }
+
+  function closeLAModal() {
+    document.getElementById('laModal').style.display = 'none';
+  }
+
+  function submitLAForm() {
+    var type = document.getElementById('laItemType').value;
+    var rowIndex = document.getElementById('laRowIndex').value;
+    var name = document.getElementById('laInputName').value.trim();
+    var amount = document.getElementById('laInputAmount').value;
+
+    if (!name || amount === "") {
+      alert("Dayavittu Name matthu Amount yeradannu narmudisi!");
+      return;
+    }
+
+    var btn = document.getElementById('btnSaveLA');
+    btn.innerText = "Saving...";
+    btn.disabled = true;
+
+    google.script.run
+      .withSuccessHandler(function(res) {
+        btn.innerText = "Save Item";
+        btn.disabled = false;
+        closeLAModal();
+        renderLAUI(res);
+      })
+      .withFailureHandler(function(err) {
+        btn.innerText = "Save Item";
+        btn.disabled = false;
+        alert("Error: " + err.message);
+      })
+      .saveOrUpdateLiabilityAsset(type, rowIndex, name, amount);
+  }
+
+  function deleteLAItem() {
+    var type = document.getElementById('laItemType').value;
+    var rowIndex = document.getElementById('laRowIndex').value;
+
+    if (confirm("Ee item delete madabeke?")) {
+      google.script.run
+        .withSuccessHandler(function(res) {
+          closeLAModal();
+          renderLAUI(res);
+        })
+        .deleteLiabilityAsset(type, rowIndex);
+    }
+  }
+</script>

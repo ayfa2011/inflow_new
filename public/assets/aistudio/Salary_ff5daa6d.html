@@ -1,0 +1,494 @@
+<!-- Salary Card Module View -->
+<style>
+  #salaryCardContainer { display: none; width: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; box-sizing: border-box; }
+
+  .sc-nav-header { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 12px 16px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 10px; }
+  .sc-nav-header .title { font-size: 16px; font-weight: 800; color: #0b3c5d; display: flex; align-items: center; gap: 6px; }
+  .sc-back-btn { background: none; border: none; font-weight: bold; color: #1a73e8; cursor: pointer; font-size: 14px; padding: 4px 0; }
+
+  .sc-controls-bar { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .sc-select-wrapper { position: relative; display: flex; align-items: center; }
+  .sc-select { padding: 8px 12px 8px 30px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; background: #fff; font-weight: 800; color: #0f172a; cursor: pointer; appearance: none; -webkit-appearance: none; }
+  .sc-select-icon { position: absolute; left: 10px; font-size: 13px; pointer-events: none; }
+  .sc-add-btn { background: #0b3c5d; border: none; color: #fff; padding: 9px 16px; border-radius: 10px; font-weight: 800; cursor: pointer; font-size: 13px; white-space: nowrap; display: flex; align-items: center; gap: 4px; }
+
+  /* 2nd Photo Exact Match: Dark Blue Header Card */
+  .sc-year-summary { background: #0f4c81; color: #fff; border-radius: 14px; padding: 14px 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 3px 6px rgba(0,0,0,0.06); }
+  .sc-summary-left { display: flex; align-items: center; gap: 12px; }
+  .sc-wallet-icon { background: rgba(255, 255, 255, 0.2); width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .sc-year-summary .lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; opacity: 0.85; color: #e2e8f0; margin-bottom: 2px; }
+  .sc-year-summary .inr { font-size: 20px; font-weight: 800; color: #ffffff; letter-spacing: -0.3px; }
+  .sc-aed-box { text-align: right; border-left: 1px solid rgba(255,255,255,0.25); padding-left: 14px; }
+  .sc-year-summary .aed-lbl { font-size: 10px; font-weight: 700; opacity: 0.85; color: #e2e8f0; }
+  .sc-year-summary .aed { font-size: 18px; font-weight: 800; color: #ffffff; }
+
+  /* 12 Months Cards Container */
+  .sc-months-panel { display: flex; flex-direction: column; gap: 6px; }
+  .sc-month-row {
+    display: flex; align-items: center; justify-content: space-between;
+    background: #fff; padding: 8px 12px; border-radius: 12px; border: 1px solid #e2e8f0;
+    cursor: pointer; -webkit-tap-highlight-color: transparent; min-height: 42px; gap: 8px;
+  }
+  .sc-month-row:active { background: #f8fafc; }
+  .sc-month-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+  
+  /* Single Standard Color for Month Badge */
+  .sc-month-badge { width: 36px; height: 26px; border-radius: 7px; background: #eff6ff; color: #1a73e8; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; flex-shrink: 0; }
+  .sc-month-name { font-size: 13px; font-weight: 800; color: #0f172a; white-space: nowrap; }
+  
+  .sc-month-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+  .sc-month-right .inr { font-size: 14px; font-weight: 800; color: #0e8353; text-align: right; white-space: nowrap; }
+  .sc-month-right .divider { color: #e2e8f0; font-size: 12px; font-weight: 300; }
+  .sc-month-right .aed { font-size: 12px; font-weight: 700; color: #64748b; text-align: right; white-space: nowrap; }
+  .sc-month-right .empty-group { display: flex; align-items: center; gap: 16px; margin-right: 4px; }
+  .sc-month-right .empty { font-size: 13px; color: #cbd5e1; font-weight: 700; }
+  .sc-month-chevron { color: #cbd5e1; font-size: 13px; flex-shrink: 0; margin-left: 2px; }
+  
+  .sc-month-row.sc-has-entry .sc-month-badge { background: #eff6ff; color: #1a73e8; }
+  .sc-month-row.sc-current { border-color: #93c5fd; }
+  .sc-month-row.sc-current .sc-month-name { color: #1a73e8; }
+
+  /* Read-only detail view shown inside a modal when a month with data is tapped */
+  .sc-detail-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; border-bottom: 1px dashed #f1f5f9; }
+  .sc-detail-row:last-of-type { border-bottom: none; }
+  .sc-detail-row .k { color: #64748b; }
+  .sc-detail-row .v { font-weight: 700; color: #1e293b; }
+  .sc-detail-total { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 8px 10px; margin: 6px 0; display: flex; justify-content: space-between; align-items: center; }
+  .sc-detail-total .k { font-size: 12px; font-weight: 700; color: #166534; }
+  .sc-detail-total .v { text-align: right; }
+  .sc-detail-total .v .aed { font-size: 15px; font-weight: 800; color: #0e8353; display: block; }
+  .sc-detail-total .v .inr { font-size: 11px; font-weight: 700; color: #15803d; }
+  .sc-detail-remarks { font-size: 12px; color: #475569; background: #f8fafc; border-radius: 8px; padding: 8px 10px; margin-top: 6px; }
+  .sc-detail-actions { display: flex; gap: 8px; margin-top: 10px; }
+  .sc-detail-actions button { flex: 1; padding: 7px; border-radius: 8px; font-weight: 700; font-size: 12px; cursor: pointer; }
+  .sc-edit-btn { background: #eef2f7; color: #334155; border: none; }
+  .sc-del-btn { background: #fff; color: #e74c3c; border: 1px solid #e74c3c; }
+
+  /* Modal */
+  .sc-modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); overflow-y: auto; }
+  .sc-modal-content { background: #fff; margin: 5% auto; padding: 18px; border-radius: 14px; width: 88%; max-width: 380px; box-sizing: border-box; }
+  .sc-input { width: 100%; padding: 9px; margin: 6px 0 12px 0; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
+  .sc-label { font-size: 11px; font-weight: bold; color: #475569; }
+  .sc-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .sc-preview { border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; font-size: 13px; background: #f0fdf4; border: 1px solid #bbf7d0; }
+  .sc-preview .line { display: flex; justify-content: space-between; margin: 2px 0; }
+  .sc-rate-note { font-size: 10px; color: #94a3b8; margin: -6px 0 10px 0; }
+
+  #scToast { display: none; position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #0f172a; color: #fff; padding: 9px 16px; border-radius: 20px; font-size: 13px; z-index: 3000; }
+</style>
+
+<div id="salaryCardContainer">
+  <div class="sc-nav-header">
+    <button class="sc-back-btn" onclick="closeSalaryCardView()">← Dashboard</button>
+    <div class="title">💰 Salary Card</div>
+    <div style="width:70px;"></div>
+  </div>
+
+  <div class="sc-controls-bar">
+    <div class="sc-select-wrapper">
+      <span class="sc-select-icon">📅</span>
+      <select id="scYearSelect" class="sc-select" onchange="scYearChanged()"></select>
+    </div>
+    <button class="sc-add-btn" onclick="openScAddModal()">+ Add Salary</button>
+  </div>
+
+  <div class="sc-year-summary">
+    <div class="sc-summary-left">
+      <div class="sc-wallet-icon">👛</div>
+      <div>
+        <div class="lbl">TOTAL SALARY (<span id="scYearLabel">-</span>)</div>
+        <div class="inr" id="scYearTotalINR">₹0</div>
+      </div>
+    </div>
+    <div class="sc-aed-box">
+      <div class="aed-lbl">AED</div>
+      <div class="aed" id="scYearTotalAED">0</div>
+    </div>
+  </div>
+
+  <div id="scMonthsList"></div>
+</div>
+
+<!-- Modal: Add / Edit Salary -->
+<div id="scModal" class="sc-modal">
+  <div class="sc-modal-content">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <h4 id="scModalTitle" style="margin:0; font-size:15px;">Add Salary</h4>
+      <button onclick="closeScModal()" style="background:none; border:none; font-size:18px; cursor:pointer;">✕</button>
+    </div>
+
+    <div class="sc-row2">
+      <div>
+        <label class="sc-label">Year</label>
+        <input type="number" id="scYear" class="sc-input" placeholder="2026" oninput="scUpdatePreview()">
+      </div>
+      <div>
+        <label class="sc-label">Month</label>
+        <select id="scMonth" class="sc-input">
+          <option value="01">January</option><option value="02">February</option><option value="03">March</option>
+          <option value="04">April</option><option value="05">May</option><option value="06">June</option>
+          <option value="07">July</option><option value="08">August</option><option value="09">September</option>
+          <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+        </select>
+      </div>
+    </div>
+
+    <label class="sc-label">Basic Salary (AED)</label>
+    <input type="number" step="any" id="scBasic" class="sc-input" placeholder="e.g. 5000" oninput="scUpdatePreview()">
+
+    <label class="sc-label">Allowance (AED)</label>
+    <input type="number" step="any" id="scAllowance" class="sc-input" placeholder="e.g. 500" oninput="scUpdatePreview()">
+
+    <label class="sc-label">OT (AED)</label>
+    <input type="number" step="any" id="scOt" class="sc-input" placeholder="e.g. 200" oninput="scUpdatePreview()">
+
+    <div id="scPreview" class="sc-preview">Enter Basic Salary to see Total</div>
+
+    <label class="sc-label">Conversion Rate (1 AED = ₹)</label>
+    <input type="number" step="any" id="scRate" class="sc-input" oninput="scUpdatePreview()">
+    <div class="sc-rate-note" id="scRateNote">Fetching live rate...</div>
+
+    <label class="sc-label">Deduction (AED) — shown in details only, not subtracted from Total</label>
+    <input type="number" step="any" id="scDeduction" class="sc-input" placeholder="e.g. 0">
+
+    <label class="sc-label">Remarks</label>
+    <textarea id="scRemarks" class="sc-input" rows="2" placeholder="Optional note"></textarea>
+
+    <button id="scSaveBtn" onclick="submitScEntry()" style="width:100%; padding:10px; background:#0b3c5d; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Save</button>
+    <button id="scDeleteBtn" onclick="deleteScEntry()" style="display:none; width:100%; margin-top:8px; padding:9px; background:#fff; color:#e74c3c; border:1px solid #e74c3c; border-radius:8px; font-weight:bold; cursor:pointer;">Delete Entry</button>
+  </div>
+</div>
+
+<!-- Modal: View Salary -->
+<div id="scViewModal" class="sc-modal">
+  <div class="sc-modal-content">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <h4 id="scViewTitle" style="margin:0; font-size:15px;">Salary Details</h4>
+      <button onclick="closeScViewModal()" style="background:none; border:none; font-size:18px; cursor:pointer;">✕</button>
+    </div>
+    <div id="scViewBody"></div>
+    <div class="sc-detail-actions">
+      <button class="sc-edit-btn" onclick="scEditFromView()">✏️️ Edit</button>
+      <button class="sc-del-btn" onclick="scDeleteFromView()">🗑️ Delete</button>
+    </div>
+  </div>
+</div>
+
+<div id="scToast"></div>
+
+<script>
+  var scAllEntries = [];
+  var scSelectedYear = null;
+  var scModalMode = 'ADD';
+  var scEditingEntry = null;
+
+  var SC_MONTH_NAMES = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+  function loadSalaryDataFromSheet() {
+    document.getElementById('scMonthsList').innerHTML = '<div style="padding:20px; text-align:center; color:#888; font-size:12px;">Loading...</div>';
+    google.script.run
+      .withSuccessHandler(function(res) { scApplyData_(res); })
+      .withFailureHandler(function(err) { alert("Error loading salary data: " + err.message); })
+      .getSalaryCardData();
+  }
+
+  function scApplyData_(res) {
+    scAllEntries = (res && res.entries) || [];
+    var years = scGetYearsList_();
+    if (!scSelectedYear || years.indexOf(Number(scSelectedYear)) === -1) {
+      scSelectedYear = years[0];
+    }
+    renderScYearDropdown();
+    renderScMonths();
+  }
+
+  function scMoney(n) { return Number(n || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 }); }
+  function scEsc(v) {
+    return String(v == null ? '' : v)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+  }
+  function scFind(rowIndex) {
+    for (var i = 0; i < scAllEntries.length; i++) if (scAllEntries[i].rowIndex === rowIndex) return scAllEntries[i];
+    return null;
+  }
+  function scToast(msg) {
+    var t = document.getElementById('scToast');
+    t.innerText = msg; t.style.display = 'block';
+    setTimeout(function() { t.style.display = 'none'; }, 2200);
+  }
+
+  function scGetYearsList_() {
+    var set = {};
+    scAllEntries.forEach(function(e) { set[e.year] = true; });
+    set[new Date().getFullYear()] = true;
+    return Object.keys(set).map(Number).sort(function(a, b) { return b - a; });
+  }
+
+  function renderScYearDropdown() {
+    var years = scGetYearsList_();
+    var sel = document.getElementById('scYearSelect');
+    sel.innerHTML = years.map(function(y) { return '<option value="' + y + '">' + y + ' ˅</option>'; }).join('');
+    sel.value = scSelectedYear;
+  }
+
+  function scYearChanged() {
+    scSelectedYear = Number(document.getElementById('scYearSelect').value);
+    renderScMonths();
+  }
+
+  function renderScMonths() {
+    document.getElementById('scYearLabel').innerText = scSelectedYear;
+
+    var yearEntries = scAllEntries.filter(function(e) { return Number(e.year) === Number(scSelectedYear); });
+    var yearTotalAED = 0, yearTotalINR = 0;
+    yearEntries.forEach(function(e) {
+      yearTotalAED += Number(e.totalAED) || 0;
+      yearTotalINR += Number(e.totalINR) || 0;
+    });
+    document.getElementById('scYearTotalAED').innerText = scMoney(yearTotalAED);
+    document.getElementById('scYearTotalINR').innerText = '₹' + scMoney(yearTotalINR);
+
+    var html = '<div class="sc-months-panel">';
+
+    for (var m = 1; m <= 12; m++) {
+      var mm = m < 10 ? '0' + m : String(m);
+      var entry = null;
+
+      for (var i = 0; i < yearEntries.length; i++) {
+        if (scNormalizeMonth_(yearEntries[i].month) === mm) {
+          entry = yearEntries[i];
+          break;
+        }
+      }
+
+      var hasEntryClass = entry ? ' sc-has-entry' : '';
+      var currentClass = (Number(scSelectedYear) === new Date().getFullYear() &&
+                          m === new Date().getMonth() + 1) ? ' sc-current' : '';
+
+      html += '<div class="sc-month-row' + hasEntryClass + currentClass + '" onclick="scMonthTapped(\'' + mm + '\')">';
+      html += '<div class="sc-month-left">';
+      html += '<div class="sc-month-badge">' + SC_MONTH_NAMES[m].substring(0, 3).toUpperCase() + '</div>';
+      html += '<div class="sc-month-name">' + SC_MONTH_NAMES[m] + '</div>';
+      html += '</div>';
+
+      if (entry) {
+        html += '<div class="sc-month-right">' +
+                  '<span class="inr">₹' + scMoney(entry.totalINR) + '</span>' +
+                  '<span class="divider">|</span>' +
+                  '<span class="aed">AED ' + scMoney(entry.totalAED) + '</span>' +
+                '</div>';
+      } else {
+        html += '<div class="sc-month-right">' +
+                  '<div class="empty-group"><span class="empty">—</span><span class="divider">|</span><span class="empty">—</span></div>' +
+                '</div>';
+      }
+      html += '<div class="sc-month-chevron">›</div>';
+      html += '</div>';
+    }
+
+    html += '</div>';
+    document.getElementById('scMonthsList').innerHTML = html;
+  }
+
+  function scNormalizeMonth_(m) {
+    if (m instanceof Date && !isNaN(m.getTime())) {
+      return String(m.getMonth() + 1).padStart(2, '0');
+    }
+
+    var s = String(m == null ? '' : m).trim();
+    var names = {
+      january:'01', february:'02', march:'03', april:'04',
+      may:'05', june:'06', july:'07', august:'08',
+      september:'09', october:'10', november:'11', december:'12'
+    };
+
+    var lower = s.toLowerCase();
+    if (names[lower]) return names[lower];
+
+    var n = Number(s);
+    if (!isNaN(n) && n >= 1 && n <= 12) {
+      return String(Math.floor(n)).padStart(2, '0');
+    }
+    return s;
+  }
+
+  function scMonthTapped(mm) {
+    var entry = null;
+    for (var i = 0; i < scAllEntries.length; i++) {
+      if (Number(scAllEntries[i].year) === Number(scSelectedYear) && scNormalizeMonth_(scAllEntries[i].month) === mm) { entry = scAllEntries[i]; break; }
+    }
+    if (!entry) { openScAddModal(mm); return; }
+    openScViewModal(entry.rowIndex);
+  }
+
+  function openScViewModal(rowIndex) {
+    var entry = scFind(rowIndex);
+    if (!entry) return;
+    scEditingEntry = entry;
+    document.getElementById('scViewTitle').innerText = SC_MONTH_NAMES[Number(entry.month)] + ' ' + entry.year;
+
+    var body = '';
+    body += '<div class="sc-detail-row"><span class="k">Basic Salary</span><span class="v">AED ' + scMoney(entry.basic) + '</span></div>';
+    body += '<div class="sc-detail-row"><span class="k">Allowance</span><span class="v">AED ' + scMoney(entry.allowance) + '</span></div>';
+    body += '<div class="sc-detail-row"><span class="k">OT</span><span class="v">AED ' + scMoney(entry.ot) + '</span></div>';
+    body += '<div class="sc-detail-total"><span class="k">Total Salary</span><div class="v"><span class="aed">AED ' + scMoney(entry.totalAED) + '</span><span class="inr">₹' + scMoney(entry.totalINR) + '</span></div></div>';
+    body += '<div class="sc-detail-row"><span class="k">Deduction</span><span class="v">AED ' + scMoney(entry.deduction) + '</span></div>';
+    if (entry.remarks) body += '<div class="sc-detail-remarks">📝 ' + scEsc(entry.remarks) + '</div>';
+    document.getElementById('scViewBody').innerHTML = body;
+
+    document.getElementById('scViewModal').style.display = 'block';
+  }
+
+  function closeScViewModal() {
+    document.getElementById('scViewModal').style.display = 'none';
+  }
+
+  function scEditFromView() {
+    var e = scEditingEntry;
+    closeScViewModal();
+    openScEditModal(e.rowIndex);
+  }
+
+  function scDeleteFromView() {
+    var e = scEditingEntry;
+    if (confirm('Delete ' + SC_MONTH_NAMES[Number(e.month)] + ' ' + e.year + ' salary entry? Idu undo madalu aagalla.')) {
+      closeScViewModal();
+      deleteScEntry();
+    }
+  }
+
+  function scShowModal(title, showDelete) {
+    document.getElementById('scModalTitle').innerText = title;
+    document.getElementById('scSaveBtn').disabled = false;
+    document.getElementById('scSaveBtn').innerText = 'Save';
+    document.getElementById('scDeleteBtn').style.display = showDelete ? 'block' : 'none';
+    document.getElementById('scModal').style.display = 'block';
+  }
+
+  function scFetchRateIntoField() {
+    document.getElementById('scRateNote').innerText = 'Fetching live rate...';
+    google.script.run
+      .withSuccessHandler(function(res) {
+        if (!document.getElementById('scRate').value) document.getElementById('scRate').value = res.rate;
+        document.getElementById('scRateNote').innerText = res.live
+          ? 'Live rate fetched. You can adjust it if needed.'
+          : 'Could not fetch live rate — using default. Please verify before saving.';
+        scUpdatePreview();
+      })
+      .withFailureHandler(function() {
+        document.getElementById('scRateNote').innerText = 'Could not fetch live rate — enter it manually.';
+      })
+      .getAedInrRate();
+  }
+
+  function openScAddModal(prefillMonth) {
+    scModalMode = 'ADD'; scEditingEntry = null;
+    document.getElementById('scYear').value = scSelectedYear || new Date().getFullYear();
+    document.getElementById('scMonth').value = prefillMonth || String(new Date().getMonth() + 1).padStart(2, '0');
+    document.getElementById('scBasic').value = '';
+    document.getElementById('scAllowance').value = '';
+    document.getElementById('scOt').value = '';
+    document.getElementById('scDeduction').value = '';
+    document.getElementById('scRemarks').value = '';
+    document.getElementById('scRate').value = '';
+    scShowModal('Add Salary', false);
+    scFetchRateIntoField();
+    scUpdatePreview();
+  }
+
+  function openScEditModal(rowIndex) {
+    var e = scFind(rowIndex);
+    if (!e) return;
+    scModalMode = 'EDIT'; scEditingEntry = e;
+    document.getElementById('scYear').value = e.year;
+    document.getElementById('scMonth').value = e.month;
+    document.getElementById('scBasic').value = e.basic;
+    document.getElementById('scAllowance').value = e.allowance;
+    document.getElementById('scOt').value = e.ot;
+    document.getElementById('scDeduction').value = e.deduction;
+    document.getElementById('scRemarks').value = e.remarks;
+    document.getElementById('scRate').value = e.rate;
+    document.getElementById('scRateNote').innerText = 'Saved rate for this entry. Adjust only if needed.';
+    scShowModal('Edit Salary', true);
+    scUpdatePreview();
+  }
+
+  function closeScModal() {
+    document.getElementById('scModal').style.display = 'none';
+  }
+
+  function scUpdatePreview() {
+    var basic = parseFloat(document.getElementById('scBasic').value) || 0;
+    var allowance = parseFloat(document.getElementById('scAllowance').value) || 0;
+    var ot = parseFloat(document.getElementById('scOt').value) || 0;
+    var rate = parseFloat(document.getElementById('scRate').value) || 0;
+
+    var totalAED = Math.round((basic + allowance + ot) * 100) / 100;
+    var totalINR = Math.round(totalAED * rate * 100) / 100;
+
+    document.getElementById('scPreview').innerHTML =
+      '<div class="line"><span>Total Salary AED</span><span style="font-weight:800; color:#0e8353;">AED ' + scMoney(totalAED) + '</span></div>' +
+      '<div class="line"><span>Total Salary INR</span><span style="font-weight:800; color:#0e8353;">₹' + scMoney(totalINR) + '</span></div>';
+  }
+
+  function submitScEntry() {
+    var entry = {};
+    if (scModalMode === 'EDIT') entry.rowIndex = scEditingEntry.rowIndex;
+
+    entry.year = parseInt(document.getElementById('scYear').value, 10);
+    entry.month = document.getElementById('scMonth').value;
+    entry.basic = parseFloat(document.getElementById('scBasic').value) || 0;
+    entry.allowance = parseFloat(document.getElementById('scAllowance').value) || 0;
+    entry.ot = parseFloat(document.getElementById('scOt').value) || 0;
+    entry.deduction = parseFloat(document.getElementById('scDeduction').value) || 0;
+    entry.remarks = document.getElementById('scRemarks').value.trim();
+    entry.rate = parseFloat(document.getElementById('scRate').value) || 0;
+
+    if (!entry.year || entry.year < 2000 || entry.year > 2100) {
+      alert("Dayavittu sari aada Year enter madi!");
+      return;
+    }
+    if (entry.basic <= 0 && entry.allowance <= 0 && entry.ot <= 0) {
+      alert("Dayavittu Basic Salary, Allowance ya OT yaavudadaru ondu enter madi!");
+      return;
+    }
+    if (entry.rate <= 0) {
+      alert("Dayavittu Conversion Rate (1 AED = ₹) enter madi!");
+      return;
+    }
+
+    var btn = document.getElementById('scSaveBtn');
+    btn.disabled = true; btn.innerText = 'Saving...';
+
+    google.script.run
+      .withSuccessHandler(function(res) {
+        scAllEntries = res.entries || [];
+        scSelectedYear = entry.year;
+        closeScModal();
+        renderScYearDropdown();
+        renderScMonths();
+        scToast(scModalMode === 'ADD' ? 'Salary added ✅' : 'Salary updated ✅');
+      })
+      .withFailureHandler(function(err) {
+        btn.disabled = false; btn.innerText = 'Save';
+        alert("Error saving: " + err.message);
+      })
+      .saveSalaryEntry(entry);
+  }
+
+  function deleteScEntry() {
+    if (!scEditingEntry) return;
+    google.script.run
+      .withSuccessHandler(function(res) {
+        scAllEntries = res.entries || [];
+        closeScModal();
+        closeScViewModal();
+        renderScYearDropdown();
+        renderScMonths();
+        scToast('Entry deleted');
+      })
+      .withFailureHandler(function(err) { alert("Error deleting: " + err.message); })
+      .deleteSalaryEntry(scEditingEntry.rowIndex);
+  }
+</script>

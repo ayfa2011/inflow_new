@@ -1,0 +1,8 @@
+{
+  "name": "inflow2036",
+  "description": "Complete personal workspace, finance, habits, ERP and life management dashboard ported from Google Apps Script.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -1,0 +1,726 @@
+<style>
+  #fivePercentClubContainer { display: none; width: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  .fpc-nav-header { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 12px 16px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 12px; }
+  .fpc-controls-bar { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 10px 14px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 12px; }
+  .fpc-select { padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; background: #fff; font-weight: 600; }
+  .fpc-metrics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 12px; }
+  .fpc-metric-card { background: #fff; border-radius: 12px; padding: 12px 14px; border: 1px solid #e2e8f0; }
+  .fpc-metric-card.full-width { grid-column: span 2; background: linear-gradient(135deg, #0b3c5d 0%, #1a73e8 100%); color: white; }
+  .fpc-metric-title { font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
+  .fpc-metric-card.full-width .fpc-metric-title { color: #cbd5e1; }
+  .fpc-metric-value { font-size: 16px; font-weight: 800; color: #0f172a; }
+  .fpc-metric-card.full-width .fpc-metric-value { font-size: 18px; color: #ffffff; }
+  .fpc-sec-card { background: #fff; border-radius: 12px; overflow: hidden; margin-bottom: 12px; border: 1px solid #e2e8f0; }
+  .fpc-sec-header { padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; background: #0b3c5d; color: white; }
+  .fpc-sec-header.open { background: #b45309; }
+  .fpc-data-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 14px; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
+  .profit-text { color: #0e8353; font-weight: 700; }
+  .loss-text { color: #e74c3c; font-weight: 700; }
+  .fpc-btn { border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 12px; padding: 7px 12px; }
+  .fpc-btn.exit { background: #0e8353; color: #fff; }
+  .fpc-btn.edit { background: #eef2f7; color: #334155; }
+  .fpc-modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); overflow-y: auto; }
+  .fpc-modal-content { background: #fff; margin: 5% auto; padding: 18px; border-radius: 14px; width: 88%; max-width: 380px; box-sizing: border-box; }
+  .fpc-input { width: 100%; padding: 9px; margin: 6px 0 12px 0; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
+  .fpc-label { font-size: 11px; font-weight: bold; color: #475569; }
+  .fpc-preview { border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; font-size: 13px; background: #f8fafc; border: 1px solid #e2e8f0; }
+  .fpc-preview .line { display: flex; justify-content: space-between; margin: 2px 0; }
+  .fpc-preview .net { margin-top: 6px; padding-top: 6px; border-top: 1px dashed #cbd5e1; font-size: 15px; font-weight: 800; }
+  #fpcToast { display: none; position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #0f172a; color: #fff; padding: 9px 16px; border-radius: 20px; font-size: 13px; z-index: 3000; }
+
+  /* Inflow Scanner Panel Styles (Replace 1) */
+  #inflowScannerPanel { display:none; background:#f1f5f9; border-radius:16px; padding:12px; margin:12px 0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
+  .isc-top { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .isc-title { font-size:16px; font-weight:800; color:#0f172a; }
+  .isc-sub { font-size:11px; color:#64748b; margin-top:2px; }
+  .isc-back { border:1px solid #cbd5e1; background:#fff; border-radius:999px; padding:6px 12px; font-size:12px; font-weight:700; color:#334155; cursor:pointer; white-space:nowrap; }
+  .isc-bar { display:flex; gap:8px; align-items:flex-end; margin-top:10px; }
+  .isc-cap { flex:1; font-size:11px; font-weight:700; color:#475569; }
+  .isc-cap input { display:block; width:100%; box-sizing:border-box; margin-top:4px; padding:10px 12px; border:1px solid #cbd5e1; border-radius:12px; font-size:14px; background:#fff; }
+  .isc-scan { background:#1a73e8; color:#fff; border:0; border-radius:12px; padding:11px 18px; font-weight:800; font-size:14px; cursor:pointer; white-space:nowrap; }
+  .isc-scan:disabled { opacity:.6; cursor:default; }
+  .isc-modes { display:flex; gap:6px; margin-top:10px; background:#e2e8f0; padding:4px; border-radius:12px; }
+  .isc-mode { flex:1; border:0; background:transparent; border-radius:9px; padding:8px 4px; font-size:12px; font-weight:700; color:#475569; cursor:pointer; }
+  .isc-mode.on { background:#fff; color:#0b65c2; box-shadow:0 1px 3px rgba(15,23,42,.12); }
+  .isc-custom { display:none; margin-top:8px; }
+  .isc-custom input { display:block; width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #cbd5e1; border-radius:12px; font-size:14px; background:#fff; text-transform:uppercase; }
+  .isc-custom small { display:block; color:#64748b; font-size:11px; margin:4px 2px 0; }
+  .isc-status { font-size:12px; color:#64748b; margin:10px 2px 8px; }
+  .isc-legend { font-size:11px; color:#64748b; margin:0 2px 8px; }
+  .isc-list { display:grid; grid-template-columns:repeat(auto-fill,minmax(440px,1fr)); gap:10px; }
+  .isc-card { background:#fff; border-radius:18px; padding:12px 14px; border:1px solid #e5e7eb; box-shadow:0 1px 3px rgba(15,23,42,.06); }
+  .isc-card.ok { border:1.5px solid #16a34a; background:#f0fdf4; }
+  .isc-head { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:6px; }
+  .isc-name { font-size:16px; font-weight:800; color:#0f172a; line-height:1.25; }
+  .isc-meta { font-size:11px; color:#64748b; margin-top:2px; }
+  .isc-score { font-size:20px; font-weight:800; white-space:nowrap; }
+  .isc-body { display:grid; grid-template-columns:1fr 175px; gap:0 16px; }
+  .isc-row { display:flex; gap:6px; padding:6px 0; border-top:1px solid #e5e7eb; font-size:12.5px; line-height:1.35; }
+  .isc-row i { font-style:normal; color:#64748b; flex:0 0 auto; }
+  .isc-row.p { color:#16a34a; } .isc-row.f { color:#dc2626; }
+  .isc-vals { display:grid; }
+  .isc-v { display:flex; justify-content:space-between; gap:8px; padding:6px 0; border-top:1px solid #e5e7eb; font-size:12.5px; color:#334155; }
+  .isc-v b { color:#0f172a; font-weight:700; }
+  .isc-note { font-size:11px; color:#64748b; margin:10px 2px 0; }
+  @media (max-width:600px) {
+    .isc-list { grid-template-columns:1fr; }
+    .isc-body { grid-template-columns:1fr; }
+    .isc-vals { grid-template-columns:repeat(3,1fr); gap:6px; margin-top:8px; border-top:1px solid #e5e7eb; padding-top:8px; }
+    .isc-v { flex-direction:column; border:0; background:#f8fafc; border-radius:10px; padding:6px 8px; font-size:11px; }
+    .isc-v b { font-size:13px; }
+  }
+</style>
+
+<div id="fivePercentClubContainer">
+  <!-- Python Scanner Section (Replace 1 UI Block) -->
+  <section id="inflowScannerPanel">
+    <div class="isc-top">
+      <div>
+        <div class="isc-title">🐍 Python Scanner</div>
+        <div class="isc-sub">7 checks · Supertrend (10,3) + ADX ≥25 · +5% target</div>
+      </div>
+      <button type="button" class="isc-back" onclick="closeInflowScanner()">← Tracker</button>
+    </div>
+    <div class="isc-modes" id="inflowModes">
+      <button type="button" class="isc-mode on" data-mode="watchlist" onclick="setInflowMode('watchlist')">My Watchlist</button>
+      <button type="button" class="isc-mode" data-mode="nifty100" onclick="setInflowMode('nifty100')">Nifty 100</button>
+      <button type="button" class="isc-mode" data-mode="custom" onclick="setInflowMode('custom')">Custom Stock</button>
+    </div>
+    <div class="isc-custom" id="inflowCustomBox">
+      <input id="inflowCustomSymbols" type="text" placeholder="NSE symbol: TCS or TCS, RELIANCE, M&amp;M" autocapitalize="characters" autocomplete="off" onkeydown="if(event.key==='Enter'){runInflowPythonScan();}">
+      <small>NSE symbol type maadi (max 20, comma-separated). Quarter result bandha stock yaavdadru check maadabahudu.</small>
+    </div>
+    <div class="isc-bar">
+      <label class="isc-cap">Capital (₹)
+        <input id="inflowScanCapital" type="number" min="1" step="1000" value="30000">
+      </label>
+      <button id="inflowScanBtn" type="button" class="isc-scan" onclick="runInflowPythonScan()">Scan</button>
+    </div>
+    <div id="inflowScanStatus" class="isc-status" role="status">Scanner API connected. Set capital and scan the market.</div>
+    <div id="inflowScanResults"></div>
+  </section>
+
+  <div class="fpc-nav-header">
+    <button onclick="closeFPCView()" style="background:none; border:none; font-weight:bold; color:#1a73e8; cursor:pointer;">← Dashboard</button>
+    <div style="font-size: 16px; font-weight: 800; color: #0b3c5d;">📈 5% Club Trading Tracker</div>
+    <button onclick="openInflowScanner()" style="background:#0b65c2;border:0;color:#fff;padding:7px 10px;border-radius:8px;font-weight:700;font-size:12px;">Scan Market</button>
+    <button onclick="openNewFPCTradeModal()" style="background:#1a73e8; border:none; color:#fff; padding:6px 12px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:12px;">+ New Trade</button>
+  </div>
+
+  <!-- OPEN TRADES (not exited yet) -->
+  <div class="fpc-sec-card">
+    <div class="fpc-sec-header open">
+      <span id="fpcOpenTitle" style="font-size:13px; font-weight:800;">🟠 Open Trades (0)</span>
+    </div>
+    <div id="fpcOpenList">
+      <div style="padding:20px; text-align:center; color:#888; font-size:12px;">Loading...</div>
+    </div>
+  </div>
+
+  <div class="fpc-controls-bar">
+    <div>
+      <label style="font-size:11px; font-weight:bold; color:#475569; display:block;">Select Exit Month:</label>
+      <select id="fpcMonthSelect" class="fpc-select" onchange="fpcMonthChanged()">
+        <option value="01">January</option><option value="02">February</option><option value="03">March</option>
+        <option value="04">April</option><option value="05">May</option><option value="06">June</option>
+        <option value="07">July</option><option value="08">August</option><option value="09">September</option>
+        <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+      </select>
+    </div>
+    <div>
+      <label style="font-size:11px; font-weight:bold; color:#475569; display:block;">Range / Year:</label>
+      <select id="fpcRangeSelect" class="fpc-select" onchange="fpcRangeChanged()">
+        <option value="CURRENT_YEAR" selected>Current Year</option>
+        <option value="LAST_YEAR">Last Year</option>
+        <option value="OVER_ALL">Over All</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="fpc-metrics-grid">
+    <div class="fpc-metric-card"><div class="fpc-metric-title">Profit Trades</div><div id="fpcProfitCount" class="fpc-metric-value" style="color:#0e8353;">0</div></div>
+    <div class="fpc-metric-card"><div class="fpc-metric-title">Loss Trades</div><div id="fpcLossCount" class="fpc-metric-value" style="color:#e74c3c;">0</div></div>
+    <div class="fpc-metric-card"><div class="fpc-metric-title">Total Profit (after charges)</div><div id="fpcTotProfit" class="fpc-metric-value" style="color:#0e8353;">₹0</div></div>
+    <div class="fpc-metric-card"><div class="fpc-metric-title">Total Loss (after charges)</div><div id="fpcTotLoss" class="fpc-metric-value" style="color:#e74c3c;">₹0</div></div>
+    <div class="fpc-metric-card full-width" style="grid-column: span 2;"><div class="fpc-metric-title">Broker Charges Paid</div><div id="fpcTotCharges" class="fpc-metric-value" style="font-size:16px;">₹0</div></div>
+    <div class="fpc-metric-card full-width"><div class="fpc-metric-title">Net Balance / P&L</div><div id="fpcNetBal" class="fpc-metric-value">₹0</div></div>
+  </div>
+
+  <div class="fpc-sec-card">
+    <div class="fpc-sec-header">
+      <span style="font-size:13px; font-weight:800;">📋 Trade History (Exited in Selected Month)</span>
+    </div>
+    <div id="fpcTradesList">
+      <div style="padding:20px; text-align:center; color:#888; font-size:12px;">Loading Data from Sheet...</div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: New / Edit / Exit -->
+<div id="fpcModal" class="fpc-modal">
+  <div class="fpc-modal-content">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <h4 id="fpcModalTitle" style="margin:0; font-size:15px;">Add New Trade</h4>
+      <button onclick="closeFPCModal()" style="background:none; border:none; font-size:18px; cursor:pointer;">✕</button>
+    </div>
+
+    <!-- Shown only in Exit mode -->
+    <div id="fpcExitSummary" style="display:none; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:10px 12px; margin-bottom:12px; font-size:13px;"></div>
+
+    <!-- Entry fields (New / Edit) -->
+    <div id="fpcEntryFields">
+      <label class="fpc-label">Asset Name</label>
+      <input type="text" id="fpcAsset" class="fpc-input" placeholder="e.g. Coal India">
+
+      <label class="fpc-label">Investment Amount (₹)</label>
+      <input type="number" id="fpcInv" class="fpc-input" placeholder="e.g. 25000" oninput="updateFPCPreview()">
+
+      <label class="fpc-label">Entry Date</label>
+      <input type="date" id="fpcEntryDate" class="fpc-input">
+    </div>
+
+    <!-- Exit fields (Exit / Edit exited trade) -->
+    <div id="fpcExitFields" style="display:none;">
+      <label class="fpc-label">Exit Date</label>
+      <input type="date" id="fpcExitDate" class="fpc-input">
+
+      <label class="fpc-label">Exit in % (e.g. 2.5 or -1.5)</label>
+      <input type="number" step="any" id="fpcPct" class="fpc-input" placeholder="e.g. 2" oninput="updateFPCPreview()">
+
+      <label class="fpc-label">Broker Charges (₹)</label>
+      <input type="number" step="any" min="0" id="fpcCharges" class="fpc-input" placeholder="e.g. 45" oninput="updateFPCPreview()">
+
+      <div id="fpcPreview" class="fpc-preview"></div>
+    </div>
+
+    <button id="fpcSaveBtn" onclick="submitFPCTradeData()" style="width:100%; padding:10px; background:#1a73e8; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Save</button>
+    <button id="fpcDeleteBtn" onclick="deleteFPCTrade()" style="display:none; width:100%; margin-top:8px; padding:9px; background:#fff; color:#e74c3c; border:1px solid #e74c3c; border-radius:8px; font-weight:bold; cursor:pointer;">Delete Trade</button>
+  </div>
+</div>
+
+<div id="fpcToast"></div>
+
+<script>
+  var rawFPCTrades = [];
+  var fpcFilterMode = 'CURRENT_YEAR';
+  var fpcModalMode = 'NEW';      // NEW | EDIT | EXIT
+  var fpcEditingTrade = null;    // trade object being edited/exited
+
+  (function initFPCFilters() {
+    var monthEl = document.getElementById('fpcMonthSelect');
+    var rangeEl = document.getElementById('fpcRangeSelect');
+    var yr = new Date().getFullYear();
+    if (monthEl) monthEl.value = String(new Date().getMonth() + 1).padStart(2, '0');
+    if (rangeEl) {
+      rangeEl.options[0].text = 'Current Year (' + yr + ')';
+      rangeEl.options[1].text = 'Last Year (' + (yr - 1) + ')';
+      rangeEl.value = 'CURRENT_YEAR';
+    }
+    fpcFilterMode = 'CURRENT_YEAR';
+  })();
+
+  function fpcMonthChanged() { fpcFilterMode = 'MONTH'; renderFPCUI(); }
+  function fpcRangeChanged() { fpcFilterMode = document.getElementById('fpcRangeSelect').value; renderFPCUI(); }
+
+  function loadFPCDataFromSheet() {
+    google.script.run
+      .withSuccessHandler(function(res) { rawFPCTrades = res.trades || []; renderFPCUI(); })
+      .withFailureHandler(function(err) { alert("Error loading trades: " + err.message); })
+      .get5PercentClubData();
+  }
+
+  // ---------- helpers ----------
+  function fpcMoney(n) { return Number(n || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 }); }
+  function fpcTodayYMD() {
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  function fpcFind(rowIndex) {
+    for (var i = 0; i < rawFPCTrades.length; i++) if (rawFPCTrades[i].rowIndex === rowIndex) return rawFPCTrades[i];
+    return null;
+  }
+  function fpcToast(msg) {
+    var t = document.getElementById('fpcToast');
+    t.innerText = msg; t.style.display = 'block';
+    setTimeout(function() { t.style.display = 'none'; }, 2200);
+  }
+
+  // ---------- render ----------
+  function renderFPCUI() {
+    renderFPCOpenTrades();
+    renderFPCExitedTrades();
+  }
+
+  function renderFPCOpenTrades() {
+    var open = rawFPCTrades.filter(function(t) { return !t.isExited; });
+    open.sort(function(a, b) { return (b.entryDate || '').localeCompare(a.entryDate || ''); });
+
+    document.getElementById('fpcOpenTitle').innerText = '🟠 Open Trades (' + open.length + ')';
+
+    if (open.length === 0) {
+      document.getElementById('fpcOpenList').innerHTML =
+        '<div style="padding:20px; text-align:center; color:#888; font-size:12px;">No open trades. Tap "+ New Trade" to add one.</div>';
+      return;
+    }
+
+    var html = '';
+    open.forEach(function(t) {
+      html +=
+        '<div class="fpc-data-row">' +
+          '<div>' +
+            '<div style="font-weight:700; color:#1e293b;">📌 ' + escapeFPCText(t.asset) + '</div>' +
+            '<div style="font-size:11px; color:#64748b;">Inv: ₹' + fpcMoney(t.investment) + ' | Entry: ' + escapeFPCText(t.entryDate) + '</div>' +
+            '<div style="font-size:10px; color:#4f46e5; font-weight:bold; margin-top:2px;">⏳ Holding: ' + t.holdingDays + ' Days</div>' +
+          '</div>' +
+          '<div style="display:flex; gap:6px; flex-shrink:0;">' +
+            '<button class="fpc-btn edit" onclick="openEditFPCTrade(' + t.rowIndex + ')">✏️ Edit</button>' +
+            '<button class="fpc-btn exit" onclick="openExitFPCTrade(' + t.rowIndex + ')">Exit</button>' +
+          '</div>' +
+        '</div>';
+    });
+    document.getElementById('fpcOpenList').innerHTML = html;
+  }
+
+  function renderFPCExitedTrades() {
+    var selMonth = document.getElementById('fpcMonthSelect').value;
+    var selRange = document.getElementById('fpcRangeSelect').value;
+
+    var now = new Date();
+    var currentYear = now.getFullYear();
+    var currentMonth = now.getMonth() + 1;
+    var currentDay = now.getDate();
+    var lastYear = currentYear - 1;
+    var mode = fpcFilterMode || selRange;
+
+    var filtered = rawFPCTrades.filter(function(t) {
+      if (!t.isExited || !t.exitDate) return false;
+      var d = parseFPCDate(t.exitDate);
+      if (!d) return false;
+
+      if (mode === 'MONTH') return d.year === currentYear && d.month === parseInt(selMonth, 10);
+      if (mode === 'CURRENT_YEAR') {
+        if (d.year !== currentYear) return false;
+        if (d.month > currentMonth || (d.month === currentMonth && d.day > currentDay)) return false;
+        return true;
+      }
+      if (mode === 'LAST_YEAR') return d.year === lastYear;
+      if (mode === 'OVER_ALL') return true;
+      return false;
+    });
+
+    filtered.sort(function(a, b) { return (b.exitDate || '').localeCompare(a.exitDate || ''); });
+
+    var pCount = 0, lCount = 0, totP = 0, totL = 0, totCharges = 0;
+    var html = '';
+    var monthSel = document.getElementById('fpcMonthSelect');
+    var monthName = monthSel.options[monthSel.selectedIndex].text;
+
+    if (filtered.length === 0) {
+      var emptyMessage = 'No exited trades found.';
+      if (mode === 'MONTH') emptyMessage = 'No exited trades found for ' + monthName + ' ' + currentYear + '.';
+      else if (mode === 'CURRENT_YEAR') emptyMessage = 'No exited trades found for Current Year.';
+      else if (mode === 'LAST_YEAR') emptyMessage = 'No exited trades found for ' + lastYear + '.';
+      html = '<div style="padding:20px; text-align:center; color:#888; font-size:12px;">' + emptyMessage + '</div>';
+    } else {
+      filtered.forEach(function(t) {
+        var investment = Number(t.investment) || 0;
+        var exitPct = Number(t.exitPct) || 0;
+        var charges = Number(t.brokerCharges) || 0;
+        var net = Number(t.netPnl);
+        if (isNaN(net)) net = investment * exitPct / 100 - charges;
+
+        var isP = net >= 0;
+        totCharges += charges;
+        if (isP) { pCount++; totP += net; } else { lCount++; totL += Math.abs(net); }
+
+        html +=
+          '<div class="fpc-data-row">' +
+            '<div>' +
+              '<div style="font-weight:700; color:#1e293b;">📌 ' + escapeFPCText(t.asset) + '</div>' +
+              '<div style="font-size:11px; color:#64748b;">Inv: ₹' + fpcMoney(investment) + ' | ' + escapeFPCText(t.entryDate) + ' → ' + escapeFPCText(t.exitDate) + '</div>' +
+              '<div style="font-size:10px; color:#4f46e5; font-weight:bold; margin-top:2px;">⏳ Holding: ' + (Number(t.holdingDays) || 0) + ' Days' +
+                (charges > 0 ? ' &nbsp;<span style="color:#b45309;">💸 Charges: ₹' + fpcMoney(charges) + '</span>' : '') + '</div>' +
+            '</div>' +
+            '<div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">' +
+              '<div style="text-align:right;">' +
+                '<div class="' + (isP ? 'profit-text' : 'loss-text') + '">' + (isP ? '+' : '-') + '₹' + fpcMoney(Math.abs(net)) + '</div>' +
+                '<div style="font-size:11px; color:#64748b;">' + (exitPct > 0 ? '+' : '') + exitPct + '%</div>' +
+              '</div>' +
+              '<button class="fpc-btn edit" onclick="openEditFPCTrade(' + t.rowIndex + ')">✏️</button>' +
+            '</div>' +
+          '</div>';
+      });
+    }
+
+    var net = totP - totL;
+    document.getElementById('fpcProfitCount').innerText = pCount;
+    document.getElementById('fpcLossCount').innerText = lCount;
+    document.getElementById('fpcTotProfit').innerText = '₹' + fpcMoney(totP);
+    document.getElementById('fpcTotLoss').innerText = '₹' + fpcMoney(totL);
+    document.getElementById('fpcTotCharges').innerText = '₹' + fpcMoney(totCharges);
+
+    var netElem = document.getElementById('fpcNetBal');
+    netElem.innerText = (net >= 0 ? '₹' : '-₹') + fpcMoney(Math.abs(net));
+    netElem.style.color = net >= 0 ? '#4ade80' : '#f87171';
+
+    document.getElementById('fpcTradesList').innerHTML = html;
+
+    var title = document.querySelector('#fivePercentClubContainer .fpc-sec-header:not(.open) span');
+    if (title) {
+      if (mode === 'MONTH') title.innerText = '📋 Trade History (' + monthName + ' ' + currentYear + ')';
+      else if (mode === 'CURRENT_YEAR') title.innerText = '📋 Trade History (Current Year: Jan 1 → Today)';
+      else if (mode === 'LAST_YEAR') title.innerText = '📋 Trade History (Last Year: ' + lastYear + ')';
+      else if (mode === 'OVER_ALL') title.innerText = '📋 Trade History (All Years)';
+    }
+  }
+
+  function parseFPCDate(value) {
+    if (!value) return null;
+    if (typeof value === 'string') {
+      var m = value.trim().match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (m) return { year: parseInt(m[1], 10), month: parseInt(m[2], 10), day: parseInt(m[3], 10) };
+      var p = new Date(value);
+      if (!isNaN(p.getTime())) return { year: p.getFullYear(), month: p.getMonth() + 1, day: p.getDate() };
+    }
+    return null;
+  }
+
+  function escapeFPCText(value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+  }
+
+  // ---------- modal ----------
+  function showFPCModal(title, saveLabel, showEntry, showExit, showDelete) {
+    document.getElementById('fpcModalTitle').innerText = title;
+    document.getElementById('fpcSaveBtn').innerText = saveLabel;
+    document.getElementById('fpcSaveBtn').disabled = false;
+    document.getElementById('fpcEntryFields').style.display = showEntry ? 'block' : 'none';
+    document.getElementById('fpcExitFields').style.display = showExit ? 'block' : 'none';
+    document.getElementById('fpcExitSummary').style.display = (!showEntry && showExit) ? 'block' : 'none';
+    document.getElementById('fpcDeleteBtn').style.display = showDelete ? 'block' : 'none';
+    document.getElementById('fpcModal').style.display = 'block';
+  }
+
+  // 1) NEW TRADE = entry only
+  function openNewFPCTradeModal() {
+    fpcModalMode = 'NEW'; fpcEditingTrade = null;
+    document.getElementById('fpcAsset').value = '';
+    document.getElementById('fpcInv').value = '';
+    document.getElementById('fpcEntryDate').value = fpcTodayYMD();
+    showFPCModal('Add New Trade (Entry)', 'Place Trade', true, false, false);
+  }
+
+  // 2) EXIT an open trade
+  function openExitFPCTrade(rowIndex) {
+    var t = fpcFind(rowIndex);
+    if (!t) return;
+    fpcModalMode = 'EXIT'; fpcEditingTrade = t;
+    document.getElementById('fpcExitSummary').innerHTML =
+      '<b>📌 ' + escapeFPCText(t.asset) + '</b><br>' +
+      '<span style="color:#64748b; font-size:12px;">Inv: ₹' + fpcMoney(t.investment) + ' | Entry: ' + escapeFPCText(t.entryDate) + '</span>';
+    document.getElementById('fpcExitDate').value = fpcTodayYMD();
+    document.getElementById('fpcPct').value = '';
+    document.getElementById('fpcCharges').value = '';
+    showFPCModal('Exit Trade', 'Save Exit', false, true, false);
+    updateFPCPreview();
+  }
+
+  // 3) EDIT (open or exited trade)
+  function openEditFPCTrade(rowIndex) {
+    var t = fpcFind(rowIndex);
+    if (!t) return;
+    fpcModalMode = 'EDIT'; fpcEditingTrade = t;
+    document.getElementById('fpcAsset').value = t.asset;
+    document.getElementById('fpcInv').value = t.investment;
+    document.getElementById('fpcEntryDate').value = t.entryDate;
+    if (t.isExited) {
+      document.getElementById('fpcExitDate').value = t.exitDate;
+      document.getElementById('fpcPct').value = t.exitPct;
+      document.getElementById('fpcCharges').value = t.brokerCharges || '';
+    }
+    showFPCModal('Edit Trade', 'Save Changes', true, t.isExited, true);
+    updateFPCPreview();
+  }
+
+  function closeFPCModal() {
+    document.getElementById('fpcModal').style.display = 'none';
+  }
+
+  // Live Profit / Loss preview while typing % and charges
+  function updateFPCPreview() {
+    var box = document.getElementById('fpcPreview');
+    if (!box || document.getElementById('fpcExitFields').style.display === 'none') return;
+
+    var inv = (fpcModalMode === 'EXIT' && fpcEditingTrade)
+      ? Number(fpcEditingTrade.investment)
+      : parseFloat(document.getElementById('fpcInv').value);
+    var pct = parseFloat(document.getElementById('fpcPct').value);
+    var charges = parseFloat(document.getElementById('fpcCharges').value) || 0;
+
+    if (isNaN(inv) || isNaN(pct)) {
+      box.innerHTML = '<span style="color:#64748b;">Enter Exit % to see Profit / Loss amount</span>';
+      return;
+    }
+
+    var gross = Math.round(inv * pct) / 100;
+    var net = Math.round((gross - charges) * 100) / 100;
+    var isP = net >= 0;
+    var grossCls = gross >= 0 ? 'profit-text' : 'loss-text';
+
+    box.innerHTML =
+      '<div class="line"><span>Gross P&L (' + (pct > 0 ? '+' : '') + pct + '%)</span><span class="' + grossCls + '">' + (gross >= 0 ? '+' : '-') + '₹' + fpcMoney(Math.abs(gross)) + '</span></div>' +
+      '<div class="line"><span>Broker Charges</span><span style="color:#b45309; font-weight:700;">-₹' + fpcMoney(charges) + '</span></div>' +
+      '<div class="line net"><span>' + (isP ? '✅ Net Profit' : '❌ Net Loss') + '</span>' +
+      '<span class="' + (isP ? 'profit-text' : 'loss-text') + '">' + (isP ? '+' : '-') + '₹' + fpcMoney(Math.abs(net)) + '</span></div>';
+  }
+
+  // ---------- save / delete ----------
+  function submitFPCTradeData() {
+    var trade = {};
+    var t = fpcEditingTrade;
+    var needEntry = (fpcModalMode === 'NEW' || fpcModalMode === 'EDIT');
+    var needExit = (fpcModalMode === 'EXIT' || (fpcModalMode === 'EDIT' && t && t.isExited));
+
+    if (fpcModalMode !== 'NEW') trade.rowIndex = t.rowIndex;
+
+    if (needEntry) {
+      trade.asset = document.getElementById('fpcAsset').value.trim();
+      trade.investment = parseFloat(document.getElementById('fpcInv').value);
+      trade.entryDate = document.getElementById('fpcEntryDate').value;
+      if (!trade.asset || isNaN(trade.investment) || trade.investment <= 0 || !trade.entryDate) {
+        alert("Dayavittu Asset Name, Investment Amount mattu Entry Date sari aagi enter madi!");
+        return;
+      }
+    } else {
+      // EXIT mode keeps existing entry details
+      trade.asset = t.asset;
+      trade.investment = t.investment;
+      trade.entryDate = t.entryDate;
+    }
+
+    if (needExit) {
+      trade.exitDate = document.getElementById('fpcExitDate').value;
+      trade.exitPct = parseFloat(document.getElementById('fpcPct').value);
+      trade.brokerCharges = parseFloat(document.getElementById('fpcCharges').value) || 0;
+
+      if (!trade.exitDate || isNaN(trade.exitPct)) {
+        alert("Dayavittu Exit Date mattu Exit % enter madi!");
+        return;
+      }
+      if (trade.brokerCharges < 0) {
+        alert("Broker Charges negative aagirabaardu!");
+        return;
+      }
+      if (trade.exitDate < trade.entryDate) {
+        alert("Exit Date, Entry Date ginta modalu irabaardu!");
+        return;
+      }
+    }
+
+    var btn = document.getElementById('fpcSaveBtn');
+    btn.disabled = true; btn.innerText = 'Saving...';
+
+    google.script.run
+      .withSuccessHandler(function(res) {
+        rawFPCTrades = res.trades || [];
+        closeFPCModal();
+        renderFPCUI();
+        fpcToast(fpcModalMode === 'NEW' ? 'Trade placed ✅' : (fpcModalMode === 'EXIT' ? 'Trade exited ✅' : 'Trade updated ✅'));
+      })
+      .withFailureHandler(function(err) {
+        btn.disabled = false; btn.innerText = 'Save';
+        alert("Error saving: " + err.message);
+      })
+      .save5PercentClubTrade(trade);
+  }
+
+  function deleteFPCTrade() {
+    if (!fpcEditingTrade) return;
+    if (!confirm('Delete "' + fpcEditingTrade.asset + '" trade? Idu undo madalu aagalla.')) return;
+
+    google.script.run
+      .withSuccessHandler(function(res) {
+        rawFPCTrades = res.trades || [];
+        closeFPCModal();
+        renderFPCUI();
+        fpcToast('Trade deleted');
+      })
+      .withFailureHandler(function(err) { alert("Error deleting: " + err.message); })
+      .delete5PercentClubTrade(fpcEditingTrade.rowIndex);
+  }
+</script>
+
+<!-- Updated JavaScript Functions (Replace 2) -->
+<script>
+/* ===== Scanner: background pre-scan (starts silently after login) =====
+   - prefetchInflowScan() is called by index.html right after login
+   - result is cached; opening the scanner shows it instantly (no waiting)
+   - cache is refreshed silently in the background (no spinner / no status change) */
+var INFLOW_SCAN_URL = 'https://inflow-scanner.onrender.com';
+var INFLOW_SCAN_STALE_MS = 5 * 60 * 1000;      // refresh silently if older than 5 min
+var INFLOW_SCAN_AUTO_MS  = 8 * 60 * 1000;      // background re-scan every 8 min while app is open
+var inflowScanCache = {};                       // key -> { capital, mode, res, time }
+var inflowScanInflight = {};                    // key -> promise
+var inflowScanTimer = null;
+var inflowScanMode = 'watchlist';               // 'watchlist' | 'nifty100' | 'custom'
+var inflowScanCurrentKey = null;
+var INFLOW_MODE_LABEL = { watchlist:'My Watchlist', nifty100:'Nifty 100', custom:'Custom' };
+
+function inflowScanCapital_(){
+  var el = document.getElementById('inflowScanCapital');
+  var c = el ? Number(el.value) : 30000;
+  return (c > 0 && Number.isFinite(c)) ? c : 30000;
+}
+function inflowCustomSymbols_(){
+  var el = document.getElementById('inflowCustomSymbols');
+  return el ? el.value.trim().toUpperCase().replace(/\s+/g,',').replace(/,+/g,',').replace(/^,|,$/g,'') : '';
+}
+function inflowKey_(capital, mode, symbols){ return mode + '|' + capital + '|' + (mode==='custom' ? symbols : ''); }
+
+// Fetch (de-duplicated per key). Never touches the UI.
+function fetchInflowScan_(capital, mode, symbols){
+  mode = mode || 'watchlist'; symbols = symbols || '';
+  var key = inflowKey_(capital, mode, symbols);
+  if (inflowScanInflight[key]) return inflowScanInflight[key];
+  var url = INFLOW_SCAN_URL + '/api/scan?capital=' + encodeURIComponent(capital) + '&mode=' + encodeURIComponent(mode) +
+            (mode==='custom' ? '&symbols=' + encodeURIComponent(symbols) : '');
+  var p = fetch(url)
+    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+    .then(function(res){
+      inflowScanCache[key] = { capital: capital, mode: mode, res: res, time: Date.now() };
+      return res;
+    });
+  inflowScanInflight[key] = p;
+  var clear = function(){ delete inflowScanInflight[key]; };
+  p.then(clear, clear);
+  return p;
+}
+
+// Called once after login: scan the watchlist quietly in the background, then keep it fresh.
+function prefetchInflowScan(){
+  fetchInflowScan_(inflowScanCapital_(), 'watchlist').then(function(){ inflowScanUpdateIfOpen_(); }).catch(function(){ /* silent */ });
+  if (!inflowScanTimer) {
+    inflowScanTimer = setInterval(function(){
+      if (document.hidden) return;
+      fetchInflowScan_(inflowScanCapital_(), 'watchlist').then(function(){ inflowScanUpdateIfOpen_(); }).catch(function(){ /* silent */ });
+    }, INFLOW_SCAN_AUTO_MS);
+  }
+}
+
+function inflowScanPanelOpen_(){
+  var p = document.getElementById('inflowScannerPanel');
+  return !!(p && p.style.display === 'block');
+}
+
+// If the scanner screen is open and fresh data arrived in background, update it quietly.
+function inflowScanUpdateIfOpen_(){
+  if (!inflowScanPanelOpen_()) return;
+  var key = inflowKey_(inflowScanCapital_(), inflowScanMode, inflowCustomSymbols_());
+  var c = inflowScanCache[key];
+  if (!c || inflowScanCurrentKey !== key) return;
+  if (window.inflowScanShownTime === c.time) return;
+  renderInflowScan_(c.res, c.time);
+}
+
+// Switch between My Watchlist / Nifty 100 / Custom Stock
+function setInflowMode(mode){
+  inflowScanMode = mode;
+  Array.prototype.forEach.call(document.querySelectorAll('#inflowModes .isc-mode'), function(b){
+    b.classList.toggle('on', b.getAttribute('data-mode') === mode);
+  });
+  document.getElementById('inflowCustomBox').style.display = (mode==='custom') ? 'block' : 'none';
+  var status = document.getElementById('inflowScanStatus');
+  var cap = inflowScanCapital_(), key = inflowKey_(cap, mode, inflowCustomSymbols_());
+  if (mode === 'custom' && !inflowCustomSymbols_()) {
+    document.getElementById('inflowScanResults').innerHTML = '';
+    inflowScanCurrentKey = null;
+    status.textContent = 'Enter an NSE symbol (e.g. TCS) and tap Scan.';
+    document.getElementById('inflowCustomSymbols').focus();
+    return;
+  }
+  if (inflowScanCache[key]) {
+    inflowScanCurrentKey = key;
+    renderInflowScan_(inflowScanCache[key].res, inflowScanCache[key].time);
+    document.getElementById('inflowScanBtn').textContent = 'Scan Again';
+    if (mode==='watchlist' && Date.now() - inflowScanCache[key].time > INFLOW_SCAN_STALE_MS) {
+      fetchInflowScan_(cap, mode, '').then(function(){ inflowScanUpdateIfOpen_(); }).catch(function(){});
+    }
+  } else if (mode === 'nifty100') {
+    status.textContent = 'Tap Scan to scan Nifty 100 (takes ~20-40 sec).';
+    document.getElementById('inflowScanResults').innerHTML = '';
+    inflowScanCurrentKey = null;
+    document.getElementById('inflowScanBtn').textContent = 'Scan';
+  } else {
+    runInflowPythonScan();
+  }
+}
+
+function openInflowScanner(){
+  var root=document.getElementById('fivePercentClubContainer');
+  Array.prototype.forEach.call(root.children,function(el){ if(el.id!=='inflowScannerPanel') el.style.display='none'; });
+  document.getElementById('inflowScannerPanel').style.display='block';
+  setInflowMode(inflowScanMode);
+}
+function closeInflowScanner(){
+  var root=document.getElementById('fivePercentClubContainer');
+  document.getElementById('inflowScannerPanel').style.display='none';
+  Array.prototype.forEach.call(root.children,function(el){ if(el.id!=='inflowScannerPanel') el.style.display=''; });
+}
+
+// Manual scan ("Scan" button / Enter key in custom box)
+function runInflowPythonScan(){
+  var capital=Number(document.getElementById('inflowScanCapital').value);
+  var status=document.getElementById('inflowScanStatus');
+  var btn=document.getElementById('inflowScanBtn');
+  var mode=inflowScanMode, symbols=(mode==='custom') ? inflowCustomSymbols_() : '';
+  if (!(capital>0 && Number.isFinite(capital))) { status.textContent='Enter a valid capital amount.'; return; }
+  if (mode==='custom' && !symbols) { status.textContent='Enter at least one NSE symbol, e.g. TCS.'; return; }
+  var key = inflowKey_(capital, mode, symbols);
+  status.textContent = 'Scanning ' + INFLOW_MODE_LABEL[mode] + '…'; btn.disabled=true; btn.textContent='Scanning…';
+  fetchInflowScan_(capital, mode, symbols).then(function(res){
+    if (inflowScanMode !== mode) return;             // user switched tab meanwhile
+    inflowScanCurrentKey = key;
+    renderInflowScan_(res, inflowScanCache[key] && inflowScanCache[key].time);
+  }).catch(function(e){status.textContent='Scanner error: '+e.message+' — verify API deployment and CORS.';})
+    .finally(function(){btn.disabled=false;btn.textContent='Scan Again';});
+}
+
+function renderInflowScan_(res, time){
+  var status=document.getElementById('inflowScanStatus'), results=document.getElementById('inflowScanResults');
+  window.inflowScanShownTime = time || null;
+  var scrollY = window.pageYOffset;
+    var rows=res.watchlist||res.data||[]; window.inflowScanRows=rows;
+    var bad=((res.diagnostics&&res.diagnostics.unconfiguredStocks)||[]).filter(function(x){return x.reason==='Invalid symbol format';}).map(function(x){return x.name;});
+    if (res.status==='error' && !rows.length) { status.textContent=res.message||'Scan failed.'; results.innerHTML=''; return; }
+    status.textContent=INFLOW_MODE_LABEL[res.mode||'watchlist']+' · Stocks: '+rows.length+' · Complete setups: '+(res.totalMatches||0)+' · Scan: '+(res.scanTime||'')+(bad.length?' · Ignored invalid: '+bad.join(', '):'');
+    var html='<div class="isc-legend">Score = checks passed (0–7), not a win probability. Green = passed, red = pending.</div><div class="isc-list">';
+    rows.forEach(function(s,i){
+      var pts=Number(s.conditionPoints||0);
+      var scoreColor=pts===7?'#16a34a':(pts>=5?'#d97706':'#dc2626');
+      var checks=(s.conditions||[]).map(function(c,k){
+        return '<div class="isc-row '+(c.pass?'p':'f')+'"><i>'+(k+1)+'</i><span>'+escapeInflowScan(c.label)+'</span></div>';
+      }).join('');
+      var vals=
+        '<div class="isc-v"><span>Price</span><b>'+money(s.buyPrice)+'</b></div>'+
+        '<div class="isc-v"><span>Qty</span><b>'+(s.qty||'—')+'</b></div>'+
+        '<div class="isc-v"><span>Invested</span><b>'+(s.investment?money(s.investment):'—')+'</b></div>'+
+        '<div class="isc-v"><span>Target</span><b>'+money(s.target)+'</b></div>'+
+        '<div class="isc-v"><span>RSI</span><b>'+(s.rsi==null?'—':s.rsi)+'</b></div>'+
+        '<div class="isc-v"><span>ADX (14)</span><b>'+(s.adx==null?'—':s.adx)+'</b></div>'+
+        '<div class="isc-v"><span>Supertrend</span><b>'+(s.supertrendBullish?'Bullish':'Bearish')+'</b></div>'+
+        '<div class="isc-v"><span>Initial ATR Stop</span><b>'+money(s.initialAtrStop)+'</b></div>'; 
+      html+='<div class="isc-card'+(s.matched?' ok':'')+'">'+
+        '<div class="isc-head"><div><div class="isc-name">'+(i+1)+'. '+escapeInflowScan(s.companyName||s.stock)+'</div>'+
+        '<div class="isc-meta">'+escapeInflowScan(s.stock)+' · '+escapeInflowScan(s.status||'Watchlist')+(s.dataStatus?' · '+escapeInflowScan(s.dataStatus):'')+'</div></div>'+
+        '<div class="isc-score" style="color:'+scoreColor+';">'+pts+'/7</div></div>'+
+        '<div class="isc-body"><div>'+checks+'</div><div class="isc-vals">'+vals+'</div></div></div>';
+    });
+    html+='</div><div class="isc-note">+5% is an illustrative target. Initial ATR stop = reference close − 3×ATR(10); after entry, ratchet upward only using highest high since entry − 3×current ATR(10). No orders are placed.</div>';
+    results.innerHTML=html;
+  window.scrollTo(0, scrollY);
+}
+function money(v){ if(v===null || v===undefined || v==='' || !Number.isFinite(Number(v))) return '—'; return '₹'+Number(v).toLocaleString('en-IN',{maximumFractionDigits:2}); }
+function escapeInflowScan(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+</script>

@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>inflow2036</title>
+  <style>
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: #f6f7fc; margin: 0; padding: 15px; display: flex; justify-content: center; width: 100%; min-width: 0; overflow-x: hidden; }
+    .container { width: 100%; max-width: 480px; min-width: 0; margin: 0 auto; }
+
+    /* ================= GLOBAL MOBILE MODULE GAP =================
+       All module pages are rendered inside .container. Keep every page
+       inside that same content width so buttons/cards never touch the
+       phone screen edges. This is layout-only; no module functionality
+       is changed. */
+    .container > [id$="Container"],
+    .container > [id$="View"],
+    .container > [id$="App"] {
+      width: 100% !important;
+      max-width: 480px !important;
+      min-width: 0 !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
+      box-sizing: border-box !important;
+      position: relative !important;
+      left: auto !important;
+      right: auto !important;
+      top: auto !important;
+      transform: none !important;
+      overflow-x: hidden !important;
+    }
+
+    /* Existing module wrappers: remove the old fullscreen/fixed behavior. */
+    #inflowDashboardContainer,
+    #salaryCardContainer,
+    #skillImproveApp {
+      width: 100% !important;
+      max-width: 480px !important;
+      min-height: 100vh !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
+      padding: 0 !important;
+      position: relative !important;
+      left: auto !important;
+      right: auto !important;
+      top: auto !important;
+      transform: none !important;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      box-sizing: border-box !important;
+      z-index: 20 !important;
+    }
+
+    /* The Skill page keeps its small internal top/bottom breathing room. */
+    #skillImproveApp {
+      padding: 10px 0 16px !important;
+    }
+
+    /* Keep the dashboard/module contents within the same parent width. */
+    #inflowDashboardContainer > div:not(#inflowLogoFileInput),
+    #salaryCardContainer > div,
+    #specialDaysDashboardContainer,
+    #bucketListContainer,
+    #graphicZoneContainer,
+    #fivePercentClubContainer,
+    #planningContainer,
+    #liabilityAssetsContainer {
+      max-width: 480px !important;
+      box-sizing: border-box !important;
+    }
+
+
+    /* ===== LOGIN SCREEN ===== */
+    body.locked .container { display: none !important; }
+    #lockScreen { position: fixed; inset: 0; z-index: 10001; background: #f6f7fc; display: none; align-items: center; justify-content: center; padding: 20px; }
+    body.locked #lockScreen { display: flex; }
+    .lock-box { width: 100%; max-width: 340px; background: #fff; border-radius: 22px; padding: 28px 22px 22px; box-shadow: 0 10px 30px rgba(40,30,100,.10); text-align: center; }
+    .lock-icon { font-size: 38px; margin-bottom: 6px; }
+    .lock-title { font-size: 20px; font-weight: 800; color: #0b3c5d; }
+    .lock-sub { font-size: 12px; color: #888; margin: 4px 0 16px; }
+    .lock-box input[type="password"] { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 16px; text-align: center; }
+    #lockError { min-height: 18px; font-size: 12px; font-weight: 700; color: #e74c3c; margin-bottom: 8px; }
+    #lockBtn { width: 100%; background: #1a73e8; color: #fff; border: none; border-radius: 12px; padding: 12px; font-size: 15px; font-weight: 800; cursor: pointer; }
+    #lockBtn:disabled { opacity: .6; }
+
+    /* Initial Preloader */
+    #appLoader {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: #ffffff; z-index: 9999; display: flex;
+      flex-direction: column; align-items: center; justify-content: center;
+      transition: opacity 0.3s ease;
+    }
+    .spinner {
+      width: 36px; height: 36px; border: 4px solid #f3f3f3;
+      border-top: 4px solid #1a73e8; border-radius: 50%;
+      animation: spin 0.8s linear infinite; margin-bottom: 12px;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    /* ================= NEW DASHBOARD DESIGN ================= */
+    #dashboardView { display:block; padding-bottom: 24px; }
+    .date-chip { display:inline-flex; align-items:center; gap:6px; padding:8px 11px; border-radius:999px; background:#eef5ff; color:#2463d4; font-size:11px; font-weight:800; white-space:nowrap; }
+
+    /* Hero */
+    .hero { position:relative; overflow:hidden; border-radius:22px; padding:16px 18px; margin-bottom:14px; color:#fff;
+      background:linear-gradient(135deg,#5b35e0 0%,#7a5cf0 60%,#8f7af5 100%); box-shadow:0 10px 26px rgba(91,53,224,.22); }
+    .hero-welcome { font-size:14px; font-weight:400; opacity:.95; }
+    .hero-name { font-size:30px; font-weight:800; letter-spacing:-1px; line-height:1.1; margin:1px 0 6px; }
+    .hero-sub { font-size:11.5px; line-height:1.4; opacity:.92; max-width:56%; position:relative; z-index:2; }
+    .hero-art { position:absolute; right:8px; bottom:0; width:40%; max-width:140px; height:auto; z-index:1; }
+    .hero .date-chip { position:absolute; top:8px; right:10px; background:rgba(255,255,255,.2); color:#fff; font-size:10px; padding:5px 9px; z-index:3; }
+
+    /* Graphic Zone button */
+    .gz-main-btn { position:relative; overflow:hidden; width:100%; border:0; border-radius:24px; padding:16px 14px; margin:0 0 16px; display:flex; align-items:center; gap:13px; text-align:left; color:#fff; cursor:pointer;
+      background:linear-gradient(120deg,#1e1b4b 0%,#4f2bdc 55%,#a21caf 115%); box-shadow:0 14px 28px rgba(79,43,220,.35); }
+    .gz-main-btn::before { content:""; position:absolute; right:-30px; top:-40px; width:140px; height:140px; border-radius:50%; background:radial-gradient(circle,rgba(255,170,90,.55),transparent 70%); }
+    .gz-main-btn::after { content:""; position:absolute; left:-20px; bottom:-50px; width:130px; height:130px; border-radius:50%; background:radial-gradient(circle,rgba(56,189,248,.35),transparent 70%); }
+    .gz-main-icon { width:62px; height:62px; flex:0 0 62px; border-radius:20px; font-size:32px; display:flex; align-items:center; justify-content:center; position:relative; z-index:1; transform:rotate(-6deg);
+      background:linear-gradient(135deg,#fb923c,#ec4899); box-shadow:0 8px 18px rgba(236,72,153,.45); border:2px solid rgba(255,255,255,.35); }
+    .gz-main-copy { position:relative; z-index:1; flex:1; min-width:0; }
+    .gz-tag { display:inline-block; font-size:9px; font-weight:800; letter-spacing:1px; padding:3px 8px; border-radius:99px; background:rgba(255,255,255,.18); margin-bottom:5px; }
+    .gz-main-title { font-size:24px; font-weight:900; letter-spacing:-.6px; line-height:1.05; }
+    .gz-chips { display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; }
+    .gz-chips span { font-size:10.5px; font-weight:700; padding:4px 8px; border-radius:99px; background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.22); }
+    .gz-main-arrow { position:relative; z-index:1; width:40px; height:40px; flex:0 0 40px; border-radius:50%; background:#fff; color:#4f2bdc; display:flex; align-items:center; justify-content:center; font-size:26px; font-weight:900; box-shadow:0 6px 14px rgba(0,0,0,.25); }
+
+    /* Section cards + tiles */
+    .sec-card { background:#fff; border-radius:20px; padding:16px 12px 14px; margin-bottom:16px; box-shadow:0 4px 16px rgba(40,30,100,.06); border:1px solid #eef0f8; }
+    .sec-head { display:flex; align-items:center; justify-content:space-between; padding:0 6px; margin-bottom:12px; }
+    .sec-title { display:flex; align-items:center; gap:10px; font-size:19px; font-weight:800; color:#16163a; }
+    .sec-title svg { width:24px; height:24px; color:#4f2bdc; }
+    .sec-count { font-size:13px; color:#6b6f85; font-weight:500; }
+    .tile-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
+    .tile { background:#fff; border:1px solid #f0f1f8; border-radius:16px; min-height:112px; padding:12px 2px 10px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; cursor:pointer; box-shadow:0 4px 14px rgba(40,30,100,.07); -webkit-tap-highlight-color:transparent; }
+    .tile:active { transform:scale(.97); }
+    .tile svg { width:36px; height:36px; fill:none; stroke:#4f2bdc; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+    .tile span { font-size:14px; font-weight:800; color:#16163a; text-align:center; line-height:1.1; }
+
+    .bottom-bar { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:25px; padding:14px 2px 0; }
+    .btn-logout { background:transparent; border:none; color:#e34b42; font-weight:750; font-size:13px; cursor:pointer; }
+    .btn-backup { background:#eaf2ff; color:#1a73e8; border:none; padding:9px 15px; border-radius:20px; font-weight:750; font-size:12px; cursor:pointer; }
+
+    /* Legacy classes (kept in case modules use them) */
+    .section-label { display:flex; align-items:center; justify-content:space-between; margin:17px 0 8px; padding:0 2px; font-size:13px; font-weight:850; color:#29415b; }
+    .section-count { font-size:10px; font-weight:800; color:#6b7a8a; background:#f1f5f9; padding:5px 8px; border-radius:999px; }
+    .grid-container { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:9px; width:100%; min-width:0; }
+    .card-btn { background:#fff; border:1px solid #e8edf3; border-radius:17px; padding:11px 4px 10px; min-height:98px; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 14px rgba(18,38,63,.045); width:100%; }
+    .icon-box { width:45px; height:45px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:20px; margin-bottom:8px; }
+    .card-title { font-size:12px; font-weight:780; color:#2b3d50; text-align:center; }
+    .bg-blue { background:#e8f1ff; }
+    .bg-green { background:#e7f7f0; }
+    .bg-orange { background:#fff2df; }
+    .bg-purple { background:#f1eafb; }
+    .bg-red { background:#ffebee; }
+
+    /* Module View Container */
+    #runWalkView { display: none; }
+    .nav-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+    .btn-back { background: #ffffff; border: 1px solid #dcdfe6; padding: 8px 14px; border-radius: 8px; font-weight: bold; cursor: pointer; color: #333; }
+    .nav-title { font-size: 18px; font-weight: 800; color: #0b3c5d; }
+
+    /* Averages Section */
+    .avg-section-title { font-size: 14px; font-weight: bold; color: #555; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+    .avg-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
+    .avg-card { background: #fff; padding: 12px 6px; border-radius: 12px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.03); }
+    .avg-label { font-size: 11px; color: #666; font-weight: 600; margin-bottom: 4px; }
+    .avg-val { font-size: 20px; font-weight: 800; color: #1a73e8; }
+    .avg-sub { font-size: 9px; color: #888; margin-top: 2px; }
+
+    /* History Cards Section */
+    .history-card { background: #fff; border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+    .history-card.today { background: #f3ebff; border: 1px solid #d8b4fe; }
+    .day-title { font-size: 15px; font-weight: 800; color: #222; }
+    .day-date { font-size: 11px; color: #666; margin-top: 2px; }
+    .dist-display { font-size: 16px; font-weight: 800; color: #1a73e8; margin-right: 10px; }
+    .btn-action { background: #fff; border: 1px solid #ccc; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer; }
+
+    /* Modals */
+    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+    .modal-content { background: #fff; margin: 30% auto; padding: 20px; border-radius: 14px; width: 85%; max-width: 360px; }
+    .modal-content input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+    .btn-save { background: #1a73e8; color: #fff; border: none; padding: 10px; border-radius: 8px; width: 100%; font-weight: bold; cursor: pointer; }
+    .btn-close { background: #f1f3f4; color: #333; border: none; padding: 8px; border-radius: 8px; width: 100%; margin-top: 6px; font-weight: bold; cursor: pointer; }
+  </style>
+</head>
+<body class="locked">
+
+  <!-- LOGIN / LOCK SCREEN -->
+  <div id="lockScreen">
+    <div class="lock-box">
+      <div class="lock-icon">🔒</div>
+      <div class="lock-title">inflow2036</div>
+      <div class="lock-sub">Password hakki</div>
+      <input type="password" id="lockInput" placeholder="Password" autocomplete="current-password"
+             onkeydown="if(event.key==='Enter') submitLogin()">
+      <div id="lockError"></div>
+      <button type="button" id="lockBtn" onclick="submitLogin()">Unlock</button>
+    </div>
+  </div>
+
+  <!-- Fullscreen App Loader -->
+  <div id="appLoader">
+    <div class="spinner"></div>
+    <div style="font-weight: 800; color: #0b3c5d; font-size: 16px;">inflow2036</div>
+    <div style="font-size: 12px; color: #888; margin-top: 4px;">Loading initial data...</div>
+  </div>
+
+  <div class="container">
+    <!-- DASHBOARD VIEW -->
+    <div id="dashboardView">
+
+      <div class="hero">
+        <div class="date-chip">📅 <span id="dashboardDate">23 Sep 2026</span></div>
+        <div class="hero-welcome">Welcome Back,</div>
+        <div class="hero-name">inflow2036</div>
+        <div class="hero-sub">Manage your money, build better habits and achieve your goals.</div>
+        <svg class="hero-art" viewBox="0 0 240 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M200 70c-20-10-22-40-8-58 22 8 28 38 8 58z" fill="#fff" opacity=".18"/>
+          <path d="M228 60c-16-8-16-32-4-46 18 6 22 30 4 46z" fill="#fff" opacity=".15"/>
+          <ellipse cx="130" cy="152" rx="100" ry="6" fill="#000" opacity=".08"/>
+          <rect x="62" y="44" width="110" height="26" rx="8" fill="#6b43e6" transform="rotate(-10 62 44)"/>
+          <rect x="68" y="50" width="100" height="18" rx="5" fill="#e9e2ff" transform="rotate(-10 68 50)"/>
+          <rect x="52" y="62" width="150" height="86" rx="14" fill="#b79cf7"/>
+          <rect x="52" y="62" width="150" height="86" rx="14" fill="none" stroke="#fff" stroke-opacity=".25" stroke-width="2"/>
+          <rect x="170" y="86" width="44" height="36" rx="10" fill="#6b43e6"/>
+          <circle cx="190" cy="104" r="6" fill="#e9e2ff"/>
+          <ellipse cx="34" cy="132" rx="22" ry="7" fill="#9d86f0"/><rect x="12" y="102" width="44" height="30" fill="#c9b8fa"/>
+          <ellipse cx="34" cy="102" rx="22" ry="7" fill="#e6dcff"/>
+          <line x1="12" y1="112" x2="56" y2="112" stroke="#9d86f0" stroke-width="2"/><line x1="12" y1="122" x2="56" y2="122" stroke="#9d86f0" stroke-width="2"/>
+          <ellipse cx="88" cy="146" rx="22" ry="7" fill="#9d86f0"/><rect x="66" y="126" width="44" height="20" fill="#c9b8fa"/>
+          <ellipse cx="88" cy="126" rx="22" ry="7" fill="#e6dcff"/>
+        </svg>
+      </div>
+
+      <button class="gz-main-btn" type="button" onclick="openGraphicZoneView()" aria-label="Open Graphic Zone">
+        <div class="gz-main-icon">🎨</div>
+        <div class="gz-main-copy">
+          <div class="gz-tag">✨ PRINT &amp; DESIGN STUDIO</div>
+          <div class="gz-main-title">Graphic Zone</div>
+          <div class="gz-chips"><span>🖨️ Jobs</span><span>👥 Customers</span><span>💰 Payments</span></div>
+        </div>
+        <div class="gz-main-arrow">›</div>
+      </button>
+
+      <!-- QUICK ACTIONS -->
+      <div class="sec-card">
+        <div class="sec-head">
+          <div class="sec-title"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>Quick Actions</div>
+          <div class="sec-count">4 Apps</div>
+        </div>
+        <div class="tile-grid">
+          <div class="tile" onclick="openRunWalkView()">
+            <svg viewBox="0 0 24 24"><circle cx="15" cy="4.5" r="2"/><path d="M7 21l3.5-6 3 2.5 2-5.5-4-2.5-3 3.5-3 .5M14 10.5l2.5 3 3.5.5M12 7.5l-2 2"/></svg><span>Run<br>Walk</span></div>
+          <div class="tile" onclick="openHabitView()">
+            <svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M8 12.5l3 3 5-6"/></svg><span>Habit</span></div>
+          <div class="tile" onclick="openQuickNoteView()">
+            <svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v10l-4 4H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M8 9h7M8 12.5h7M8 16h4"/></svg><span>Quick<br>Note</span></div>
+          <div class="tile" onclick="openDiaryView()">
+            <svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8.5 8l1.5 3 2-3 2 3 1.5-3M8 16h8"/></svg><span>Diary</span></div>
+        </div>
+      </div>
+
+      <!-- MONEY -->
+      <div class="sec-card">
+        <div class="sec-head">
+          <div class="sec-title"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 2h6l-1.5 3h-3z"/><path d="M10 6c-5 3-7 7-7 11 0 3 2 5 5 5h8c3 0 5-2 5-5 0-4-2-8-7-11z"/><text x="12" y="18" font-size="9" font-weight="700" text-anchor="middle" fill="#fff">$</text></svg>Money</div>
+          <div class="sec-count">4 Apps</div>
+        </div>
+        <div class="tile-grid">
+          <div class="tile" onclick="openLiabilityAssetsView()">
+            <svg viewBox="0 0 24 24"><path d="M14.5 3.5l6 6-2 1-2.5 2.5-.5 3.5-1.5 1.5-7-7L8.5 9.5l3.5-.5L14.5 6.5z"/><path d="M8.5 15.5L3.5 20.5"/></svg><span>Liability</span></div>
+          <div class="tile" onclick="openSavingBankView()">
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-6 9 6z"/><path d="M5.5 11v7M9.5 11v7M14.5 11v7M18.5 11v7M3.5 20.5h17"/></svg><span>Saving<br>Bank</span></div>
+          <div class="tile" onclick="openSalaryCardView()">
+            <svg viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M2.5 10h19M6 15h4"/></svg><span>Salary<br>Card</span></div>
+          <div class="tile" onclick="openBucketListView()">
+            <svg viewBox="0 0 24 24"><path d="M4.5 5h15L17.5 20h-11z"/><path d="M4.5 5c0-1.5 3.5-2 7.5-2s7.5.5 7.5 2"/></svg><span>Bucket<br>List</span></div>
+        </div>
+      </div>
+
+      <!-- LIFE & WORK -->
+      <div class="sec-card">
+        <div class="sec-head">
+          <div class="sec-title"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2H9z" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="2" y="6.5" width="20" height="14" rx="3"/></svg>Life &amp; Work</div>
+          <div class="sec-count">6 Apps</div>
+        </div>
+        <div class="tile-grid">
+          <div class="tile" onclick="openPlanningView()">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="16.5" rx="3"/><path d="M8 2.5v4M16 2.5v4M3 9.5h18"/><text x="12" y="18" font-size="7.5" font-weight="700" text-anchor="middle" fill="#4f2bdc" stroke="none">17</text></svg><span>Planning</span></div>
+          <div class="tile" onclick="alert('Health clicked')">
+            <svg viewBox="0 0 24 24"><path d="M12 20.5C5 15 3 11.5 3 8.5A4.5 4.5 0 0 1 12 6.5a4.5 4.5 0 0 1 9 2c0 3-2 6.5-9 12z"/></svg><span>Health</span></div>
+          <div class="tile" onclick="openInflow2036View()">
+            <svg viewBox="0 0 24 24"><rect x="3" y="14" width="4.5" height="6.5" rx="1"/><rect x="9.5" y="8" width="4.5" height="12.5" rx="1"/><rect x="16" y="3" width="4.5" height="17.5" rx="1"/></svg><span>inflow2036</span></div>
+          <div class="tile" onclick="open5PercentClubView()">
+            <svg viewBox="0 0 24 24"><path d="M3 15l5-5 4 3.5 8-8.5"/><path d="M15 4.5h5V9.5"/><path d="M5 21v-4M10 21v-5M15 21v-7M20 21v-8"/></svg><span>5%<br>Club</span></div>
+          <div class="tile" onclick="openSkillView()">
+            <svg viewBox="0 0 24 24"><path d="M8 20v-3c-2.5-1-4-3.5-4-6.5A7.5 7.5 0 0 1 12 3a7.5 7.5 0 0 1 8 7.5c0 3-1.5 5.5-4 6.5v3z"/><path d="M9.5 9.5l2.5 2.5 2.5-2.5M12 12v4"/></svg><span>Skill<br>Improve</span></div>
+          <div class="tile" onclick="openSpecialDaysView()">
+            <svg viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M4 15.5c2 1.5 3.5 1.5 4 0 .5 1.5 3.5 1.5 4 0 .5 1.5 3.5 1.5 4 0 .5 1.5 2 1.5 4 0M8 11V8M12 11V8M16 11V8M8 5.5v.5M12 5.5v.5M16 5.5v.5"/></svg><span>Special<br>Days</span></div>
+        </div>
+      </div>
+
+      <div class="bottom-bar">
+        <button class="btn-logout" onclick="alert('Logout')">↳ Logout</button>
+        <button class="btn-backup" onclick="alert('Backup')">☁️ Backup all</button>
+      </div>
+    </div>
+
+    <!-- RUN / WALK MODULE VIEW -->
+    <div id="runWalkView">
+      <div class="nav-header">
+        <button class="btn-back" onclick="closeRunWalkView()">← Back</button>
+        <div class="nav-title">Run / Walk Activity</div>
+      </div>
+
+      <div class="avg-section-title">📊 Averages</div>
+      <div class="avg-grid">
+        <div class="avg-card">
+          <div class="avg-label">Weekly Average</div>
+          <div class="avg-val" id="weeklyAvg">0.0</div>
+          <div class="avg-sub">KM / Day (7 Days)</div>
+        </div>
+        <div class="avg-card">
+          <div class="avg-label">Monthly Average</div>
+          <div class="avg-val" id="monthlyAvg">0.0</div>
+          <div class="avg-sub">KM / Day (30 Days)</div>
+        </div>
+        <div class="avg-card">
+          <div class="avg-label">Yearly Average</div>
+          <div class="avg-val" id="yearlyAvg">0.0</div>
+          <div class="avg-sub">KM / Day (365 Days)</div>
+        </div>
+      </div>
+
+      <div class="avg-section-title">🗓️ 7 Days History</div>
+      <div id="historyList">Loading...</div>
+    </div>
+
+    <!-- MODULE INCLUDES -->
+    <?!= include('HabitView'); ?>
+    <?!= include('QuickNoteView'); ?>
+    <?!= include('DiaryView'); ?>
+    <?!= include('LiabilityAssetsView'); ?>
+    <?!= include('PlanningView'); ?>
+    <?!= include('BucketList'); ?>
+    <?!= include('specialDays'); ?>
+    <?!= include('graphicZone'); ?>
+    <?!= include('FivePercentClub'); ?>
+    <?!= include('Salary'); ?>
+    <?!= include('SavingBankView'); ?>
+    <?!= include('inflow2036'); ?>
+    <?!= include('skill'); ?>
+  </div>
+
+  <!-- EDIT MODAL FOR RUN WALK -->
+  <div id="editModal" class="modal">
+    <div class="modal-content">
+      <h3 id="modalTitle">Edit Entry</h3>
+      <label id="modalDateLabel" style="font-size: 12px; color: #666;"></label>
+      <input type="number" id="inputDistance" step="0.1" placeholder="KM namoodisi (e.g. 5.5)">
+      <button type="button" id="btnSaveModal" class="btn-save" onclick="submitDistanceUpdate()">Save to Sheet</button>
+      <button type="button" class="btn-close" onclick="closeEditModal()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- GRAPHIC ZONE ADD / EDIT JOB MODAL -->
+  <div id="gzJobModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
+    <div style="background: #fff; width: 90%; max-width: 500px; padding: 20px; border-radius: 12px; max-height: 90vh; overflow-y: auto;">
+      <h3 id="gzModalTitle" style="margin-top: 0; color: #1e293b;">Add New Job</h3>
+      <input type="hidden" id="gzRowIndex">
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+        <div>
+          <label style="font-size: 11px; font-weight: bold; color: #475569;">Date</label>
+          <input type="date" id="gzDateInput" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+        </div>
+        <div>
+          <label style="font-size: 11px; font-weight: bold; color: #475569;">Job No</label>
+          <input type="text" id="gzJobNoInput" placeholder="G308" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+        </div>
+      </div>
+
+      <div style="margin-bottom: 10px;">
+        <label style="font-size: 11px; font-weight: bold; color: #475569;">Customer Name</label>
+        <input type="text" id="gzCustNameInput" placeholder="Customer Name" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+        <div>
+          <label style="font-size: 11px; font-weight: bold; color: #475569;">Phone (WhatsApp)</label>
+          <input type="text" id="gzPhoneInput" placeholder="919876543210" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+        </div>
+        <div>
+          <label style="font-size: 11px; font-weight: bold; color: #475569;">Place</label>
+          <input type="text" id="gzPlaceInput" placeholder="Place" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+        </div>
+      </div>
+
+      <div style="margin-bottom: 10px;">
+        <label style="font-size: 11px; font-weight: bold; color: #475569;">Item Description</label>
+        <input type="text" id="gzItemInput" placeholder="Printing / Design item" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px;">
+        <div>
+          <label style="font-size: 11px; font-weight: bold; color: #475569;">Qty</label>
+          <input type="number" id="gzQtyInput" placeholder="100" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+        </div>
+        <div>
+          <label style="font-size: 11px; font-weight: bold; color: #475569;">Rate (₹)</label>
+          <input type="number" id="gzRateInput" placeholder="10" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+        </div>
+        <div>
+          <label style="font-size: 11px; font-weight: bold; color: #475569;">Paid (₹)</label>
+          <input type="number" id="gzPaidInput" placeholder="1000" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+        <div>
+          <label style="font-size: 11px; font-weight: bold; color: #475569;">Print Cost (₹)</label>
+          <input type="number" id="gzPrintCostInput" placeholder="500" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+        </div>
+        <div>
+          <label style="font-size: 11px; font-weight: bold; color: #475569;">Other Cost (₹)</label>
+          <input type="number" id="gzOtherCostInput" placeholder="0" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+        <div>
+          <label style="font-size: 11px; font-weight: bold; color: #475569;">Status</label>
+          <select id="gzStatusInput" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; background: #fff; box-sizing: border-box;">
+            <option value="Design Pending">Design Pending</option>
+            <option value="Printing">Printing</option>
+            <option value="Ready for Delivery">Ready for Delivery</option>
+            <option value="Delivered">Delivered</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size: 11px; font-weight: bold; color: #475569;">Remarks</label>
+          <input type="text" id="gzRemarksInput" placeholder="Remarks" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;">
+        <button type="button" onclick="closeGzJobModal()" style="padding: 8px 14px; background: #e2e8f0; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">Cancel</button>
+        <button type="button" onclick="submitGzJobForm()" style="padding: 8px 14px; background: #2563eb; color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">Save Job</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT INCLUDES -->
+  <?!= include('inflow2036EventsScript'); ?>
+  <?!= include('specialDaysScript'); ?>
+
+  <script>
+    var selectedDateStr = "";
+    
+    window.appDataCache = {
+      runWalk: null,
+      planning: null,
+      quickNotes: null,
+      bucketList: null,
+      habits: null
+    };
+
+    var appPassword_ = "";
+
+    function lockApp(msg) {
+      document.body.classList.add('locked');
+      var l = document.getElementById('appLoader'); if (l) l.style.display = 'none';
+      var e = document.getElementById('lockError'); if (e) e.textContent = msg || '';
+      var b = document.getElementById('lockBtn'); if (b) { b.disabled = false; b.textContent = 'Unlock'; }
+      var i = document.getElementById('lockInput'); if (i) { i.value = ''; }
+    }
+
+    function submitLogin() {
+      var pwd = document.getElementById('lockInput').value;
+      if (!pwd) { document.getElementById('lockError').textContent = 'Password hakki'; return; }
+      var b = document.getElementById('lockBtn'); b.disabled = true; b.textContent = 'Checking...';
+      document.getElementById('lockError').textContent = '';
+      startApp_(pwd);
+    }
+
+    function startApp_(pwd) {
+      google.script.run
+        .withSuccessHandler(function(data) {
+          if (!data || data.locked) {
+            lockApp(data && data.locked && pwd ? 'Tappu password!' : '');
+            return;
+          }
+          appPassword_ = pwd;
+          window.appDataCache.runWalk = data.runWalk;
+          window.appDataCache.planning = data.planning;
+          window.appDataCache.quickNotes = data.quickNotes;
+          window.appDataCache.bucketList = data.bucketList;
+          window.appDataCache.habits = data.habits;
+          window.appDataCache.all = data;
+          window.appDataCache.skill = data.skill;
+          window.appDataCache.diary = data.diary;
+          window.appDataCache.liabilityAssets = data.liabilityAssets;
+          window.appDataCache.salary = data.salary;
+          window.appDataCache.savingBank = data.savingBank;
+          document.body.classList.remove('locked');
+          var loader = document.getElementById('appLoader');
+          if (loader) loader.style.display = 'none';
+          // Start 5% Club scanner quietly in the background (no loader / no UI change)
+          setTimeout(function() {
+            try { if (typeof prefetchInflowScan === 'function') prefetchInflowScan(); } catch (e) {}
+          }, 2500);
+        })
+        .withFailureHandler(function(err) {
+          lockApp('Connection error, matte try madi');
+        })
+        .getInitialAppData(pwd);
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+      var dateEl = document.getElementById('dashboardDate');
+      if (dateEl) {
+        var now = new Date();
+        dateEl.textContent = now.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+      }
+      // Always ask for password; also clear any password saved by an older version
+      try { localStorage.removeItem('inflowPwd'); } catch (e) {}
+      lockApp('');
+    });
+
+    // Keep preloaded cache in sync when a module re-renders after save/delete
+    (function() {
+      function hook(fnName, key) {
+        var orig = window[fnName];
+        if (typeof orig !== 'function') return;
+        window[fnName] = function(data) { if (data) window.appDataCache[key] = data; return orig.apply(this, arguments); };
+      }
+      hook('renderQuickNotesUI', 'quickNotes');
+      hook('renderDiaryUI', 'diary');
+      hook('renderLAUI', 'liabilityAssets');
+      hook('scApplyData_', 'salary');
+      hook('sbApplyData_', 'savingBank');
+      var origAuto = window.handleNoteAutoSave;
+      if (typeof origAuto === 'function') {
+        window.handleNoteAutoSave = function(rowIndex) {
+          var t = document.getElementById('note_txt_' + rowIndex), c = window.appDataCache.quickNotes;
+          if (t && c) c.forEach(function(n) { if (n.rowIndex === rowIndex) n.content = t.value; });
+          return origAuto.apply(this, arguments);
+        };
+      }
+    })();
+
+    function hideAllViews() {
+      document.getElementById('dashboardView').style.display = 'none';
+      if (document.getElementById('runWalkView')) document.getElementById('runWalkView').style.display = 'none';
+      if (document.getElementById('habitTrackerContainer')) document.getElementById('habitTrackerContainer').style.display = 'none';
+      if (document.getElementById('quickNoteContainer')) document.getElementById('quickNoteContainer').style.display = 'none';
+      if (document.getElementById('diaryContainer')) document.getElementById('diaryContainer').style.display = 'none';
+      if (document.getElementById('liabilityAssetsContainer')) document.getElementById('liabilityAssetsContainer').style.display = 'none';
+      if (document.getElementById('planningContainer')) document.getElementById('planningContainer').style.display = 'none';
+      if (document.getElementById('bucketListContainer')) document.getElementById('bucketListContainer').style.display = 'none';
+      if (document.getElementById('inflowDashboardContainer')) document.getElementById('inflowDashboardContainer').style.display = 'none';
+      if (document.getElementById('specialDaysDashboardContainer')) document.getElementById('specialDaysDashboardContainer').style.display = 'none';
+      if (document.getElementById('graphicZoneContainer')) document.getElementById('graphicZoneContainer').style.display = 'none';
+      if (document.getElementById('fivePercentClubContainer')) document.getElementById('fivePercentClubContainer').style.display = 'none';
+      if (document.getElementById('salaryCardContainer')) document.getElementById('salaryCardContainer').style.display = 'none';
+      if (document.getElementById('skillImproveApp')) document.getElementById('skillImproveApp').style.display = 'none';
+      if (document.getElementById('savingBankContainer')) document.getElementById('savingBankContainer').style.display = 'none';
+    }
+
+    function openSkillView() {
+      hideAllViews();
+      var skillView = document.getElementById('skillImproveApp');
+      if (skillView) skillView.style.display = 'block';
+      if (window.appDataCache.skill && typeof renderSkillCards === 'function') renderSkillCards(window.appDataCache.skill);
+      if (typeof loadSkillTrackerData === 'function') loadSkillTrackerData();
+    }
+
+    function switchView(viewId) {
+      if (viewId === 'dashboardView') {
+        var skillView = document.getElementById('skillImproveApp');
+        if (skillView) skillView.style.display = 'none';
+        document.getElementById('dashboardView').style.display = 'block';
+      }
+    }
+
+    function openSpecialDaysView() {
+      hideAllViews();
+      var specialContainer = document.getElementById('specialDaysDashboardContainer');
+      if (specialContainer) specialContainer.style.display = 'block';
+      if (typeof fetchSpecialDaysDataFromSheet === 'function') fetchSpecialDaysDataFromSheet();
+    }
+
+    function openInflow2036View() {
+      hideAllViews();
+      var inflowContainer = document.getElementById('inflowDashboardContainer');
+      if (inflowContainer) inflowContainer.style.display = 'block';
+      if (typeof fetchInflowDataFromSheet === 'function') {
+        fetchInflowDataFromSheet(function(items) {
+          if (typeof setupInflowEventListeners === 'function') {
+            setupInflowEventListeners(items, function(updatedItems) {});
+          }
+        });
+      }
+    }
+
+    function openSavingBankView() {
+      hideAllViews();
+      var sbView = document.getElementById('savingBankContainer');
+      if (sbView) sbView.style.display = 'block';
+      if (window.appDataCache.savingBank && typeof sbApplyData_ === 'function') {
+        sbApplyData_(window.appDataCache.savingBank);
+        google.script.run.withSuccessHandler(function(d) { sbApplyData_(d); }).getSavingBankData();
+      } else if (typeof loadSavingBankData === 'function') loadSavingBankData();
+    }
+
+    function openSalaryCardView() {
+      hideAllViews();
+      var salaryView = document.getElementById('salaryCardContainer');
+      if (salaryView) salaryView.style.display = 'block';
+      if (window.appDataCache.salary && typeof scApplyData_ === 'function') {
+        scApplyData_(window.appDataCache.salary);
+        google.script.run.withSuccessHandler(function(d) { scApplyData_(d); }).getSalaryCardData();
+      } else if (typeof loadSalaryDataFromSheet === 'function') loadSalaryDataFromSheet();
+    }
+
+    function closeSalaryCardView() {
+      var salaryView = document.getElementById('salaryCardContainer');
+      if (salaryView) salaryView.style.display = 'none';
+      document.getElementById('dashboardView').style.display = 'block';
+    }
+
+    function openGraphicZoneView() {
+      hideAllViews();
+      var gzView = document.getElementById('graphicZoneContainer');
+      if (gzView) gzView.style.display = 'block';
+      if (typeof initGraphicZone === 'function') initGraphicZone();
+    }
+
+    function open5PercentClubView() {
+      hideAllViews();
+      var fpcView = document.getElementById('fivePercentClubContainer');
+      if (fpcView) fpcView.style.display = 'block';
+      if (typeof loadFPCDataFromSheet === 'function') loadFPCDataFromSheet();
+    }
+
+    function closeFPCView() {
+      var fpcView = document.getElementById('fivePercentClubContainer');
+      if (fpcView) fpcView.style.display = 'none';
+      document.getElementById('dashboardView').style.display = 'block';
+    }
+
+    function openRunWalkView() {
+      hideAllViews();
+      document.getElementById('runWalkView').style.display = 'block';
+      if (window.appDataCache.runWalk) {
+        renderRunWalkUI(window.appDataCache.runWalk);
+      }
+      loadDashboardData();
+    }
+
+    function closeRunWalkView() {
+      document.getElementById('runWalkView').style.display = 'none';
+      document.getElementById('dashboardView').style.display = 'block';
+    }
+
+    function openHabitView() {
+      hideAllViews();
+      var habitView = document.getElementById('habitTrackerContainer');
+      if (habitView) habitView.style.display = 'block';
+      if (window.appDataCache.habits && typeof renderHabitTrackerUI === 'function') renderHabitTrackerUI(window.appDataCache.habits);
+      if (typeof loadHabitTrackerData === 'function') loadHabitTrackerData();
+    }
+
+    function openQuickNoteView() {
+      hideAllViews();
+      var qnView = document.getElementById('quickNoteContainer');
+      if (qnView) {
+        qnView.style.display = 'block';
+      }
+      if (window.appDataCache.quickNotes && typeof renderQuickNotesUI === 'function') {
+        renderQuickNotesUI(window.appDataCache.quickNotes);
+        google.script.run.withSuccessHandler(function(n) {
+          var a = document.activeElement;
+          if (a && a.tagName === 'TEXTAREA') return; // don't disturb typing
+          renderQuickNotesUI(n);
+        }).getQuickNotesData();
+      } else if (typeof loadQuickNotesData === 'function') {
+        loadQuickNotesData();
+      }
+    }
+
+    function openDiaryView() {
+      hideAllViews();
+      var diaryView = document.getElementById('diaryContainer');
+      if (diaryView) diaryView.style.display = 'block';
+      if (window.appDataCache.diary && typeof renderDiaryUI === 'function') {
+        renderDiaryUI(window.appDataCache.diary);
+        google.script.run.withSuccessHandler(function(d) { renderDiaryUI(d); }).getDiaryEntries();
+      } else if (typeof loadDiaryEntriesData === 'function') loadDiaryEntriesData();
+    }
+
+    function openLiabilityAssetsView() {
+      hideAllViews();
+      var laView = document.getElementById('liabilityAssetsContainer');
+      if (laView) laView.style.display = 'block';
+      if (window.appDataCache.liabilityAssets && typeof renderLAUI === 'function') {
+        renderLAUI(window.appDataCache.liabilityAssets);
+        google.script.run.withSuccessHandler(function(d) { renderLAUI(d); }).getLiabilityAssetsData();
+      } else if (typeof loadLiabilityAssetsData === 'function') loadLiabilityAssetsData();
+    }
+
+    function openPlanningView() {
+      hideAllViews();
+      var planningView = document.getElementById('planningContainer');
+      if (planningView) planningView.style.display = 'block';
+      if (window.appDataCache.planning && typeof renderPlanningCards === 'function') {
+        renderPlanningCards(window.appDataCache.planning);
+      }
+      if (typeof loadPlanningData === 'function') loadPlanningData();
+    }
+
+    function openBucketListView() {
+      hideAllViews();
+      var bView = document.getElementById('bucketListContainer');
+      if (bView) bView.style.display = 'block';
+      if (typeof loadBucketListData === 'function') loadBucketListData();
+    }
+
+    function loadDashboardData() {
+      google.script.run
+        .withSuccessHandler(function(data) {
+          window.appDataCache.runWalk = data;
+          renderRunWalkUI(data);
+        })
+        .withFailureHandler(function(err) { alert("Error: " + err.message); })
+        .getRunWalkDashboardData();
+    }
+
+    function renderRunWalkUI(data) {
+      document.getElementById('weeklyAvg').innerText = data.weeklyAvg;
+      document.getElementById('monthlyAvg').innerText = data.monthlyAvg;
+      document.getElementById('yearlyAvg').innerText = data.yearlyAvg;
+
+      var listHtml = "";
+      data.history.forEach(function(item, idx) {
+        var isToday = (idx === 0);
+        var cardClass = isToday ? "history-card today" : "history-card";
+        var btnText = item.distance > 0 ? "✏️ Edit" : "+ Add";
+
+        listHtml += '<div class="' + cardClass + '">' +
+                      '<div>' +
+                        '<div class="day-title">' + item.dayName + '</div>' +
+                        '<div class="day-date">' + item.formattedDate + '</div>' +
+                      '</div>' +
+                      '<div style="display: flex; align-items: center;">' +
+                        '<div class="dist-display">' + item.distance.toFixed(1) + ' KM</div>' +
+                        '<button type="button" class="btn-action" onclick="openEditModal(\'' + item.dateStr + '\', \'' + item.dayName + '\', ' + item.distance + ')">' + btnText + '</button>' +
+                      '</div>' +
+                    '</div>';
+      });
+      document.getElementById('historyList').innerHTML = listHtml;
+    }
+
+    function openEditModal(dateStr, dayName, currentDist) {
+      selectedDateStr = dateStr;
+      document.getElementById('modalTitle').innerText = dayName + ' Entry Update';
+      document.getElementById('modalDateLabel').innerText = 'Date: ' + dateStr;
+      document.getElementById('inputDistance').value = currentDist > 0 ? currentDist : '';
+      document.getElementById('editModal').style.display = 'block';
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').style.display = 'none';
+    }
+
+    function submitDistanceUpdate() {
+      var distVal = document.getElementById('inputDistance').value;
+      if (distVal === "" || distVal < 0) {
+        alert("Dayavittu sariyada Distance namoodisi!");
+        return;
+      }
+
+      var saveBtn = document.getElementById('btnSaveModal');
+      saveBtn.disabled = true;
+      saveBtn.innerText = "Saving...";
+
+      google.script.run
+        .withSuccessHandler(function(updatedData) {
+          saveBtn.disabled = false;
+          saveBtn.innerText = "Save to Sheet";
+          closeEditModal();
+          window.appDataCache.runWalk = updatedData;
+          renderRunWalkUI(updatedData);
+        })
+        .withFailureHandler(function(err) {
+          saveBtn.disabled = false;
+          saveBtn.innerText = "Save to Sheet";
+          alert("Error: " + err.message);
+        })
+        .saveOrUpdateRunWalkEntry(selectedDateStr, distVal);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,264 @@
+<!-- ================= SAVING BANK MODULE VIEW ================= -->
+<style>
+  #savingBankContainer { display: none; width: 100%; box-sizing: border-box; padding-bottom: 24px; }
+  #savingBankContainer * { box-sizing: border-box; }
+
+  .sb-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+  .sb-back { background: #fff; border: 1px solid #e3e6ee; border-radius: 12px; padding: 10px 12px; font-size: 13px; font-weight: 800; color: #1e1b4b; cursor: pointer; text-align: left; line-height: 1.2; flex: 1; min-width: 0; box-shadow: 0 2px 6px rgba(20,30,80,.05); }
+  .sb-add { background: #5b2a9e; color: #fff; border: none; border-radius: 12px; padding: 11px 14px; font-size: 14px; font-weight: 800; cursor: pointer; white-space: nowrap; box-shadow: 0 4px 10px rgba(91,42,158,.3); flex-shrink: 0; }
+  .sb-add:active, .sb-back:active { transform: scale(.97); }
+
+  .sb-totals { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+  .sb-total { background: #fff; border-radius: 14px; padding: 12px 14px; box-shadow: 0 3px 10px rgba(20,30,80,.06); border-left: 4px solid #2e7d32; min-width: 0; }
+  .sb-total.aed { border-left-color: #2a7ac0; }
+  .sb-total .lbl { font-size: 11px; color: #64748b; font-weight: 700; letter-spacing: .3px; text-transform: uppercase; }
+  .sb-total .val { font-size: 22px; font-weight: 800; margin-top: 3px; color: #2e7d32; overflow-wrap: anywhere; }
+  .sb-total.aed .val { color: #2a7ac0; }
+
+  .sb-list { display: flex; flex-direction: column; gap: 8px; }
+  .sb-card { background: #fff; border-radius: 16px; padding: 10px 12px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 8px rgba(20,30,80,.05); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .sb-card:active { background: #fafafe; }
+  .sb-logo { width: 48px; height: 48px; border-radius: 12px; flex-shrink: 0; background: #f1f0f8; border: 1px solid #ececf4; display: flex; align-items: center; justify-content: center; overflow: hidden; font-weight: 800; font-size: 20px; color: #fff; }
+  .sb-logo img { width: 100%; height: 100%; object-fit: contain; background: #fff; }
+  .sb-info { flex: 1; min-width: 0; }
+  .sb-name-row { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+  .sb-name { font-size: 16px; font-weight: 800; color: #16163a; overflow-wrap: anywhere; }
+  .sb-badge { font-size: 10px; font-weight: 800; padding: 3px 7px; border-radius: 8px; background: #e3f6e8; color: #2e7d32; }
+  .sb-badge.aed { background: #e1effb; color: #2a6fb0; }
+  .sb-type { font-size: 12px; color: #6b7280; margin-top: 2px; }
+  .sb-bal { background: #f3f2f8; border: 1px solid #e8e6f1; border-radius: 12px; padding: 8px 12px; font-size: 13px; color: #555; white-space: nowrap; flex-shrink: 0; }
+  .sb-bal b { font-size: 18px; color: #111; margin-left: 2px; }
+  .sb-empty { background: #fff; border-radius: 14px; padding: 24px; text-align: center; color: #888; font-size: 13px; }
+
+  /* Modal */
+  #sbModal { display: none; position: fixed; inset: 0; background: rgba(15,23,42,.55); z-index: 9000; align-items: center; justify-content: center; padding: 16px; }
+  .sb-modal-box { background: #fff; width: 100%; max-width: 380px; max-height: 92vh; overflow-y: auto; border-radius: 20px; padding: 18px; }
+  .sb-modal-box h3 { margin: 0 0 10px; font-size: 17px; color: #16163a; }
+  .sb-modal-box label { display: block; font-size: 11px; font-weight: 800; color: #64748b; margin: 8px 0 4px; text-transform: uppercase; }
+  .sb-modal-box input, .sb-modal-box select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 15px; background: #fff; }
+  .sb-logo-pick { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+  .sb-logo-pick .sb-logo { width: 52px; height: 52px; }
+  .sb-logo-pick button { background: #f1f0f8; border: 1px solid #ddd; border-radius: 10px; padding: 9px 12px; font-size: 13px; font-weight: 700; cursor: pointer; }
+  .sb-btn-row { display: flex; gap: 8px; margin-top: 14px; }
+  .sb-btn-row button { flex: 1; padding: 11px; border: none; border-radius: 12px; font-size: 14px; font-weight: 800; cursor: pointer; }
+  #sbSaveBtn { background: #5b2a9e; color: #fff; }
+  #sbCancelBtn { background: #eef0f4; color: #333; }
+  #sbDeleteBtn { background: #fde8e8; color: #c0262d; margin-top: 8px; width: 100%; display: none; }
+</style>
+
+<div id="savingBankContainer">
+  <div class="sb-top">
+    <button type="button" class="sb-back" onclick="closeSavingBankView()">← ಡ್ಯಾಶ್‌ಬೋರ್ಡ್‌ಗೆ ಹಿಂತಿರುಗಿ (Exit)</button>
+    <button type="button" class="sb-add" onclick="sbOpenAdd()">+ Add New Bank</button>
+  </div>
+
+  <div class="sb-totals">
+    <div class="sb-total"><div class="lbl">Total Rs. (₹) Balance</div><div class="val" id="sbTotalInr">₹ 0</div></div>
+    <div class="sb-total aed"><div class="lbl">Total AED Balance</div><div class="val" id="sbTotalAed">AED 0</div></div>
+  </div>
+
+  <div id="sbList" class="sb-list"><div class="sb-empty">Loading...</div></div>
+</div>
+
+<!-- Add / Edit Bank Modal -->
+<div id="sbModal">
+  <div class="sb-modal-box">
+    <h3 id="sbModalTitle">Add New Bank</h3>
+    <input type="hidden" id="sbRowIndex">
+    <input type="hidden" id="sbLogoUrlHidden">
+
+    <label>Logo (optional)</label>
+    <div class="sb-logo-pick">
+      <div class="sb-logo" id="sbLogoPreview">🏦</div>
+      <button type="button" onclick="document.getElementById('sbLogoFile').click()">Choose Logo</button>
+      <input type="file" id="sbLogoFile" accept="image/*" style="display:none;" onchange="sbLogoChosen(this)">
+    </div>
+
+    <label>Bank / Wallet Name</label>
+    <input type="text" id="sbNameInput" placeholder="e.g. Federal Bank">
+
+    <label>Currency</label>
+    <select id="sbCurrencyInput">
+      <option value="INR">Rs. (INR)</option>
+      <option value="AED">AED</option>
+    </select>
+
+    <label>Account Type</label>
+    <input type="text" id="sbTypeInput" placeholder="e.g. Savings Account">
+
+    <label>Balance</label>
+    <input type="number" step="any" inputmode="decimal" id="sbBalanceInput" placeholder="0">
+
+    <div class="sb-btn-row">
+      <button type="button" id="sbCancelBtn" onclick="sbCloseModal()">Cancel</button>
+      <button type="button" id="sbSaveBtn" onclick="sbSave()">Save</button>
+    </div>
+    <button type="button" id="sbDeleteBtn" onclick="sbDelete()">🗑️ Delete</button>
+  </div>
+</div>
+
+<script>
+  var sbBanks = [];
+  var sbPendingLogo = null; // { data, type, name }
+  var sbColors = ['#2563eb','#7c3aed','#db2777','#ea580c','#059669','#0891b2','#ca8a04','#475569'];
+
+  function sbEsc(t) {
+    return String(t == null ? '' : t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function sbMoney(n) { return Number(n || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 }); }
+
+  function loadSavingBankData() {
+    var l = document.getElementById('sbList');
+    if (l && !sbBanks.length) l.innerHTML = '<div class="sb-empty">Loading...</div>';
+    google.script.run
+      .withSuccessHandler(function(res) { sbApplyData_(res); })
+      .withFailureHandler(function(err) {
+        if (l) l.innerHTML = '<div class="sb-empty" style="color:red;">Error: ' + sbEsc(err.message) + '</div>';
+      })
+      .getSavingBankData();
+  }
+
+  function sbApplyData_(res) {
+    sbBanks = (res && res.banks) || [];
+    sbRender();
+  }
+
+  function sbRender() {
+    var inr = 0, aed = 0, html = '';
+    sbBanks.forEach(function(b) {
+      if (b.currency === 'AED') aed += Number(b.balance || 0); else inr += Number(b.balance || 0);
+      var isAed = b.currency === 'AED';
+      var color = sbColors[(b.name || 'A').charCodeAt(0) % sbColors.length];
+      var logo = b.logoUrl
+        ? '<img src="' + sbEsc(b.logoUrl) + '" alt="" onerror="this.parentNode.style.background=\'' + color + '\';this.parentNode.textContent=\'' + sbEsc((b.name || '?').charAt(0).toUpperCase()) + '\'">'
+        : sbEsc((b.name || '?').charAt(0).toUpperCase());
+      html += '<div class="sb-card" onclick="sbOpenEdit(' + b.rowIndex + ')">' +
+                '<div class="sb-logo"' + (b.logoUrl ? '' : ' style="background:' + color + ';"') + '>' + logo + '</div>' +
+                '<div class="sb-info">' +
+                  '<div class="sb-name-row"><span class="sb-name">' + sbEsc(b.name) + '</span>' +
+                  '<span class="sb-badge' + (isAed ? ' aed' : '') + '">' + (isAed ? 'AED' : 'RS.') + '</span></div>' +
+                  '<div class="sb-type">' + sbEsc(b.type) + '</div>' +
+                '</div>' +
+                '<div class="sb-bal">' + (isAed ? 'AED' : 'Rs.') + ' <b>' + sbMoney(b.balance) + '</b></div>' +
+              '</div>';
+    });
+    document.getElementById('sbList').innerHTML = html || '<div class="sb-empty">No banks added yet. Tap "+ Add New Bank".</div>';
+    document.getElementById('sbTotalInr').textContent = '₹ ' + sbMoney(inr);
+    document.getElementById('sbTotalAed').textContent = 'AED ' + sbMoney(aed);
+  }
+
+  function closeSavingBankView() {
+    document.getElementById('savingBankContainer').style.display = 'none';
+    document.getElementById('dashboardView').style.display = 'block';
+  }
+
+  function sbSetPreview(url, name) {
+    var p = document.getElementById('sbLogoPreview');
+    if (url) { p.style.background = '#fff'; p.innerHTML = '<img src="' + sbEsc(url) + '" alt="">'; }
+    else { p.style.background = ''; p.textContent = '🏦'; }
+  }
+
+  function sbOpenAdd() {
+    sbPendingLogo = null;
+    document.getElementById('sbModalTitle').textContent = 'Add New Bank';
+    document.getElementById('sbRowIndex').value = '';
+    document.getElementById('sbLogoUrlHidden').value = '';
+    document.getElementById('sbNameInput').value = '';
+    document.getElementById('sbCurrencyInput').value = 'INR';
+    document.getElementById('sbTypeInput').value = '';
+    document.getElementById('sbBalanceInput').value = '';
+    document.getElementById('sbLogoFile').value = '';
+    document.getElementById('sbDeleteBtn').style.display = 'none';
+    sbSetPreview('');
+    sbShowModal();
+  }
+
+  function sbOpenEdit(rowIndex) {
+    var b = null;
+    sbBanks.forEach(function(x) { if (x.rowIndex === rowIndex) b = x; });
+    if (!b) return;
+    sbPendingLogo = null;
+    document.getElementById('sbModalTitle').textContent = 'Edit Bank';
+    document.getElementById('sbRowIndex').value = b.rowIndex;
+    document.getElementById('sbLogoUrlHidden').value = b.logoUrl || '';
+    document.getElementById('sbNameInput').value = b.name;
+    document.getElementById('sbCurrencyInput').value = b.currency;
+    document.getElementById('sbTypeInput').value = b.type;
+    document.getElementById('sbBalanceInput').value = b.balance;
+    document.getElementById('sbLogoFile').value = '';
+    document.getElementById('sbDeleteBtn').style.display = 'block';
+    sbSetPreview(b.logoUrl);
+    sbShowModal();
+  }
+
+  function sbShowModal() { document.getElementById('sbModal').style.display = 'flex'; }
+  function sbCloseModal() { document.getElementById('sbModal').style.display = 'none'; }
+
+  // Resize chosen logo to max 160px so upload is small and fast
+  function sbLogoChosen(input) {
+    var file = input.files && input.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var img = new Image();
+      img.onload = function() {
+        var max = 160, w = img.width, h = img.height;
+        var scale = Math.min(1, max / Math.max(w, h));
+        var c = document.createElement('canvas');
+        c.width = Math.round(w * scale); c.height = Math.round(h * scale);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        var data = c.toDataURL('image/png');
+        sbPendingLogo = { data: data, type: 'image/png', name: 'bank_logo_' + Date.now() + '.png' };
+        sbSetPreview(data);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function sbSave() {
+    var name = document.getElementById('sbNameInput').value.trim();
+    if (!name) { alert('Bank name hakki!'); return; }
+    var btn = document.getElementById('sbSaveBtn');
+    btn.disabled = true; btn.textContent = 'Saving...';
+
+    var item = {
+      rowIndex: document.getElementById('sbRowIndex').value || null,
+      name: name,
+      currency: document.getElementById('sbCurrencyInput').value,
+      type: document.getElementById('sbTypeInput').value.trim(),
+      balance: Number(document.getElementById('sbBalanceInput').value || 0),
+      logoUrl: document.getElementById('sbLogoUrlHidden').value || ''
+    };
+
+    function done() { btn.disabled = false; btn.textContent = 'Save'; }
+    function doSave() {
+      google.script.run
+        .withSuccessHandler(function(res) { done(); sbCloseModal(); sbApplyData_(res); })
+        .withFailureHandler(function(err) { done(); alert('Error saving: ' + err.message); })
+        .saveSavingBankItem(item);
+    }
+
+    if (sbPendingLogo) {
+      google.script.run
+        .withSuccessHandler(function(r) {
+          if (r && r.success) { item.logoUrl = r.logoUrl; doSave(); }
+          else { done(); alert('Logo upload failed: ' + (r && r.error)); }
+        })
+        .withFailureHandler(function(err) { done(); alert('Logo upload error: ' + err.message); })
+        .uploadSavingBankLogo(sbPendingLogo.data, sbPendingLogo.type, sbPendingLogo.name);
+    } else {
+      doSave();
+    }
+  }
+
+  function sbDelete() {
+    var rowIndex = document.getElementById('sbRowIndex').value;
+    if (!rowIndex) return;
+    if (!confirm('Ee bank delete madabeka?')) return;
+    google.script.run
+      .withSuccessHandler(function(res) { sbCloseModal(); sbApplyData_(res); })
+      .withFailureHandler(function(err) { alert('Error deleting: ' + err.message); })
+      .deleteSavingBankItem(parseInt(rowIndex, 10));
+  }
+</script>
