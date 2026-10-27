@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useApp } from '../context/AppContext';
 import { Trade5Pct } from '../types';
 import { TradeService } from '../services';
 import { ArrowLeft, Plus, Search, Calendar, Edit3, Trash2, CheckCircle2 } from 'lucide-react';
+import { getScannerStocks, ScannedStock } from '../data/scannerStocks';
 
 export const FivePercentClubView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { data, saveTrade, deleteTrade } = useApp();
@@ -12,7 +13,9 @@ export const FivePercentClubView: React.FC<{ onBack: () => void }> = ({ onBack }
   const [scanCapital, setScanCapital] = useState('30000');
   const [customSymbol, setCustomSymbol] = useState('');
   const [isScanning, setIsScanning] = useState(false);
-  const [scanStatus, setScanStatus] = useState('Ready to scan. Tap Scan Market.');
+  const [scanStatus, setScanStatus] = useState('Ready to scan. Tap Run Scan or choose tab.');
+  const [scannerSearch, setScannerSearch] = useState('');
+  const [checkFilter, setCheckFilter] = useState<'ALL' | 'HIGH' | 'MED'>('ALL');
 
   // Filters
   const [selectedMonth, setSelectedMonth] = useState(() =>
@@ -131,13 +134,46 @@ export const FivePercentClubView: React.FC<{ onBack: () => void }> = ({ onBack }
     setShowModal(false);
   };
 
-  // Sample scanner results
-  const mockScannerResults = [
-    { stock: 'COALINDIA', name: 'Coal India Ltd', price: 428.5, target: 449.9, points: 7, supertrend: 'Bullish', adx: 29.4, rsi: 58.2, atrStop: 412.0 },
-    { stock: 'NTPC', name: 'NTPC Ltd', price: 382.1, target: 401.2, points: 6, supertrend: 'Bullish', adx: 27.1, rsi: 61.5, atrStop: 368.5 },
-    { stock: 'TATAMOTORS', name: 'Tata Motors Passenger', price: 890.0, target: 934.5, points: 5, supertrend: 'Bullish', adx: 25.8, rsi: 54.0, atrStop: 855.0 },
-    { stock: 'TCS', name: 'Tata Consultancy Services', price: 4050.0, target: 4252.5, points: 4, supertrend: 'Neutral', adx: 22.3, rsi: 48.0, atrStop: 3920.0 }
-  ];
+  const rawScannedStocks = useMemo(() => {
+    return getScannerStocks(scanMode, customSymbol);
+  }, [scanMode, customSymbol]);
+
+  const filteredScannedStocks = useMemo(() => {
+    return rawScannedStocks.filter(s => {
+      const q = scannerSearch.trim().toLowerCase();
+      const matchesSearch = !q || 
+        s.stock.toLowerCase().includes(q) || 
+        s.name.toLowerCase().includes(q) ||
+        s.sector.toLowerCase().includes(q);
+      
+      if (!matchesSearch) return false;
+      if (checkFilter === 'HIGH') return s.points >= 6;
+      if (checkFilter === 'MED') return s.points >= 4 && s.points <= 5;
+      return true;
+    });
+  }, [rawScannedStocks, scannerSearch, checkFilter]);
+
+  const handleRunScan = () => {
+    setIsScanning(true);
+    setScanStatus(`Scanning ${rawScannedStocks.length} stocks against 7 technical rules...`);
+    setTimeout(() => {
+      setIsScanning(false);
+      const highCount = rawScannedStocks.filter(s => s.points >= 6).length;
+      setScanStatus(`✅ Scan complete · Scanned ${rawScannedStocks.length} stocks · ${highCount} High Match setups found.`);
+    }, 600);
+  };
+
+  const quickAddFromScanner = (s: ScannedStock) => {
+    setActiveTrade(null);
+    setModalMode('NEW');
+    setAssetName(s.stock);
+    setInvestment(scanCapital || '30000');
+    setEntryDate(new Date().toISOString().split('T')[0]);
+    setExitDate(new Date().toISOString().split('T')[0]);
+    setExitPct('5.0');
+    setBrokerCharges('45');
+    setShowModal(true);
+  };
 
   return (
     <div className="space-y-4 pb-12 animate-fadeIn">
@@ -158,13 +194,13 @@ export const FivePercentClubView: React.FC<{ onBack: () => void }> = ({ onBack }
         <div className="flex items-center gap-1.5 flex-shrink-0">
           <button
             onClick={() => setScannerOpen(!scannerOpen)}
-            className="py-1.5 px-3 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
+            className="py-1.5 px-3 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer"
           >
             {scannerOpen ? 'Close Scanner' : 'Scan Market'}
           </button>
           <button
             onClick={openNewTrade}
-            className="py-1.5 px-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
+            className="py-1.5 px-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer"
           >
             + Trade
           </button>
@@ -183,35 +219,44 @@ export const FivePercentClubView: React.FC<{ onBack: () => void }> = ({ onBack }
                 7 Checks · Supertrend (10,3) + ADX ≥ 25 · +5% Target
               </h3>
             </div>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/30">
-              Live Engine
+            <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/30">
+              Scanned: {rawScannedStocks.length} Stocks
             </span>
           </div>
 
           <div className="flex gap-1.5 p-1 bg-slate-800 rounded-xl text-xs font-bold">
             <button
-              onClick={() => setScanMode('watchlist')}
-              className={`flex-1 py-1.5 rounded-lg transition-colors ${
-                scanMode === 'watchlist' ? 'bg-sky-600 text-white' : 'text-slate-400'
+              onClick={() => {
+                setScanMode('watchlist');
+                setScanStatus(`Switched to Watchlist · ${getScannerStocks('watchlist').length} stocks loaded.`);
+              }}
+              className={`flex-1 py-1.5 rounded-lg transition-colors cursor-pointer ${
+                scanMode === 'watchlist' ? 'bg-sky-600 text-white shadow-xs' : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              My Watchlist
+              My Watchlist ({getScannerStocks('watchlist').length})
             </button>
             <button
-              onClick={() => setScanMode('nifty100')}
-              className={`flex-1 py-1.5 rounded-lg transition-colors ${
-                scanMode === 'nifty100' ? 'bg-sky-600 text-white' : 'text-slate-400'
+              onClick={() => {
+                setScanMode('nifty100');
+                setScanStatus(`Switched to Nifty 100 · All 100 stocks loaded.`);
+              }}
+              className={`flex-1 py-1.5 rounded-lg transition-colors cursor-pointer ${
+                scanMode === 'nifty100' ? 'bg-sky-600 text-white shadow-xs' : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              Nifty 100
+              Nifty 100 (100)
             </button>
             <button
-              onClick={() => setScanMode('custom')}
-              className={`flex-1 py-1.5 rounded-lg transition-colors ${
-                scanMode === 'custom' ? 'bg-sky-600 text-white' : 'text-slate-400'
+              onClick={() => {
+                setScanMode('custom');
+                setScanStatus('Enter any custom stock symbol or comma-separated symbols.');
+              }}
+              className={`flex-1 py-1.5 rounded-lg transition-colors cursor-pointer ${
+                scanMode === 'custom' ? 'bg-sky-600 text-white shadow-xs' : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              Custom
+              Custom Search
             </button>
           </div>
 
@@ -220,13 +265,13 @@ export const FivePercentClubView: React.FC<{ onBack: () => void }> = ({ onBack }
               type="text"
               value={customSymbol}
               onChange={(e) => setCustomSymbol(e.target.value.toUpperCase())}
-              placeholder="Enter NSE symbol, e.g. TCS, INFY, RELIANCE"
+              placeholder="Enter NSE symbol, e.g. TCS, INFY, RELIANCE, TATAMOTORS"
               className="w-full py-2 px-3 bg-slate-800 border border-slate-700 rounded-xl text-xs font-bold text-white focus:outline-none focus:border-sky-500"
             />
           )}
 
-          <div className="flex items-center gap-3">
-            <div className="flex-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
               <label className="block text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-wider">
                 Capital per Trade (₹)
               </label>
@@ -237,74 +282,144 @@ export const FivePercentClubView: React.FC<{ onBack: () => void }> = ({ onBack }
                 className="w-full py-2 px-3 bg-slate-800 border border-slate-700 rounded-xl text-xs font-bold text-white focus:outline-none focus:border-sky-500"
               />
             </div>
-            <button
-              onClick={() => {
-                setIsScanning(true);
-                setScanStatus('Scanning market setup conditions...');
-                setTimeout(() => {
-                  setIsScanning(false);
-                  setScanStatus('Scan complete · 3 stocks matched complete setup criteria.');
-                }, 800);
-              }}
-              className="py-2.5 px-5 bg-sky-500 hover:bg-sky-600 font-bold text-xs rounded-xl shadow-md shadow-sky-500/20 active:scale-95 transition-all text-slate-950 mt-4"
-            >
-              {isScanning ? 'Scanning...' : 'Run Scan'}
-            </button>
+            
+            <div className="flex items-end">
+              <button
+                onClick={handleRunScan}
+                className="w-full py-2.5 px-5 bg-sky-500 hover:bg-sky-400 font-black text-xs rounded-xl shadow-md shadow-sky-500/20 active:scale-95 transition-all text-slate-950 cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                {isScanning ? '🔍 Scanning Market...' : `⚡ Run Scan (${rawScannedStocks.length} Stocks)`}
+              </button>
+            </div>
           </div>
 
-          <div className="text-[11px] text-slate-400 font-medium">{scanStatus}</div>
+          {/* Search & Filter Controls inside Scanner */}
+          <div className="pt-2 border-t border-slate-800 space-y-2">
+            <div className="flex flex-col sm:flex-row gap-2 items-center justify-between">
+              <div className="relative w-full sm:w-auto flex-1">
+                <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
+                <input
+                  type="text"
+                  value={scannerSearch}
+                  onChange={(e) => setScannerSearch(e.target.value)}
+                  placeholder={`Search ${rawScannedStocks.length} stocks...`}
+                  className="w-full py-1.5 pl-8 pr-3 bg-slate-800/80 border border-slate-700/80 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
+                />
+              </div>
 
-          {/* Scanner Cards */}
-          <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
-            {mockScannerResults.map((s, idx) => {
-              const capNum = parseFloat(scanCapital) || 30000;
-              const qty = Math.floor(capNum / s.price);
-              const invested = qty * s.price;
-
-              return (
-                <div
-                  key={s.stock}
-                  className={`p-3.5 rounded-2xl border transition-all ${
-                    s.points >= 6
-                      ? 'bg-slate-800/90 border-emerald-500/40'
-                      : 'bg-slate-800/50 border-slate-700'
+              <div className="flex gap-1 w-full sm:w-auto">
+                <button
+                  onClick={() => setCheckFilter('ALL')}
+                  className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-colors cursor-pointer ${
+                    checkFilter === 'ALL' ? 'bg-sky-500/30 text-sky-300 border border-sky-400/40' : 'bg-slate-800 text-slate-400'
                   }`}
                 >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <div className="text-sm font-black text-white">{s.name}</div>
-                      <div className="text-[11px] text-slate-400 font-semibold">{s.stock} · NSE</div>
-                    </div>
-                    <span
-                      className={`text-sm font-black px-2 py-0.5 rounded-lg ${
-                        s.points >= 6 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'
-                      }`}
-                    >
-                      {s.points}/7 Checks
-                    </span>
-                  </div>
+                  All ({rawScannedStocks.length})
+                </button>
+                <button
+                  onClick={() => setCheckFilter('HIGH')}
+                  className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-colors cursor-pointer ${
+                    checkFilter === 'HIGH' ? 'bg-emerald-500/30 text-emerald-300 border border-emerald-400/40' : 'bg-slate-800 text-slate-400'
+                  }`}
+                >
+                  High (6-7 Checks)
+                </button>
+                <button
+                  onClick={() => setCheckFilter('MED')}
+                  className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-colors cursor-pointer ${
+                    checkFilter === 'MED' ? 'bg-amber-500/30 text-amber-300 border border-amber-400/40' : 'bg-slate-800 text-slate-400'
+                  }`}
+                >
+                  Medium (4-5 Checks)
+                </button>
+              </div>
+            </div>
 
-                  <div className="grid grid-cols-4 gap-2 mt-2 pt-2 border-t border-slate-700/60 text-[11px]">
-                    <div>
-                      <span className="text-slate-400 block text-[9px]">LTP</span>
-                      <b className="text-white font-bold">₹{s.price}</b>
+            <div className="text-[11px] text-sky-400 font-medium flex items-center justify-between">
+              <span>{scanStatus}</span>
+              <span className="text-slate-400 text-[10px]">
+                Showing {filteredScannedStocks.length} of {rawScannedStocks.length}
+              </span>
+            </div>
+          </div>
+
+          {/* Scanner Cards Scroll Area */}
+          <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
+            {filteredScannedStocks.length === 0 ? (
+              <div className="py-8 text-center text-xs text-slate-400 bg-slate-800/40 rounded-2xl border border-slate-800">
+                No stocks match your search or filter criteria.
+              </div>
+            ) : (
+              filteredScannedStocks.map((s) => {
+                const capNum = parseFloat(scanCapital) || 30000;
+                const qty = Math.floor(capNum / s.price);
+                const invested = qty * s.price;
+
+                return (
+                  <div
+                    key={s.stock}
+                    className={`p-3.5 rounded-2xl border transition-all ${
+                      s.points >= 6
+                        ? 'bg-slate-800/90 border-emerald-500/40 hover:border-emerald-500/70'
+                        : 'bg-slate-800/50 border-slate-700/80 hover:border-slate-600'
+                    }`}
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <div className="text-sm font-black text-white flex items-center gap-2">
+                          <span>{s.name}</span>
+                          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-700 text-slate-300">
+                            {s.sector}
+                          </span>
+                        </div>
+                        <div className="text-[11px] text-slate-400 font-semibold mt-0.5">
+                          {s.stock} · NSE · Supertrend: <span className={s.supertrend === 'Bullish' ? 'text-emerald-400' : 'text-amber-400'}>{s.supertrend}</span> · ADX: {s.adx}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`text-xs font-black px-2 py-1 rounded-lg ${
+                            s.points >= 6
+                              ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                              : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                          }`}
+                        >
+                          {s.points}/7 Checks
+                        </span>
+
+                        <button
+                          onClick={() => quickAddFromScanner(s)}
+                          className="py-1 px-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-[11px] rounded-lg shadow-sm active:scale-95 transition-all cursor-pointer"
+                          title="Log into 5% Trade Tracker"
+                        >
+                          + Trade
+                        </button>
+                      </div>
                     </div>
-                    <div>
-                      <span className="text-slate-400 block text-[9px]">+5% Target</span>
-                      <b className="text-emerald-400 font-bold">₹{s.target}</b>
-                    </div>
-                    <div>
-                      <span className="text-slate-400 block text-[9px]">ATR Stop</span>
-                      <b className="text-rose-400 font-bold">₹{s.atrStop}</b>
-                    </div>
-                    <div>
-                      <span className="text-slate-400 block text-[9px]">Qty / Inv</span>
-                      <b className="text-white font-bold">{qty} (₹{invested})</b>
+
+                    <div className="grid grid-cols-4 gap-2 mt-2 pt-2 border-t border-slate-700/60 text-[11px]">
+                      <div>
+                        <span className="text-slate-400 block text-[9px]">LTP</span>
+                        <b className="text-white font-bold">₹{s.price.toLocaleString('en-IN')}</b>
+                      </div>
+                      <div>
+                        <span className="text-slate-400 block text-[9px]">+5% Target</span>
+                        <b className="text-emerald-400 font-bold">₹{s.target.toLocaleString('en-IN')}</b>
+                      </div>
+                      <div>
+                        <span className="text-slate-400 block text-[9px]">ATR Stop</span>
+                        <b className="text-rose-400 font-bold">₹{s.atrStop.toLocaleString('en-IN')}</b>
+                      </div>
+                      <div>
+                        <span className="text-slate-400 block text-[9px]">Qty / Inv</span>
+                        <b className="text-white font-bold">{qty} (₹{invested.toLocaleString('en-IN')})</b>
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
         </div>
       )}
