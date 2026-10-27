@@ -22,7 +22,8 @@ import {
 import {
   StorageService,
   GraphicZoneService,
-  TradeService
+  TradeService,
+  GoogleDriveService
 } from '../services';
 
 const AUTH_KEY = 'inflow2036_auth_v1';
@@ -35,6 +36,7 @@ interface AppContextType {
   login: (pwd: string) => boolean;
   logout: () => void;
   exportBackupJSON: () => void;
+  backupToGoogleDrive: () => Promise<{ success: boolean; message: string; link?: string }>;
   importBackupJSON: (file: File) => Promise<boolean>;
   resetToDefaults: () => void;
 
@@ -146,6 +148,22 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const exportBackupJSON = () => {
     StorageService.exportBackup(data);
+  };
+
+  const backupToGoogleDrive = async (): Promise<{ success: boolean; message: string; link?: string }> => {
+    const res = await GoogleDriveService.uploadBackupToDrive(data, 'inflow2036_Backups');
+    if (res.success) {
+      return {
+        success: true,
+        message: `✅ Backup uploaded successfully to Google Drive folder 'inflow2036_Backups' as '${res.fileName}'`,
+        link: res.webViewLink
+      };
+    } else {
+      return {
+        success: false,
+        message: `❌ Failed to save backup to Google Drive: ${res.error || 'Unknown error'}`
+      };
+    }
   };
 
   const importBackupJSON = async (file: File): Promise<boolean> => {
@@ -704,6 +722,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         login,
         logout,
         exportBackupJSON,
+        backupToGoogleDrive,
         importBackupJSON,
         resetToDefaults,
 

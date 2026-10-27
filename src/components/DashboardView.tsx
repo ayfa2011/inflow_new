@@ -10,7 +10,11 @@ import {
   DollarSign,
   Briefcase,
   ChevronRight,
-  ShieldAlert
+  ShieldAlert,
+  CloudUpload,
+  ExternalLink,
+  Loader2,
+  FolderCheck
 } from 'lucide-react';
 
 interface DashboardViewProps {
@@ -18,9 +22,28 @@ interface DashboardViewProps {
 }
 
 export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) => {
-  const { logout, exportBackupJSON, importBackupJSON, resetToDefaults, data } = useApp();
+  const { logout, exportBackupJSON, backupToGoogleDrive, importBackupJSON, resetToDefaults, data } = useApp();
   const [showBackupModal, setShowBackupModal] = useState(false);
   const [backupMessage, setBackupMessage] = useState('');
+  const [isDriveUploading, setIsDriveUploading] = useState(false);
+  const [driveLink, setDriveLink] = useState<string | null>(null);
+
+  const handleDriveBackup = async () => {
+    setIsDriveUploading(true);
+    setBackupMessage('');
+    setDriveLink(null);
+    try {
+      const res = await backupToGoogleDrive();
+      setBackupMessage(res.message);
+      if (res.success && res.link) {
+        setDriveLink(res.link);
+      }
+    } catch (err: any) {
+      setBackupMessage(`❌ Error: ${err?.message || 'Google Drive save failed'}`);
+    } finally {
+      setIsDriveUploading(false);
+    }
+  };
 
   const todayFormatted = new Intl.DateTimeFormat('en-GB', {
     day: '2-digit',
@@ -362,25 +385,55 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
           <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl border border-slate-100">
             <h3 className="text-lg font-black text-slate-900 mb-1">☁️ Backup &amp; Data Sync</h3>
             <p className="text-xs text-slate-500 mb-4">
-              Export your full data to JSON or import from an existing backup file.
+              ಗೂಗಲ್ ಡ್ರೈವ್ (Google Drive) ಫೋಲ್ಡರ್‌ಗೆ ಆಟೋಮೆಟಿಕ್ ಆಗಿ ಬ್ಯಾಕಪ್ ಸೇವ್ ಮಾಡಿ.
             </p>
 
             {backupMessage && (
-              <div className="p-3 mb-4 rounded-xl text-xs font-bold bg-slate-100 text-slate-800 text-center">
-                {backupMessage}
+              <div className="p-3 mb-4 rounded-xl text-xs font-bold bg-slate-50 border border-slate-200 text-slate-800 space-y-2">
+                <div>{backupMessage}</div>
+                {driveLink && (
+                  <a
+                    href={driveLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-indigo-600 hover:text-indigo-800 underline font-extrabold text-xs mt-1"
+                  >
+                    <FolderCheck className="w-4 h-4 text-emerald-600" />
+                    Open in Google Drive
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                )}
               </div>
             )}
 
             <div className="space-y-3">
               <button
-                onClick={exportBackupJSON}
-                className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 shadow-md shadow-indigo-600/20"
+                onClick={handleDriveBackup}
+                disabled={isDriveUploading}
+                className="w-full py-3.5 px-4 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 active:scale-[0.98] text-white font-black rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/25 disabled:opacity-60 transition-all"
               >
-                <Download className="w-4 h-4" />
-                Download JSON Backup
+                {isDriveUploading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Saving to Google Drive...
+                  </>
+                ) : (
+                  <>
+                    <CloudUpload className="w-4 h-4" />
+                    Save to Google Drive (inflow2036_Backups)
+                  </>
+                )}
               </button>
 
-              <label className="w-full py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-xs flex items-center justify-center gap-2 cursor-pointer transition-colors">
+              <button
+                onClick={exportBackupJSON}
+                className="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs flex items-center justify-center gap-2 transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                Download Local JSON File
+              </button>
+
+              <label className="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs flex items-center justify-center gap-2 cursor-pointer transition-colors">
                 <Upload className="w-4 h-4" />
                 Restore from JSON File
                 <input
@@ -398,9 +451,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
                     setShowBackupModal(false);
                   }
                 }}
-                className="w-full py-2.5 px-4 text-slate-500 hover:text-red-600 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                className="w-full py-2 px-4 text-slate-400 hover:text-red-600 text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-colors pt-1"
               >
-                <RotateCcw className="w-3.5 h-3.5" />
+                <RotateCcw className="w-3 h-3" />
                 Reset to Default Data
               </button>
             </div>

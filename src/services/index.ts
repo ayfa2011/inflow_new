@@ -6,3 +6,5 @@ export * from './planningService';
 export * from './graphicZoneService';
 export * from './specialDaysService';
 export * from './tradeService';
+export * from './googleDriveService';
+

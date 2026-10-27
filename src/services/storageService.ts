@@ -14,7 +14,7 @@ const app = initializeApp({
   appId: firebaseConfig.appId
 });
 
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId || '(default)');
+export const db = getFirestore(app, (firebaseConfig as any).firestoreDatabaseId || '(default)');
 
 const STORAGE_KEY = 'inflow2036_data_v1';
 const FIRESTORE_DOC_PATH = 'workspaces/inflow2036_user_data';
