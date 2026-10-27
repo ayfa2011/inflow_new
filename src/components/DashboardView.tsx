@@ -277,7 +277,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
             </div>
             Life &amp; Work
           </div>
-          <span className="text-xs font-semibold text-slate-400">6 Apps</span>
+          <span className="text-xs font-semibold text-slate-400">7 Apps</span>
         </div>
 
         <div className="grid grid-cols-4 gap-2.5">
@@ -356,6 +356,19 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
             </div>
             <span className="text-xs font-bold text-slate-800 text-center leading-tight">
               Special<br />Days
+            </span>
+          </button>
+
+          {/* Our World */}
+          <button
+            onClick={() => onSelectView('ourWorld')}
+            className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-50/70 hover:bg-blue-50/60 active:scale-95 transition-all border border-slate-100 min-h-[96px] group"
+          >
+            <div className="w-12 h-12 rounded-xl bg-blue-100/80 text-blue-700 flex items-center justify-center text-2xl mb-1.5 shadow-sm group-hover:scale-105 transition-transform">
+              🌍
+            </div>
+            <span className="text-xs font-bold text-slate-800 text-center leading-tight">
+              Our<br />World
             </span>
           </button>
         </div>

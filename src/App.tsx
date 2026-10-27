@@ -17,6 +17,7 @@ import { Inflow2036View } from './components/Inflow2036View';
 import { FivePercentClubView } from './components/FivePercentClubView';
 import { SkillImproveView } from './components/SkillImproveView';
 import { SpecialDaysView } from './components/SpecialDaysView';
+import { OurWorldView } from './components/OurWorldView';
 
 const MainAppContent: React.FC = () => {
   const { isLocked } = useApp();
@@ -55,6 +56,7 @@ const MainAppContent: React.FC = () => {
         {currentView === 'fivePercentClub' && <FivePercentClubView onBack={handleBackToDashboard} />}
         {currentView === 'skill' && <SkillImproveView onBack={handleBackToDashboard} />}
         {currentView === 'specialDays' && <SpecialDaysView onBack={handleBackToDashboard} />}
+        {currentView === 'ourWorld' && <OurWorldView onBack={handleBackToDashboard} />}
       </div>
     </div>
   );
