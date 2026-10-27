@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { AppProvider, useApp } from './context/AppContext';
-import { LockScreen } from './components/LockScreen';
+import { AppProvider } from './context/AppContext';
 import { DashboardView } from './components/DashboardView';
 import { RunWalkView } from './components/RunWalkView';
 import { HabitView } from './components/HabitView';
@@ -21,12 +20,9 @@ import { OurWorldView } from './components/OurWorldView';
 import { StockScannerView } from './components/StockScannerView';
 
 const MainAppContent: React.FC = () => {
-  const { isLocked } = useApp();
   const [currentView, setCurrentView] = useState<string>('dashboard');
 
-  if (isLocked) {
-    return <LockScreen />;
-  }
+  // Login is temporarily disabled per user request - opens directly into dashboard
 
   const handleBackToDashboard = () => {
     setCurrentView('dashboard');

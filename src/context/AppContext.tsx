@@ -121,13 +121,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }).catch(err => console.error('Cloud sync err:', err));
   }, []);
 
-  const [isLocked, setIsLocked] = useState<boolean>(() => {
-    try {
-      return sessionStorage.getItem(AUTH_KEY) !== 'unlocked';
-    } catch {
-      return true;
-    }
-  });
+  // Login temporarily disabled per user request - direct open
+  const [isLocked, setIsLocked] = useState<boolean>(false);
 
   const [loginError, setLoginError] = useState<string>('');
 
@@ -155,7 +150,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const logout = () => {
     sessionStorage.removeItem(AUTH_KEY);
-    setIsLocked(true);
+    // Login temporarily disabled per user request
+    setIsLocked(false);
   };
 
   const exportBackupJSON = () => {
