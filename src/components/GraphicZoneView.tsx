@@ -42,6 +42,9 @@ export const GraphicZoneView: React.FC<{ onBack: () => void }> = ({ onBack }) =>
   const [filterYear, setFilterYear] = useState<string>('ALL');
   const [filterMonth, setFilterMonth] = useState<string>('ALL');
 
+  // Delivered jobs filter ('all' vs 'dueOnly')
+  const [deliveredFilter, setDeliveredFilter] = useState<'all' | 'dueOnly'>('all');
+
   // Customer search & drilldown
   const [dirQuery, setDirQuery] = useState('');
   const [selectedCustName, setSelectedCustName] = useState<string | null>(null);
@@ -137,6 +140,20 @@ export const GraphicZoneView: React.FC<{ onBack: () => void }> = ({ onBack }) =>
   });
 
   const deliveredJobsList = jobs.filter(j => j.status === 'Delivered');
+  const deliveredTotalDue = deliveredJobsList.reduce(
+    (sum, j) => sum + Math.max(0, (Number(j.totalAmount) || 0) - (Number(j.paid) || 0)),
+    0
+  );
+  const deliveredJobsWithDue = deliveredJobsList.filter(
+    j => Math.max(0, (Number(j.totalAmount) || 0) - (Number(j.paid) || 0)) > 0
+  );
+  const deliveredPartialDueCount = deliveredJobsList.filter(
+    j => (Number(j.paid) || 0) > 0 && (Number(j.paid) || 0) < (Number(j.totalAmount) || 0)
+  ).length;
+  const deliveredUnpaidCount = deliveredJobsList.filter(
+    j => (Number(j.paid) || 0) === 0 && (Number(j.totalAmount) || 0) > 0
+  ).length;
+
   const deliveredPoints = formatPts(deliveredProfit);
   const remainingTargetAmount = Math.max(0, GZ_TARGET - deliveredProfit);
   const neededPoints = formatPts(remainingTargetAmount);
@@ -383,6 +400,11 @@ export const GraphicZoneView: React.FC<{ onBack: () => void }> = ({ onBack }) =>
     const isDone = j.status === 'Delivered' || j.status === 'Cancel';
     const isCancel = j.status === 'Cancel';
     const exp = (Number(j.printCost) || 0) + (Number(j.otherCost) || 0);
+    const totalAmt = Number(j.totalAmount) || 0;
+    const paidAmt = Number(j.paid) || 0;
+    const dueAmt = Math.max(0, totalAmt - paidAmt);
+    const isPartial = paidAmt > 0 && dueAmt > 0;
+    const isFullyPaid = totalAmt > 0 && dueAmt === 0;
 
     return (
       <div
@@ -392,7 +414,9 @@ export const GraphicZoneView: React.FC<{ onBack: () => void }> = ({ onBack }) =>
           isCancel
             ? 'border-slate-100 bg-slate-50/60 opacity-80'
             : isDone
-            ? 'border-emerald-100 bg-emerald-50/20'
+            ? dueAmt > 0
+              ? 'border-amber-200/90 bg-amber-50/15'
+              : 'border-emerald-100 bg-emerald-50/20'
             : 'border-slate-100 hover:border-blue-200'
         }`}
       >
@@ -413,18 +437,61 @@ export const GraphicZoneView: React.FC<{ onBack: () => void }> = ({ onBack }) =>
           {j.item || '-'}
         </div>
 
+        {/* Financial Metrics Strip with Due Amount */}
         <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 mt-2.5 pt-2 border-t border-slate-100">
           <span>Qty: <b className="text-slate-800">{j.qty}</b></span>
           <span className="text-slate-300">|</span>
           <span>Exp: <b className="text-slate-800">{formatMoney(exp)}</b></span>
           <span className="text-slate-300">|</span>
-          <span>Inv: <b className="text-slate-800">{formatMoney(j.totalAmount)}</b></span>
+          <span>Inv: <b className="text-slate-800">{formatMoney(totalAmt)}</b></span>
           <span className="text-slate-300">|</span>
-          <span>Paid: <b className="text-slate-800">{formatMoney(j.paid)}</b></span>
+          <span>Paid: <b className="text-slate-800">{formatMoney(paidAmt)}</b></span>
+          <span className="text-slate-300">|</span>
+          <span>
+            Due:{' '}
+            <b className={dueAmt > 0 ? 'text-rose-600 font-black' : 'text-emerald-600 font-extrabold'}>
+              {formatMoney(dueAmt)}
+            </b>
+          </span>
         </div>
 
-        <div className="flex items-center justify-between text-xs mt-2 pt-1">
-          <div className="flex items-center gap-1.5">
+        {/* Due & Partial Payment Breakdown Banner */}
+        {!isCancel && dueAmt > 0 && (
+          <div className={`mt-2.5 p-2.5 rounded-xl flex items-center justify-between text-xs border ${
+            isPartial
+              ? 'bg-amber-50/90 border-amber-200 text-amber-900'
+              : 'bg-rose-50/90 border-rose-200 text-rose-900'
+          }`}>
+            <div className="flex items-center gap-2 min-w-0">
+              <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${isPartial ? 'bg-amber-500' : 'bg-rose-500'}`} />
+              <div className="min-w-0 truncate">
+                <span className="font-extrabold text-slate-900 block truncate">
+                  {isPartial ? 'Partial Paid' : 'Payment Pending'}
+                </span>
+                <span className="text-[11px] text-slate-500 font-medium block">
+                  {formatMoney(paidAmt)} paid of {formatMoney(totalAmt)}
+                </span>
+              </div>
+            </div>
+            <div className="text-right shrink-0 pl-2">
+              <span className="text-[10px] uppercase font-bold text-slate-500 block">Balance Due</span>
+              <span className="text-sm font-black text-rose-600">{formatMoney(dueAmt)}</span>
+            </div>
+          </div>
+        )}
+
+        {!isCancel && isFullyPaid && (
+          <div className="mt-2 py-1 px-2.5 rounded-xl bg-emerald-50 border border-emerald-200/60 flex items-center justify-between text-[11px] font-bold text-emerald-800">
+            <span className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              Fully Paid ({formatMoney(paidAmt)})
+            </span>
+            <span className="text-emerald-700 font-extrabold">Due: ₹0</span>
+          </div>
+        )}
+
+        <div className="flex items-center justify-between text-xs mt-2.5 pt-1">
+          <div className="flex items-center gap-1.5 flex-wrap">
             <span className="text-slate-400 font-medium">Status:</span>
             <span
               className={`font-black text-[11px] px-2 py-0.5 rounded-md ${
@@ -437,6 +504,11 @@ export const GraphicZoneView: React.FC<{ onBack: () => void }> = ({ onBack }) =>
             >
               {j.status}
             </span>
+            {j.status === 'Delivered' && dueAmt > 0 && (
+              <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-rose-100 text-rose-700 border border-rose-200">
+                ⚠️ Due: {formatMoney(dueAmt)}
+              </span>
+            )}
           </div>
 
           {!isCancel && (
@@ -1135,16 +1207,100 @@ export const GraphicZoneView: React.FC<{ onBack: () => void }> = ({ onBack }) =>
               </div>
 
               {/* Delivered & Cancelled */}
-              <div>
-                <div className="text-xs font-black text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                  ✅ Delivered &amp; Cancelled (
-                  {jobs.filter(j => j.status === 'Delivered' || j.status === 'Cancel').length}
-                  )
+              <div className="space-y-2.5 pt-2">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div className="text-xs font-black text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                    <span>✅ Delivered &amp; Cancelled ({jobs.filter(j => j.status === 'Delivered' || j.status === 'Cancel').length})</span>
+                  </div>
+
+                  {/* Quick toggle pill: All vs With Due */}
+                  <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-xl text-[11px] font-bold">
+                    <button
+                      type="button"
+                      onClick={() => setDeliveredFilter('all')}
+                      className={`py-1 px-2.5 rounded-lg transition-colors cursor-pointer ${
+                        deliveredFilter === 'all'
+                          ? 'bg-white text-slate-900 shadow-xs font-black'
+                          : 'text-slate-500 hover:text-slate-800'
+                      }`}
+                    >
+                      All ({jobs.filter(j => j.status === 'Delivered' || j.status === 'Cancel').length})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDeliveredFilter('dueOnly')}
+                      className={`py-1 px-2.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 ${
+                        deliveredFilter === 'dueOnly'
+                          ? 'bg-rose-600 text-white shadow-xs font-black'
+                          : deliveredJobsWithDue.length > 0
+                          ? 'text-rose-600 hover:text-rose-700'
+                          : 'text-slate-400'
+                      }`}
+                    >
+                      <span>With Due</span>
+                      {deliveredJobsWithDue.length > 0 && (
+                        <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-black ${
+                          deliveredFilter === 'dueOnly' ? 'bg-white/30 text-white' : 'bg-rose-100 text-rose-700'
+                        }`}>
+                          {deliveredJobsWithDue.length}
+                        </span>
+                      )}
+                    </button>
+                  </div>
                 </div>
+
+                {/* Delivered Balance Due Summary Banner */}
+                {deliveredTotalDue > 0 && (
+                  <div className="p-3.5 bg-gradient-to-r from-rose-50 via-amber-50/70 to-orange-50 rounded-2xl border border-rose-200/90 shadow-xs flex items-center justify-between">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
+                        <span className="text-xs font-black text-rose-950 uppercase tracking-wide">
+                          Total Due on Delivered Jobs
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-600 font-medium mt-1">
+                        {deliveredJobsWithDue.length} delivered job(s) with pending due:{' '}
+                        <b className="text-rose-800">
+                          {deliveredPartialDueCount > 0 && `${deliveredPartialDueCount} partial paid`}
+                          {deliveredPartialDueCount > 0 && deliveredUnpaidCount > 0 && ' · '}
+                          {deliveredUnpaidCount > 0 && `${deliveredUnpaidCount} unpaid`}
+                        </b>
+                      </p>
+                    </div>
+                    <div className="text-right pl-3 shrink-0">
+                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                        Total Balance Due
+                      </span>
+                      <span className="text-base sm:text-lg font-black text-rose-600 block">
+                        {formatMoney(deliveredTotalDue)}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
                 <div className="space-y-2.5">
-                  {jobs
-                    .filter(j => j.status === 'Delivered' || j.status === 'Cancel')
-                    .map(j => renderJobCard(j))}
+                  {(() => {
+                    const deliveredAndCancelList = jobs.filter(j => j.status === 'Delivered' || j.status === 'Cancel');
+                    const displayList = deliveredFilter === 'dueOnly'
+                      ? deliveredAndCancelList.filter(j => {
+                          const due = Math.max(0, (Number(j.totalAmount) || 0) - (Number(j.paid) || 0));
+                          return due > 0 && j.status !== 'Cancel';
+                        })
+                      : deliveredAndCancelList;
+
+                    if (displayList.length === 0) {
+                      return (
+                        <div className="bg-white rounded-2xl p-6 text-center text-xs text-slate-400 border border-slate-100">
+                          {deliveredFilter === 'dueOnly'
+                            ? '🎉 No delivered jobs with pending balance due!'
+                            : 'No delivered or cancelled jobs.'}
+                        </div>
+                      );
+                    }
+
+                    return displayList.map(j => renderJobCard(j));
+                  })()}
                 </div>
               </div>
             </div>
@@ -1488,6 +1644,41 @@ export const GraphicZoneView: React.FC<{ onBack: () => void }> = ({ onBack }) =>
                   />
                 </div>
               </div>
+
+              {/* Live Payment & Due Preview in Modal */}
+              {(() => {
+                const total = (parseFloat(jobQty) || 0) * (parseFloat(jobRate) || 0);
+                const paid = parseFloat(jobPaid) || 0;
+                const due = Math.max(0, total - paid);
+                const profit = total - (parseFloat(jobPrintCost) || 0) - (parseFloat(jobOtherCost) || 0);
+
+                return (
+                  <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-1.5">
+                    <div className="flex justify-between items-center text-xs font-bold text-slate-600">
+                      <span>Total Amount:</span>
+                      <span className="text-slate-900 font-black">{formatMoney(total)}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-xs font-bold text-slate-600">
+                      <span>Paid Amount:</span>
+                      <span className="text-slate-900 font-black">{formatMoney(paid)}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-xs font-bold pt-1 border-t border-dashed border-slate-200">
+                      <span className={due > 0 ? "text-rose-700 font-black" : "text-emerald-700 font-bold"}>
+                        {due > 0 ? (paid > 0 ? "Partial Balance Due:" : "Full Balance Due:") : "Balance Due:"}
+                      </span>
+                      <span className={due > 0 ? "text-rose-600 text-sm font-black" : "text-emerald-600 text-sm font-black"}>
+                        {formatMoney(due)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center text-[11px] text-slate-400 font-semibold pt-0.5">
+                      <span>Estimated Profit:</span>
+                      <span className={profit >= 0 ? "text-emerald-600 font-bold" : "text-red-500 font-bold"}>
+                        {formatMoney(profit)}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })()}
 
               <div className="flex gap-2 pt-3">
                 {editingJob && (
