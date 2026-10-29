@@ -39,7 +39,7 @@ export const LiabilityAssetsView: React.FC<{ onBack: () => void }> = ({ onBack }
     e.preventDefault();
     const amt = parseFloat(amountVal);
     if (!nameVal.trim() || isNaN(amt)) {
-      alert('ದಯವಿಟ್ಟು Name ಮತ್ತು Amount ನಮೂದಿಸಿ!');
+      alert('Please enter Name and Amount!');
       return;
     }
     saveLiabilityAsset(
@@ -70,18 +70,18 @@ export const LiabilityAssetsView: React.FC<{ onBack: () => void }> = ({ onBack }
       </div>
 
       {/* Summary Card */}
-      <div className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm space-y-2.5">
-        <div className="flex justify-between items-center text-xs font-bold text-slate-600">
+      <div className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm space-y-3">
+        <div className="flex justify-between items-center text-sm font-bold text-slate-600">
           <span>Total Liquid Assets</span>
-          <span className="text-emerald-600 text-sm font-black">{formatMoney(totalAssets)}</span>
+          <span className="text-emerald-600 text-base font-black">{formatMoney(totalAssets)}</span>
         </div>
-        <div className="flex justify-between items-center text-xs font-bold text-slate-600">
+        <div className="flex justify-between items-center text-sm font-bold text-slate-600">
           <span>Total Liabilities</span>
-          <span className="text-rose-600 text-sm font-black">{formatMoney(totalLiabilities)}</span>
+          <span className="text-rose-600 text-base font-black">{formatMoney(totalLiabilities)}</span>
         </div>
-        <div className="flex justify-between items-center pt-2.5 border-t border-dashed border-slate-200 text-sm font-black">
+        <div className="flex justify-between items-center pt-3 border-t border-dashed border-slate-200 text-base font-black">
           <span className="text-slate-900">Net Worth</span>
-          <span className={netWorth >= 0 ? 'text-emerald-600 text-base' : 'text-rose-600 text-base'}>
+          <span className={netWorth >= 0 ? 'text-emerald-600 text-lg font-black' : 'text-rose-600 text-lg font-black'}>
             {formatMoney(netWorth)}
           </span>
         </div>
@@ -89,79 +89,79 @@ export const LiabilityAssetsView: React.FC<{ onBack: () => void }> = ({ onBack }
 
       {/* Liquid Assets Section */}
       <div className="bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm">
-        <div className="bg-[#0e8353] text-white p-3.5 flex items-center justify-between">
-          <span className="text-xs font-black tracking-wide">
+        <div className="bg-[#0e8353] text-white p-4 flex items-center justify-between">
+          <span className="text-sm font-black tracking-wide">
             💰 Liquid Assets ({assets.length})
           </span>
           <button
             onClick={() => openAdd('ASSET')}
-            className="text-[11px] font-bold px-3 py-1 rounded-full bg-white/20 hover:bg-white/30 transition-colors active:scale-95"
+            className="text-xs font-bold px-3.5 py-1.5 rounded-full bg-white/20 hover:bg-white/30 transition-colors active:scale-95 shadow-sm"
           >
             + Add Asset
           </button>
         </div>
-        <div className="bg-emerald-50/50 text-[10px] font-extrabold text-emerald-900 uppercase tracking-wider px-3.5 py-1.5 flex justify-between border-b border-emerald-100/60">
+        <div className="bg-emerald-50/70 text-xs font-extrabold text-emerald-900 uppercase tracking-wider px-4 py-2 flex justify-between border-b border-emerald-100/60">
           <span>PARTICULAR / SOURCE</span>
           <span>AMOUNT</span>
         </div>
         <div className="divide-y divide-slate-100">
           {assets.length === 0 ? (
-            <div className="py-5 text-center text-xs text-slate-400">No Liquid Assets added</div>
+            <div className="py-6 text-center text-sm text-slate-400 font-medium">No Liquid Assets added</div>
           ) : (
             assets.map(item => (
               <div
                 key={item.id}
                 onClick={() => openEdit(item)}
-                className="p-3.5 flex justify-between items-center hover:bg-slate-50/80 cursor-pointer transition-colors active:scale-[0.99]"
+                className="p-4 flex justify-between items-center hover:bg-slate-50/80 cursor-pointer transition-colors active:scale-[0.99]"
               >
-                <span className="text-xs font-semibold text-slate-800">{item.name}</span>
-                <span className="text-xs font-black text-slate-900">{formatMoney(item.amount)}</span>
+                <span className="text-sm font-bold text-slate-800">{item.name}</span>
+                <span className="text-sm font-black text-slate-900">{formatMoney(item.amount)}</span>
               </div>
             ))
           )}
         </div>
-        <div className="bg-slate-50 p-3 flex justify-between text-xs font-black border-t border-slate-100">
-          <span>Total Liquid Assets</span>
-          <span className="text-emerald-600">{formatMoney(totalAssets)}</span>
+        <div className="bg-slate-50 p-4 flex justify-between text-sm font-black border-t border-slate-100">
+          <span className="text-slate-700">Total Liquid Assets</span>
+          <span className="text-emerald-600 text-base">{formatMoney(totalAssets)}</span>
         </div>
       </div>
 
       {/* Liabilities Section */}
       <div className="bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm">
-        <div className="bg-[#34495e] text-white p-3.5 flex items-center justify-between">
-          <span className="text-xs font-black tracking-wide">
+        <div className="bg-[#34495e] text-white p-4 flex items-center justify-between">
+          <span className="text-sm font-black tracking-wide">
             💳 Liabilities ({liabilities.length})
           </span>
           <button
             onClick={() => openAdd('LIABILITY')}
-            className="text-[11px] font-bold px-3 py-1 rounded-full bg-white/20 hover:bg-white/30 transition-colors active:scale-95"
+            className="text-xs font-bold px-3.5 py-1.5 rounded-full bg-white/20 hover:bg-white/30 transition-colors active:scale-95 shadow-sm"
           >
             + Add Liability
           </button>
         </div>
-        <div className="bg-slate-100 text-[10px] font-extrabold text-slate-700 uppercase tracking-wider px-3.5 py-1.5 flex justify-between border-b border-slate-200">
+        <div className="bg-slate-100 text-xs font-extrabold text-slate-700 uppercase tracking-wider px-4 py-2 flex justify-between border-b border-slate-200">
           <span>PARTICULAR / PAYEE</span>
           <span>AMOUNT</span>
         </div>
         <div className="divide-y divide-slate-100">
           {liabilities.length === 0 ? (
-            <div className="py-5 text-center text-xs text-slate-400">No Liabilities added</div>
+            <div className="py-6 text-center text-sm text-slate-400 font-medium">No Liabilities added</div>
           ) : (
             liabilities.map(item => (
               <div
                 key={item.id}
                 onClick={() => openEdit(item)}
-                className="p-3.5 flex justify-between items-center hover:bg-slate-50/80 cursor-pointer transition-colors active:scale-[0.99]"
+                className="p-4 flex justify-between items-center hover:bg-slate-50/80 cursor-pointer transition-colors active:scale-[0.99]"
               >
-                <span className="text-xs font-semibold text-slate-800">{item.name}</span>
-                <span className="text-xs font-black text-rose-600">{formatMoney(item.amount)}</span>
+                <span className="text-sm font-bold text-slate-800">{item.name}</span>
+                <span className="text-sm font-black text-rose-600">{formatMoney(item.amount)}</span>
               </div>
             ))
           )}
         </div>
-        <div className="bg-slate-50 p-3 flex justify-between text-xs font-black border-t border-slate-100">
-          <span>Total Liabilities</span>
-          <span className="text-rose-600">{formatMoney(totalLiabilities)}</span>
+        <div className="bg-slate-50 p-4 flex justify-between text-sm font-black border-t border-slate-100">
+          <span className="text-slate-700">Total Liabilities</span>
+          <span className="text-rose-600 text-base">{formatMoney(totalLiabilities)}</span>
         </div>
       </div>
 
@@ -177,7 +177,7 @@ export const LiabilityAssetsView: React.FC<{ onBack: () => void }> = ({ onBack }
 
             <form onSubmit={handleSave} className="space-y-3.5">
               <div>
-                <label className="block text-[11px] font-bold text-slate-500 mb-1">
+                <label className="block text-xs font-bold text-slate-600 mb-1.5">
                   Particular / Name
                 </label>
                 <input
@@ -185,14 +185,14 @@ export const LiabilityAssetsView: React.FC<{ onBack: () => void }> = ({ onBack }
                   value={nameVal}
                   onChange={(e) => setNameVal(e.target.value)}
                   placeholder="e.g. Sabith / Emergency Cash"
-                  className="w-full py-2.5 px-3 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:border-indigo-600"
+                  className="w-full py-3 px-3.5 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:border-indigo-600"
                   autoFocus
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-slate-500 mb-1">
+                <label className="block text-xs font-bold text-slate-600 mb-1.5">
                   Amount (₹)
                 </label>
                 <input
@@ -201,12 +201,12 @@ export const LiabilityAssetsView: React.FC<{ onBack: () => void }> = ({ onBack }
                   value={amountVal}
                   onChange={(e) => setAmountVal(e.target.value)}
                   placeholder="e.g. 5000"
-                  className="w-full py-2.5 px-3 border border-slate-200 rounded-xl text-sm font-bold focus:outline-none focus:border-indigo-600"
+                  className="w-full py-3 px-3.5 border border-slate-200 rounded-xl text-base font-bold focus:outline-none focus:border-indigo-600"
                   required
                 />
               </div>
 
-              <div className="flex gap-2 pt-2">
+              <div className="flex gap-2.5 pt-3">
                 {activeItem && (
                   <button
                     type="button"
@@ -216,7 +216,7 @@ export const LiabilityAssetsView: React.FC<{ onBack: () => void }> = ({ onBack }
                         setShowModal(false);
                       }
                     }}
-                    className="py-2.5 px-3 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs rounded-xl flex items-center justify-center"
+                    className="py-3 px-3.5 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-sm rounded-xl flex items-center justify-center transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -225,14 +225,14 @@ export const LiabilityAssetsView: React.FC<{ onBack: () => void }> = ({ onBack }
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 font-bold text-slate-700 text-xs rounded-xl"
+                  className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 font-bold text-slate-700 text-sm rounded-xl transition-colors"
                 >
                   Cancel
                 </button>
 
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 font-bold text-white text-xs rounded-xl shadow-md shadow-indigo-600/20"
+                  className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 font-bold text-white text-sm rounded-xl shadow-md shadow-indigo-600/20 transition-colors"
                 >
                   Save Item
                 </button>

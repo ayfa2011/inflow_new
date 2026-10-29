@@ -150,20 +150,20 @@ export const PlanningView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 <div
                   key={p.id}
                   onClick={() => setActivePlanId(p.id)}
-                  className="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between hover:shadow-md cursor-pointer transition-all active:scale-[0.98] group"
+                  className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between hover:shadow-md cursor-pointer transition-all active:scale-[0.98] group"
                 >
-                  <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="flex items-center gap-3 min-w-0">
                     <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
+                      className="w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0 shadow-sm"
                       style={{ backgroundColor: preset.bg, color: preset.color }}
                     >
                       {preset.icon}
                     </div>
                     <div className="min-w-0">
-                      <h4 className="text-xs font-black text-slate-900 truncate group-hover:text-blue-600 transition-colors">
+                      <h4 className="text-sm sm:text-base font-black text-slate-900 truncate group-hover:text-blue-600 transition-colors">
                         {p.name}
                       </h4>
-                      <span className="text-[10px] font-bold text-slate-400 block mt-0.5">
+                      <span className="text-xs font-bold text-slate-500 block mt-1">
                         {p.items.length} items · {formatMoney(pBal)}
                       </span>
                     </div>
@@ -179,15 +179,15 @@ export const PlanningView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 setNewPlanTitle('');
                 setShowNewPlanModal(true);
               }}
-              className="col-span-2 bg-slate-50/70 border-1.5 border-dashed border-blue-200 rounded-2xl p-4 flex items-center justify-between cursor-pointer hover:bg-blue-50/40 transition-colors active:scale-[0.99]"
+              className="col-span-2 bg-slate-50/80 border-2 border-dashed border-blue-200 rounded-2xl p-4 flex items-center justify-between cursor-pointer hover:bg-blue-50/50 transition-colors active:scale-[0.99]"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xl">
+                <div className="w-11 h-11 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xl shadow-sm">
                   +
                 </div>
                 <div>
-                  <div className="text-xs font-extrabold text-slate-900">Add New Plan</div>
-                  <div className="text-[10px] text-slate-400">Create your next goal / budget</div>
+                  <div className="text-sm sm:text-base font-black text-slate-900">Add New Plan</div>
+                  <div className="text-xs text-slate-500 mt-0.5">Create your next goal / budget</div>
                 </div>
               </div>
               <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-sm font-bold">
@@ -202,15 +202,15 @@ export const PlanningView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           {/* Plan Title & Net Balance Bar */}
           <div className="bg-white p-4 rounded-3xl border-l-4 border-l-blue-600 border border-slate-100 shadow-sm flex items-center justify-between">
             <div>
-              <span className="text-[10px] font-bold uppercase text-slate-400">Active Plan</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Active Plan</span>
               <div className="flex items-center gap-2 mt-0.5">
-                <h3 className="text-base font-black text-slate-900">{activePlan?.name}</h3>
+                <h3 className="text-lg sm:text-xl font-black text-slate-900">{activePlan?.name}</h3>
                 <button
                   onClick={() => {
                     setRenameTitle(activePlan?.name || '');
                     setShowRenameModal(true);
                   }}
-                  className="text-[11px] font-bold text-blue-600 hover:text-blue-800 p-1"
+                  className="text-xs font-bold text-blue-600 hover:text-blue-800 p-1"
                 >
                   ✏️
                 </button>
@@ -218,8 +218,8 @@ export const PlanningView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             </div>
 
             <div className="text-right">
-              <span className="text-[10px] font-bold uppercase text-slate-400">Net Balance</span>
-              <div className="text-base font-black text-blue-600 mt-0.5">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Net Balance</span>
+              <div className="text-lg sm:text-xl font-black text-blue-600 mt-0.5">
                 {formatMoney(netBalance)}
               </div>
             </div>
@@ -227,11 +227,11 @@ export const PlanningView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
           {/* Income Section Card */}
           <div className="bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm">
-            <div className="bg-[#0e8353] text-white p-3.5 flex items-center justify-between">
-              <span className="text-xs font-black tracking-wide">💰 Income Details</span>
+            <div className="bg-[#0e8353] text-white p-4 flex items-center justify-between">
+              <span className="text-sm font-black tracking-wide">💰 Income Details</span>
               <button
                 onClick={() => openAddItem('INCOME')}
-                className="text-[11px] font-bold px-3 py-1 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+                className="text-xs font-bold px-3.5 py-1.5 rounded-full bg-white/20 hover:bg-white/30 transition-colors shadow-sm active:scale-95"
               >
                 + Add Income
               </button>
@@ -239,33 +239,33 @@ export const PlanningView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
             <div className="divide-y divide-slate-100">
               {incomes.length === 0 ? (
-                <div className="py-4 text-center text-xs text-slate-400">No income items added</div>
+                <div className="py-6 text-center text-sm text-slate-400 font-medium">No income items added</div>
               ) : (
                 incomes.map(item => (
-                  <div key={item.id} className="p-3 flex items-center justify-between hover:bg-slate-50 transition-colors">
-                    <div className="flex items-center gap-2.5 min-w-0">
+                  <div key={item.id} className="p-3.5 px-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                    <div className="flex items-center gap-3 min-w-0">
                       <button
                         onClick={() => togglePlanItemTick(activePlanId, item.id)}
                         className="text-slate-400 hover:text-emerald-600 transition-colors"
                       >
                         {item.ticked ? (
-                          <CheckSquare className="w-4 h-4 text-emerald-600" />
+                          <CheckSquare className="w-5 h-5 text-emerald-600" />
                         ) : (
-                          <Square className="w-4 h-4 text-slate-300" />
+                          <Square className="w-5 h-5 text-slate-300" />
                         )}
                       </button>
-                      <span className={`text-xs font-semibold text-slate-800 truncate ${item.ticked ? 'line-through text-slate-400' : ''}`}>
+                      <span className={`text-sm sm:text-base font-bold text-slate-800 truncate ${item.ticked ? 'line-through text-slate-400' : ''}`}>
                         {item.name}
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      <span className={`text-xs font-black text-slate-900 ${item.ticked ? 'line-through text-slate-400' : ''}`}>
+                    <div className="flex items-center gap-2.5 flex-shrink-0">
+                      <span className={`text-sm sm:text-base font-black text-slate-900 ${item.ticked ? 'line-through text-slate-400' : ''}`}>
                         {formatMoney(item.amount)}
                       </span>
                       <button
                         onClick={() => openEditItem(item)}
-                        className="p-1 text-slate-400 hover:text-slate-700 rounded transition-colors text-xs"
+                        className="p-1.5 text-slate-400 hover:text-slate-700 rounded transition-colors text-sm"
                       >
                         ✏️
                       </button>
@@ -275,19 +275,19 @@ export const PlanningView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               )}
             </div>
 
-            <div className="bg-slate-50 p-3 flex justify-between text-xs font-black border-t border-slate-100">
-              <span>Total Income</span>
+            <div className="bg-slate-50 p-4 flex justify-between text-sm sm:text-base font-black border-t border-slate-100">
+              <span className="text-slate-700">Total Income</span>
               <span className="text-emerald-600">{formatMoney(totalIncome)}</span>
             </div>
           </div>
 
           {/* Expense Section Card */}
           <div className="bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm">
-            <div className="bg-[#334155] text-white p-3.5 flex items-center justify-between">
-              <span className="text-xs font-black tracking-wide">💸 Expense Details</span>
+            <div className="bg-[#334155] text-white p-4 flex items-center justify-between">
+              <span className="text-sm font-black tracking-wide">💸 Expense Details</span>
               <button
                 onClick={() => openAddItem('EXPENSE')}
-                className="text-[11px] font-bold px-3 py-1 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+                className="text-xs font-bold px-3.5 py-1.5 rounded-full bg-white/20 hover:bg-white/30 transition-colors shadow-sm active:scale-95"
               >
                 + Add Expense
               </button>
@@ -295,33 +295,33 @@ export const PlanningView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
             <div className="divide-y divide-slate-100">
               {expenses.length === 0 ? (
-                <div className="py-4 text-center text-xs text-slate-400">No expense items added</div>
+                <div className="py-6 text-center text-sm text-slate-400 font-medium">No expense items added</div>
               ) : (
                 expenses.map(item => (
-                  <div key={item.id} className="p-3 flex items-center justify-between hover:bg-slate-50 transition-colors">
-                    <div className="flex items-center gap-2.5 min-w-0">
+                  <div key={item.id} className="p-3.5 px-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                    <div className="flex items-center gap-3 min-w-0">
                       <button
                         onClick={() => togglePlanItemTick(activePlanId, item.id)}
                         className="text-slate-400 hover:text-emerald-600 transition-colors"
                       >
                         {item.ticked ? (
-                          <CheckSquare className="w-4 h-4 text-emerald-600" />
+                          <CheckSquare className="w-5 h-5 text-emerald-600" />
                         ) : (
-                          <Square className="w-4 h-4 text-slate-300" />
+                          <Square className="w-5 h-5 text-slate-300" />
                         )}
                       </button>
-                      <span className={`text-xs font-semibold text-slate-800 truncate ${item.ticked ? 'line-through text-slate-400' : ''}`}>
+                      <span className={`text-sm sm:text-base font-bold text-slate-800 truncate ${item.ticked ? 'line-through text-slate-400' : ''}`}>
                         {item.name}
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      <span className={`text-xs font-black text-slate-900 ${item.ticked ? 'line-through text-slate-400' : ''}`}>
+                    <div className="flex items-center gap-2.5 flex-shrink-0">
+                      <span className={`text-sm sm:text-base font-black text-rose-600 ${item.ticked ? 'line-through text-slate-400' : ''}`}>
                         {formatMoney(item.amount)}
                       </span>
                       <button
                         onClick={() => openEditItem(item)}
-                        className="p-1 text-slate-400 hover:text-slate-700 rounded transition-colors text-xs"
+                        className="p-1.5 text-slate-400 hover:text-slate-700 rounded transition-colors text-sm"
                       >
                         ✏️
                       </button>
@@ -331,8 +331,8 @@ export const PlanningView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               )}
             </div>
 
-            <div className="bg-slate-50 p-3 flex justify-between text-xs font-black border-t border-slate-100">
-              <span>Total Expense</span>
+            <div className="bg-slate-50 p-4 flex justify-between text-sm sm:text-base font-black border-t border-slate-100">
+              <span className="text-slate-700">Total Expense</span>
               <span className="text-rose-600">{formatMoney(totalExpenses)}</span>
             </div>
           </div>
@@ -343,8 +343,8 @@ export const PlanningView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       {showNewPlanModal && (
         <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl border border-slate-100 animate-scaleUp">
-            <h4 className="text-base font-black text-slate-900 mb-1">Create New Plan</h4>
-            <p className="text-xs text-slate-400 mb-4">
+            <h4 className="text-lg font-black text-slate-900 mb-1">Create New Plan</h4>
+            <p className="text-sm text-slate-500 mb-4">
               e.g. Wedding Plan / Car Purchase / Vacation Trip
             </p>
 
@@ -363,22 +363,22 @@ export const PlanningView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 value={newPlanTitle}
                 onChange={(e) => setNewPlanTitle(e.target.value)}
                 placeholder="Plan title..."
-                className="w-full py-2.5 px-3 border border-slate-200 rounded-xl text-sm font-bold focus:outline-none focus:border-blue-600"
+                className="w-full py-3 px-3.5 border border-slate-200 rounded-xl text-base font-bold focus:outline-none focus:border-blue-600"
                 autoFocus
                 required
               />
 
-              <div className="flex gap-2">
+              <div className="flex gap-2.5">
                 <button
                   type="button"
                   onClick={() => setShowNewPlanModal(false)}
-                  className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 font-bold text-slate-700 text-xs rounded-xl"
+                  className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 font-bold text-slate-700 text-sm rounded-xl transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 font-bold text-white text-xs rounded-xl shadow-md shadow-blue-500/20"
+                  className="flex-1 py-3 bg-blue-600 hover:bg-blue-700 font-bold text-white text-sm rounded-xl shadow-md shadow-blue-500/20 transition-colors"
                 >
                   Create Plan
                 </button>
@@ -392,7 +392,7 @@ export const PlanningView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       {showRenameModal && (
         <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl border border-slate-100 animate-scaleUp">
-            <h4 className="text-base font-black text-slate-900 mb-3">Rename Plan Title</h4>
+            <h4 className="text-lg font-black text-slate-900 mb-3">Rename Plan Title</h4>
 
             <form
               onSubmit={(e) => {
@@ -408,22 +408,22 @@ export const PlanningView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 type="text"
                 value={renameTitle}
                 onChange={(e) => setRenameTitle(e.target.value)}
-                className="w-full py-2.5 px-3 border border-slate-200 rounded-xl text-sm font-bold focus:outline-none focus:border-blue-600"
+                className="w-full py-3 px-3.5 border border-slate-200 rounded-xl text-base font-bold focus:outline-none focus:border-blue-600"
                 autoFocus
                 required
               />
 
-              <div className="flex gap-2">
+              <div className="flex gap-2.5">
                 <button
                   type="button"
                   onClick={() => setShowRenameModal(false)}
-                  className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 font-bold text-slate-700 text-xs rounded-xl"
+                  className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 font-bold text-slate-700 text-sm rounded-xl transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 font-bold text-white text-xs rounded-xl shadow-md shadow-blue-500/20"
+                  className="flex-1 py-3 bg-blue-600 hover:bg-blue-700 font-bold text-white text-sm rounded-xl shadow-md shadow-blue-500/20 transition-colors"
                 >
                   Save Title
                 </button>
@@ -437,7 +437,7 @@ export const PlanningView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       {showItemModal && (
         <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl border border-slate-100 animate-scaleUp">
-            <h4 className="text-base font-black text-slate-900 mb-4">
+            <h4 className="text-lg font-black text-slate-900 mb-4">
               {activeItem
                 ? `Edit ${modalType === 'INCOME' ? 'Income' : 'Expense'}`
                 : `Add ${modalType === 'INCOME' ? 'Income' : 'Expense'}`}
@@ -445,7 +445,7 @@ export const PlanningView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
             <form onSubmit={handleItemSubmit} className="space-y-3.5">
               <div>
-                <label className="block text-[11px] font-bold text-slate-500 mb-1">
+                <label className="block text-xs font-bold text-slate-600 mb-1.5">
                   Particular / Item Name
                 </label>
                 <input
@@ -453,14 +453,14 @@ export const PlanningView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                   value={itemName}
                   onChange={(e) => setItemName(e.target.value)}
                   placeholder="e.g. Flight Tickets / Hall Rent"
-                  className="w-full py-2.5 px-3 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:border-blue-600"
+                  className="w-full py-3 px-3.5 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:border-blue-600"
                   autoFocus
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-slate-500 mb-1">
+                <label className="block text-xs font-bold text-slate-600 mb-1.5">
                   Amount (₹)
                 </label>
                 <input
@@ -469,12 +469,12 @@ export const PlanningView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                   value={itemAmount}
                   onChange={(e) => setItemAmount(e.target.value)}
                   placeholder="e.g. 15000"
-                  className="w-full py-2.5 px-3 border border-slate-200 rounded-xl text-sm font-bold focus:outline-none focus:border-blue-600"
+                  className="w-full py-3 px-3.5 border border-slate-200 rounded-xl text-base font-bold focus:outline-none focus:border-blue-600"
                   required
                 />
               </div>
 
-              <div className="flex gap-2 pt-2">
+              <div className="flex gap-2.5 pt-3">
                 {activeItem && activePlanId && (
                   <button
                     type="button"
@@ -484,7 +484,7 @@ export const PlanningView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                         setShowItemModal(false);
                       }
                     }}
-                    className="py-2.5 px-3 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs rounded-xl flex items-center justify-center"
+                    className="py-3 px-3.5 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-sm rounded-xl flex items-center justify-center transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -493,14 +493,14 @@ export const PlanningView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 <button
                   type="button"
                   onClick={() => setShowItemModal(false)}
-                  className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 font-bold text-slate-700 text-xs rounded-xl"
+                  className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 font-bold text-slate-700 text-sm rounded-xl transition-colors"
                 >
                   Cancel
                 </button>
 
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 font-bold text-white text-xs rounded-xl shadow-md shadow-blue-500/20"
+                  className="flex-1 py-3 bg-blue-600 hover:bg-blue-700 font-bold text-white text-sm rounded-xl shadow-md shadow-blue-500/20 transition-colors"
                 >
                   Save Item
                 </button>

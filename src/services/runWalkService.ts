@@ -18,8 +18,10 @@ export interface DayHistoryItem {
 import { getLocalDateString } from '../utils/dateUtils';
 
 export class RunWalkService {
-  static kannadaDays = ['ಭಾನುವಾರ', 'ಸೋಮವಾರ', 'ಮಂಗಳವಾರ', 'ಬುಧವಾರ', 'ಗುರುವಾರ', 'ಶುಕ್ರವಾರ', 'ಶನಿವಾರ'];
-  static kannadaMonths = ['ಜನವರಿ', 'ಫೆಬ್ರವರಿ', 'ಮಾರ್ಚ್', 'ಏಪ್ರಿಲ್', 'ಮೇ', 'ಜೂನ್', 'ಜುಲೈ', 'ಆಗಸ್ಟ್', 'ಸೆಪ್ಟೆಂಬರ್', 'ಅಕ್ಟೋಬರ್', 'ನವೆಂಬರ್', 'ಡಿಸೆಂಬರ್'];
+  static days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  static months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  static kannadaDays = RunWalkService.days;
+  static kannadaMonths = RunWalkService.months;
 
   static calculateAverages(entries: RunWalkEntry[], now = new Date()): RunWalkAverages {
     const parse = (str: string) => new Date(`${str}T00:00:00`);

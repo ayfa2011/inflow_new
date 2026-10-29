@@ -466,7 +466,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
           <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl border border-slate-100">
             <h3 className="text-lg font-black text-slate-900 mb-1">☁️ Backup &amp; Data Sync</h3>
             <p className="text-xs text-slate-500 mb-4">
-              ಗೂಗಲ್ ಡ್ರೈವ್ (Google Drive) ಫೋಲ್ಡರ್‌ಗೆ ಆಟೋಮೆಟಿಕ್ ಆಗಿ ಬ್ಯಾಕಪ್ ಸೇವ್ ಮಾಡಿ.
+              Automatically backup your data to your Google Drive folder.
             </p>
 
             {backupMessage && (

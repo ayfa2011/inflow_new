@@ -110,11 +110,11 @@ export const SalaryCardView: React.FC<{ onBack: () => void }> = ({ onBack }) => 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (bVal <= 0 && aVal <= 0 && otVal <= 0) {
-      alert('Dayavittu Basic Salary, Allowance ಅಥವಾ OT ನಮೂದಿಸಿ!');
+      alert('Please enter Basic Salary, Allowance or OT!');
       return;
     }
     if (rateVal <= 0) {
-      alert('Dayavittu Conversion Rate (1 AED = ₹) ನಮೂದಿಸಿ!');
+      alert('Please enter Conversion Rate (1 AED = ₹)!');
       return;
     }
 

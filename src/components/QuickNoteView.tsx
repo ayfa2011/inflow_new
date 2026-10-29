@@ -41,7 +41,7 @@ export const QuickNoteView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       <div className="space-y-3">
         {data.quickNotes.length === 0 ? (
           <div className="bg-white rounded-3xl p-8 text-center text-slate-400 font-medium border border-slate-100 shadow-sm">
-            ಯಾವುದೇ Quick Note ಇಲ್ಲ. "+" ಬಟನ್ ಬಳಸಿ ಹೊಸ Note ಸೇರಿಸಿ.
+            No Quick Notes yet. Tap "+" to create a new note.
           </div>
         ) : (
           data.quickNotes.map((note) => (
@@ -52,7 +52,7 @@ export const QuickNoteView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               <textarea
                 value={note.content}
                 onChange={(e) => handleTextChange(note.id, e.target.value)}
-                placeholder="ಇಲ್ಲಿ ಬರೆಯಿರಿ... (Type your note here)"
+                placeholder="Type your note here..."
                 rows={3}
                 className="w-full text-sm font-medium text-slate-800 focus:outline-none resize-y placeholder:text-slate-300 leading-relaxed bg-transparent"
               />
@@ -65,7 +65,7 @@ export const QuickNoteView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
                 <button
                   onClick={() => {
-                    if (confirm('ಈ Quick Note ಡಿಲೀಟ್ ಮಾಡಬೇಕೆ?')) {
+                    if (confirm('Delete this Quick Note?')) {
                       deleteQuickNote(note.id);
                     }
                   }}

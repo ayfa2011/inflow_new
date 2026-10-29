@@ -108,7 +108,7 @@ export const SkillImproveView: React.FC<{ onBack: () => void }> = ({ onBack }) =
           Dashboard
         </button>
         <span className="text-base font-black text-slate-800 flex items-center gap-1.5">
-          🗣️ Skill Improve (ಕನ್ನಡ → Hindi)
+          🗣️ Skill Improve (Phrases &amp; Speaking)
         </span>
         <button
           onClick={openAdd}
@@ -155,8 +155,8 @@ export const SkillImproveView: React.FC<{ onBack: () => void }> = ({ onBack }) =
       </div>
 
       <div className="flex justify-between items-center text-[10px] font-black text-slate-400 uppercase tracking-wider px-2">
-        <span>SL NO &amp; ಕನ್ನಡ ವಾಕ್ಯ (SENTENCE)</span>
-        <span>ಉತ್ತರ / ACTION</span>
+        <span>SL NO &amp; PHRASE / SENTENCE</span>
+        <span>TRANSLATION / ACTION</span>
       </div>
 
       {/* Sentences List */}

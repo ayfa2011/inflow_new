@@ -89,7 +89,7 @@ export const HabitView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               {data.habits.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="py-8 text-center text-slate-400 font-medium">
-                    ಯಾವುದೇ Habit ಇಲ್ಲ. "+" ಬಟನ್ ಬಳಸಿ ಸೇರಿಸಿ.
+                    No Habits yet. Tap "+" to add a habit.
                   </td>
                 </tr>
               ) : (
@@ -122,7 +122,7 @@ export const HabitView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                     <td className="py-2 px-2 text-center">
                       <button
                         onClick={() => {
-                          if (confirm(`"${habit.title}" habit ಡಿಲೀಟ್ ಮಾಡಬೇಕೆ?`)) {
+                          if (confirm(`Delete habit "${habit.title}"?`)) {
                             deleteHabit(habit.id);
                           }
                         }}

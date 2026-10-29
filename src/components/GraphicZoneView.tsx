@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { useApp } from '../context/AppContext';
 import { GraphicJob, GraphicJobStatus, GraphicCustomer } from '../types';
 import {
@@ -15,7 +15,13 @@ import {
   XCircle,
   Edit3,
   Calendar,
-  DollarSign
+  DollarSign,
+  Filter,
+  TrendingUp,
+  RotateCcw,
+  Building2,
+  ChevronDown,
+  CalendarDays
 } from 'lucide-react';
 import html2canvas from 'html2canvas';
 
@@ -31,6 +37,10 @@ export const GraphicZoneView: React.FC<{ onBack: () => void }> = ({ onBack }) =>
 
   const [activeTab, setActiveTab] = useState<'sheet' | 'pending' | 'customers'>('sheet');
   const [subView, setSubView] = useState<'main' | 'target' | 'report'>('main');
+
+  // Yearly & Monthly Filter States
+  const [filterYear, setFilterYear] = useState<string>('ALL');
+  const [filterMonth, setFilterMonth] = useState<string>('ALL');
 
   // Customer search & drilldown
   const [dirQuery, setDirQuery] = useState('');
@@ -68,8 +78,41 @@ export const GraphicZoneView: React.FC<{ onBack: () => void }> = ({ onBack }) =>
     '₹' + Number(n || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 });
   const formatPts = (n: number) => Math.round((Number(n || 0) / GZ_POINT) * 100) / 100;
 
-  // Metrics
+  // Month Options Dictionary
+  const MONTH_OPTIONS = [
+    { value: 'ALL', label: 'All Months' },
+    { value: '01', label: 'January' },
+    { value: '02', label: 'February' },
+    { value: '03', label: 'March' },
+    { value: '04', label: 'April' },
+    { value: '05', label: 'May' },
+    { value: '06', label: 'June' },
+    { value: '07', label: 'July' },
+    { value: '08', label: 'August' },
+    { value: '09', label: 'September' },
+    { value: '10', label: 'October' },
+    { value: '11', label: 'November' },
+    { value: '12', label: 'December' }
+  ];
+
+  // Raw Jobs
   const jobs = data.graphicJobs;
+
+  // Dynamically extract available years from jobs
+  const availableYears = useMemo(() => {
+    const yrs = new Set<string>();
+    const currentYearStr = new Date().getFullYear().toString();
+    yrs.add(currentYearStr);
+    jobs.forEach(j => {
+      if (j.date) {
+        const y = j.date.split('-')[0];
+        if (y && y.length === 4) yrs.add(y);
+      }
+    });
+    return Array.from(yrs).sort().reverse();
+  }, [jobs]);
+
+  // Overall metrics (All time)
   let totalBusiness = 0;
   let totalOrders = 0;
   let pendingJobs = 0;
@@ -98,6 +141,136 @@ export const GraphicZoneView: React.FC<{ onBack: () => void }> = ({ onBack }) =>
   const remainingTargetAmount = Math.max(0, GZ_TARGET - deliveredProfit);
   const neededPoints = formatPts(remainingTargetAmount);
   const targetPct = Math.min(100, (deliveredProfit / GZ_TARGET) * 100);
+
+  // Filtered Jobs based on Year & Month
+  const filteredJobs = useMemo(() => {
+    return jobs.filter(j => {
+      if (j.status === 'Cancel') return false;
+      if (!j.date) return filterYear === 'ALL' && filterMonth === 'ALL';
+      const parts = j.date.split('-');
+      const y = parts[0];
+      const m = parts[1];
+      if (filterYear !== 'ALL' && y !== filterYear) return false;
+      if (filterMonth !== 'ALL' && m !== filterMonth) return false;
+      return true;
+    });
+  }, [jobs, filterYear, filterMonth]);
+
+  // Filtered Metrics
+  let filteredBusiness = 0;
+  let filteredOrders = 0;
+  let filteredPending = 0;
+  let filteredDelivered = 0;
+  let filteredBalanceDue = 0;
+  let filteredEstProfit = 0;
+  let filteredRealisedProfit = 0;
+  let filteredDeliveredProfit = 0;
+  let filteredPrintCost = 0;
+  let filteredOtherCost = 0;
+  let filteredPaid = 0;
+
+  filteredJobs.forEach(j => {
+    filteredOrders += 1;
+    filteredBusiness += j.totalAmount;
+    filteredBalanceDue += j.balanceDue;
+    filteredEstProfit += j.estimatedProfit;
+    filteredPrintCost += (Number(j.printCost) || 0);
+    filteredOtherCost += (Number(j.otherCost) || 0);
+    filteredPaid += (Number(j.paid) || 0);
+    const itemRealised = j.realisedProfit ?? (j.paid - j.printCost - j.otherCost);
+    filteredRealisedProfit += itemRealised;
+    if (j.status === 'Delivered') {
+      filteredDelivered += 1;
+      filteredDeliveredProfit += j.estimatedProfit;
+    } else {
+      filteredPending += 1;
+    }
+  });
+
+  const filteredTotalExpenses = filteredPrintCost + filteredOtherCost;
+  const filteredMarginPct = filteredBusiness > 0 ? ((filteredEstProfit / filteredBusiness) * 100).toFixed(1) : '0';
+  const isFilterActive = filterYear !== 'ALL' || filterMonth !== 'ALL';
+
+  const periodLabel = useMemo(() => {
+    if (filterYear === 'ALL' && filterMonth === 'ALL') {
+      return 'All Time';
+    }
+    const monthObj = MONTH_OPTIONS.find(m => m.value === filterMonth);
+    const mStr = filterMonth !== 'ALL' ? (monthObj?.label || filterMonth) : 'All Months';
+    const yStr = filterYear !== 'ALL' ? `Year ${filterYear}` : 'All Years';
+    return `${yStr} · ${mStr}`;
+  }, [filterYear, filterMonth]);
+
+  // Monthly Breakdown (12 Months of selected or current year)
+  const monthlyBreakdown = useMemo(() => {
+    const targetYear = filterYear !== 'ALL' ? filterYear : new Date().getFullYear().toString();
+    const monthsData = Array.from({ length: 12 }, (_, i) => {
+      const mNum = String(i + 1).padStart(2, '0');
+      const mName = new Date(2026, i, 1).toLocaleString('en-US', { month: 'short' });
+      return {
+        monthNum: mNum,
+        monthName: mName,
+        orders: 0,
+        business: 0,
+        profit: 0,
+        balance: 0
+      };
+    });
+
+    jobs.forEach(j => {
+      if (j.status === 'Cancel' || !j.date) return;
+      const [y, m] = j.date.split('-');
+      if (y === targetYear) {
+        const idx = parseInt(m, 10) - 1;
+        if (idx >= 0 && idx < 12) {
+          monthsData[idx].orders += 1;
+          monthsData[idx].business += j.totalAmount;
+          monthsData[idx].profit += j.estimatedProfit;
+          monthsData[idx].balance += j.balanceDue;
+        }
+      }
+    });
+
+    const maxBusiness = Math.max(...monthsData.map(m => m.business), 1);
+    return { targetYear, monthsData, maxBusiness };
+  }, [jobs, filterYear]);
+
+  // Top Customers in filtered period
+  const topFilteredCustomers = useMemo(() => {
+    const map: Record<string, { name: string; place: string; phone: string; orders: number; business: number; balance: number }> = {};
+    filteredJobs.forEach(j => {
+      if (!map[j.customerName]) {
+        map[j.customerName] = {
+          name: j.customerName,
+          place: j.place,
+          phone: j.phone,
+          orders: 0,
+          business: 0,
+          balance: 0
+        };
+      }
+      map[j.customerName].orders += 1;
+      map[j.customerName].business += j.totalAmount;
+      map[j.customerName].balance += j.balanceDue;
+    });
+    return Object.values(map).sort((a, b) => b.business - a.business).slice(0, 5);
+  }, [filteredJobs]);
+
+  const setAllTimePreset = () => {
+    setFilterYear('ALL');
+    setFilterMonth('ALL');
+  };
+
+  const setCurrentYearPreset = () => {
+    setFilterYear(new Date().getFullYear().toString());
+    setFilterMonth('ALL');
+  };
+
+  const setCurrentMonthPreset = () => {
+    const now = new Date();
+    setFilterYear(now.getFullYear().toString());
+    setFilterMonth(String(now.getMonth() + 1).padStart(2, '0'));
+  };
 
   // Customer suggestion autocomplete list
   const customers = getGraphicCustomers();
@@ -395,53 +568,348 @@ export const GraphicZoneView: React.FC<{ onBack: () => void }> = ({ onBack }) =>
         </div>
       )}
 
-      {/* SUBVIEW: REPORTS */}
+      {/* SUBVIEW: BUSINESS REPORT DASHBOARD (YEARLY & MONTHLY) */}
       {subView === 'report' && (
-        <div className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm space-y-4 animate-scaleUp">
-          <div className="flex justify-between items-center pb-2 border-b border-slate-100">
+        <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-100 shadow-sm space-y-4 animate-scaleUp">
+          {/* Header */}
+          <div className="flex justify-between items-center pb-3 border-b border-slate-100">
             <div>
-              <span className="text-[10px] font-black tracking-widest text-indigo-600 uppercase">
-                📈 Business Reports
-              </span>
-              <h3 className="text-xl font-black text-slate-900">Performance Summary</h3>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-50 text-[#5f259f] text-[11px] font-extrabold uppercase tracking-wide mb-1">
+                <BarChart3 className="w-3.5 h-3.5" />
+                <span>Business Report Dashboard</span>
+              </div>
+              <h3 className="text-xl font-black text-slate-900 leading-tight">
+                Business Performance Report
+              </h3>
+              <p className="text-xs text-slate-400 font-medium">
+                Yearly &amp; Monthly Financial Performance
+              </p>
             </div>
             <button
               onClick={() => setSubView('main')}
-              className="py-1 px-3 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold"
+              className="py-1.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors cursor-pointer"
             >
-              Close
+              ← Back
             </button>
           </div>
 
-          <div className="grid grid-cols-2 gap-2.5">
-            <div className="p-3 bg-blue-50/60 rounded-2xl border border-blue-100">
-              <small className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                Total Business
-              </small>
-              <b className="text-lg font-black text-blue-700">{formatMoney(totalBusiness)}</b>
+          {/* FILTER CONTROLS (YEARLY & MONTHLY) */}
+          <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black text-slate-800 flex items-center gap-1.5">
+                <Filter className="w-3.5 h-3.5 text-[#5f259f]" />
+                Report Filter
+              </span>
+              {isFilterActive && (
+                <button
+                  onClick={setAllTimePreset}
+                  className="text-[11px] font-bold text-rose-600 hover:text-rose-700 bg-rose-50 px-2 py-0.5 rounded-lg flex items-center gap-1 transition-colors cursor-pointer"
+                >
+                  <RotateCcw className="w-3 h-3" />
+                  Reset
+                </button>
+              )}
             </div>
-            <div className="p-3 bg-emerald-50/60 rounded-2xl border border-emerald-100">
-              <small className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                Total Est. Profit
-              </small>
-              <b className="text-lg font-black text-emerald-700">{formatMoney(estimatedProfit)}</b>
+
+            <div className="grid grid-cols-2 gap-2">
+              {/* Year Selector */}
+              <div>
+                <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">
+                  Year
+                </label>
+                <div className="relative">
+                  <select
+                    value={filterYear}
+                    onChange={(e) => setFilterYear(e.target.value)}
+                    className="w-full appearance-none bg-white border border-slate-200 text-slate-900 text-xs font-extrabold rounded-xl py-2 px-3 pr-8 focus:outline-none focus:border-[#5f259f] shadow-xs cursor-pointer"
+                  >
+                    <option value="ALL">All Years</option>
+                    {availableYears.map(yr => (
+                      <option key={yr} value={yr}>Year {yr}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                </div>
+              </div>
+
+              {/* Month Selector */}
+              <div>
+                <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">
+                  Month
+                </label>
+                <div className="relative">
+                  <select
+                    value={filterMonth}
+                    onChange={(e) => setFilterMonth(e.target.value)}
+                    className="w-full appearance-none bg-white border border-slate-200 text-slate-900 text-xs font-extrabold rounded-xl py-2 px-3 pr-8 focus:outline-none focus:border-[#5f259f] shadow-xs cursor-pointer"
+                  >
+                    {MONTH_OPTIONS.map(m => (
+                      <option key={m.value} value={m.value}>{m.label}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                </div>
+              </div>
             </div>
-            <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
-              <small className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                Total Orders
-              </small>
-              <b className="text-lg font-black text-slate-900">{totalOrders}</b>
-            </div>
-            <div className="p-3 bg-red-50/60 rounded-2xl border border-red-100">
-              <small className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                Balance Due
-              </small>
-              <b className="text-lg font-black text-red-600">{formatMoney(balanceDue)}</b>
+
+            {/* Quick Pills */}
+            <div className="flex items-center gap-1.5 flex-wrap pt-1 text-[11px]">
+              <button
+                onClick={setAllTimePreset}
+                className={`py-1 px-2.5 rounded-lg font-bold transition-all cursor-pointer ${
+                  filterYear === 'ALL' && filterMonth === 'ALL'
+                    ? 'bg-[#5f259f] text-white shadow-xs'
+                    : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
+                }`}
+              >
+                All Time
+              </button>
+              <button
+                onClick={setCurrentYearPreset}
+                className={`py-1 px-2.5 rounded-lg font-bold transition-all cursor-pointer ${
+                  filterYear === new Date().getFullYear().toString() && filterMonth === 'ALL'
+                    ? 'bg-[#5f259f] text-white shadow-xs'
+                    : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
+                }`}
+              >
+                Year {new Date().getFullYear()}
+              </button>
+              <button
+                onClick={setCurrentMonthPreset}
+                className={`py-1 px-2.5 rounded-lg font-bold transition-all cursor-pointer ${
+                  filterYear === new Date().getFullYear().toString() && filterMonth === String(new Date().getMonth() + 1).padStart(2, '0')
+                    ? 'bg-[#5f259f] text-white shadow-xs'
+                    : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
+                }`}
+              >
+                Current Month
+              </button>
             </div>
           </div>
 
-          <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-100 text-xs text-slate-600 font-medium leading-relaxed">
-            💡 Total profit is calculated as <b>Total Amount - (Print Cost + Other Cost)</b>. Realised profit is <b>Paid - (Print Cost + Other Cost)</b>. Cancelled jobs are excluded from analytics.
+          {/* ACTIVE PERIOD SUMMARY BANNER */}
+          <div className="p-3 bg-gradient-to-r from-purple-50 via-indigo-50 to-blue-50 rounded-2xl border border-purple-100/80 flex items-center justify-between gap-2">
+            <div>
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                Active Period
+              </span>
+              <b className="text-sm font-black text-slate-900">{periodLabel}</b>
+            </div>
+            <div className="text-right">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                Orders
+              </span>
+              <b className="text-sm font-black text-[#5f259f]">{filteredOrders} orders</b>
+            </div>
+          </div>
+
+          {/* 4 PRIMARY METRIC CARDS */}
+          <div className="grid grid-cols-2 gap-2.5">
+            {/* Total Business */}
+            <div className="p-3.5 bg-gradient-to-br from-blue-50/80 to-blue-100/40 rounded-2xl border border-blue-200/80">
+              <small className="text-[10px] font-bold text-blue-900 uppercase tracking-wider block">
+                Turnover
+              </small>
+              <b className="text-xl font-black text-blue-700 block mt-0.5">
+                {formatMoney(filteredBusiness)}
+              </b>
+              <span className="text-[10px] font-semibold text-slate-500 mt-1 block">
+                Gross sales from {filteredOrders} jobs
+              </span>
+            </div>
+
+            {/* Est Net Profit */}
+            <div className="p-3.5 bg-gradient-to-br from-emerald-50/80 to-emerald-100/40 rounded-2xl border border-emerald-200/80">
+              <small className="text-[10px] font-bold text-emerald-900 uppercase tracking-wider block">
+                Net Profit
+              </small>
+              <b className="text-xl font-black text-emerald-700 block mt-0.5">
+                {formatMoney(filteredEstProfit)}
+              </b>
+              <span className="text-[10px] font-semibold text-emerald-600 mt-1 block">
+                Margin: {filteredMarginPct}%
+              </span>
+            </div>
+
+            {/* Total Orders */}
+            <div className="p-3.5 bg-gradient-to-br from-purple-50/80 to-purple-100/40 rounded-2xl border border-purple-200/80">
+              <small className="text-[10px] font-bold text-purple-900 uppercase tracking-wider block">
+                Orders
+              </small>
+              <b className="text-xl font-black text-[#5f259f] block mt-0.5">
+                {filteredOrders}
+              </b>
+              <span className="text-[10px] font-semibold text-slate-500 mt-1 block">
+                ✅ {filteredDelivered} Delv · ⏳ {filteredPending} Pend
+              </span>
+            </div>
+
+            {/* Balance Due */}
+            <div className="p-3.5 bg-gradient-to-br from-rose-50/80 to-rose-100/40 rounded-2xl border border-rose-200/80">
+              <small className="text-[10px] font-bold text-rose-900 uppercase tracking-wider block">
+                Balance Due
+              </small>
+              <b className="text-xl font-black text-rose-600 block mt-0.5">
+                {formatMoney(filteredBalanceDue)}
+              </b>
+              <span className="text-[10px] font-semibold text-slate-500 mt-1 block">
+                To be collected
+              </span>
+            </div>
+          </div>
+
+          {/* SECONDARY CASH & EXPENSE BREAKDOWN */}
+          <div className="grid grid-cols-3 gap-2">
+            <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100 text-center">
+              <small className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">
+                Expenses
+              </small>
+              <b className="text-xs font-black text-slate-800 block mt-0.5">
+                {formatMoney(filteredTotalExpenses)}
+              </b>
+            </div>
+            <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100 text-center">
+              <small className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">
+                Paid / Collected
+              </small>
+              <b className="text-xs font-black text-slate-800 block mt-0.5">
+                {formatMoney(filteredPaid)}
+              </b>
+            </div>
+            <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100 text-center">
+              <small className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">
+                Delivered Profit
+              </small>
+              <b className="text-xs font-black text-emerald-600 block mt-0.5">
+                {formatMoney(filteredDeliveredProfit)}
+              </b>
+            </div>
+          </div>
+
+          {/* 12-MONTH PERFORMANCE BREAKDOWN TABLE FOR SELECTED YEAR */}
+          <div className="pt-2">
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="text-xs font-black text-slate-900 flex items-center gap-1.5">
+                <CalendarDays className="w-3.5 h-3.5 text-[#5f259f]" />
+                <span>Year {monthlyBreakdown.targetYear} Monthly Breakdown</span>
+              </h4>
+              <span className="text-[10px] font-bold text-slate-400">12 Months</span>
+            </div>
+
+            <div className="bg-slate-50 rounded-2xl border border-slate-200/80 p-3 space-y-2">
+              <div className="grid grid-cols-12 text-[10px] font-bold text-slate-400 uppercase px-1 pb-1 border-b border-slate-200">
+                <span className="col-span-3">Month</span>
+                <span className="col-span-2 text-center">Orders</span>
+                <span className="col-span-4 text-right">Business</span>
+                <span className="col-span-3 text-right">Profit</span>
+              </div>
+
+              <div className="divide-y divide-slate-100 max-h-56 overflow-y-auto pr-1">
+                {monthlyBreakdown.monthsData.map((m) => {
+                  const isCurrentFilteredMonth = filterMonth === m.monthNum;
+                  const barWidth = Math.max(0, Math.min(100, (m.business / monthlyBreakdown.maxBusiness) * 100));
+
+                  return (
+                    <div
+                      key={m.monthNum}
+                      onClick={() => {
+                        setFilterYear(monthlyBreakdown.targetYear);
+                        setFilterMonth(m.monthNum);
+                      }}
+                      className={`py-1.5 px-1 grid grid-cols-12 items-center text-xs cursor-pointer rounded-lg transition-colors ${
+                        isCurrentFilteredMonth
+                          ? 'bg-purple-100/70 font-black text-[#5f259f]'
+                          : 'hover:bg-slate-100 text-slate-700'
+                      }`}
+                      title={`Click to filter by ${m.monthName} ${monthlyBreakdown.targetYear}`}
+                    >
+                      <div className="col-span-3 flex items-center gap-1">
+                        <span className="font-bold">{m.monthName}</span>
+                        {isCurrentFilteredMonth && <span className="text-[9px]">●</span>}
+                      </div>
+                      <div className="col-span-2 text-center font-bold text-slate-500">
+                        {m.orders}
+                      </div>
+                      <div className="col-span-4 text-right font-black text-slate-900">
+                        {formatMoney(m.business)}
+                      </div>
+                      <div className="col-span-3 text-right font-black text-emerald-600">
+                        {formatMoney(m.profit)}
+                      </div>
+
+                      {/* Mini visual volume bar */}
+                      <div className="col-span-12 h-1 bg-slate-200/70 rounded-full mt-1 overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full"
+                          style={{ width: `${barWidth}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* TOP PERFORMING CUSTOMERS IN SELECTED PERIOD */}
+          {topFilteredCustomers.length > 0 && (
+            <div className="pt-2">
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="text-xs font-black text-slate-900 flex items-center gap-1.5">
+                  <Building2 className="w-3.5 h-3.5 text-indigo-600" />
+                  <span>Top Customers in {periodLabel}</span>
+                </h4>
+                <span className="text-[10px] font-bold text-slate-400">Top 5</span>
+              </div>
+
+              <div className="bg-slate-50 rounded-2xl border border-slate-200/80 divide-y divide-slate-100 p-1">
+                {topFilteredCustomers.map((cust, idx) => (
+                  <div key={cust.name} className="p-2.5 flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 text-[10px] font-black flex items-center justify-center shrink-0">
+                        {idx + 1}
+                      </span>
+                      <div className="min-w-0 truncate">
+                        <b className="text-slate-900 font-extrabold truncate block">{cust.name}</b>
+                        <span className="text-[10px] text-slate-400 block">{cust.place || 'Local'} · {cust.orders} order(s)</span>
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <b className="text-sm font-black text-slate-900 block">{formatMoney(cust.business)}</b>
+                      {cust.balance > 0 && (
+                        <span className="text-[10px] font-bold text-rose-600 block">
+                          Bal: {formatMoney(cust.balance)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ORDERS IN SELECTED PERIOD */}
+          <div className="pt-2">
+            <h4 className="text-xs font-black text-slate-900 mb-2 flex items-center justify-between">
+              <span>Orders in {periodLabel} ({filteredJobs.length} Jobs)</span>
+              {filteredJobs.length > 5 && (
+                <span className="text-[10px] font-normal text-slate-400">Scroll to see all</span>
+              )}
+            </h4>
+
+            {filteredJobs.length === 0 ? (
+              <div className="py-8 text-center text-xs text-slate-400 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                No orders found in this period.
+              </div>
+            ) : (
+              <div className="space-y-2 max-h-72 overflow-y-auto pr-0.5">
+                {filteredJobs.map(j => renderJobCard(j))}
+              </div>
+            )}
+          </div>
+
+          <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 text-[11px] text-slate-500 font-medium leading-relaxed">
+            💡 Total profit = <b>Total Amount - (Print Cost + Other Cost)</b>. Cancelled jobs are excluded from reports.
           </div>
         </div>
       )}
@@ -464,48 +932,142 @@ export const GraphicZoneView: React.FC<{ onBack: () => void }> = ({ onBack }) =>
             <div className="text-2xl font-bold opacity-80">›</div>
           </button>
 
-          {/* Report Link */}
-          <div className="flex justify-end">
-            <button
-              onClick={() => setSubView('report')}
-              className="py-1.5 px-3 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-blue-600 flex items-center gap-1.5 transition-colors shadow-xs"
-            >
-              <BarChart3 className="w-3.5 h-3.5" />
-              View Reports
-            </button>
+          {/* YEARLY & MONTHLY BUSINESS FILTER BAR */}
+          <div className="bg-white p-3.5 rounded-3xl border border-slate-100 shadow-sm space-y-2.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5 text-xs font-black text-slate-800">
+                <Filter className="w-3.5 h-3.5 text-[#5f259f]" />
+                <span>Business Filter</span>
+              </div>
+              <button
+                onClick={() => setSubView('report')}
+                className="py-1 px-2.5 bg-purple-50 hover:bg-purple-100 text-[#5f259f] font-extrabold text-[11px] rounded-lg flex items-center gap-1 transition-colors cursor-pointer"
+              >
+                <BarChart3 className="w-3.5 h-3.5" />
+                Report Dashboard ›
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              {/* Year Selector */}
+              <div>
+                <label className="block text-[10px] font-bold text-slate-400 mb-0.5 uppercase tracking-wider">
+                  Year
+                </label>
+                <div className="relative">
+                  <select
+                    value={filterYear}
+                    onChange={(e) => setFilterYear(e.target.value)}
+                    className="w-full appearance-none bg-slate-50 border border-slate-200 text-slate-800 text-xs font-extrabold rounded-xl py-2 px-3 pr-8 focus:outline-none focus:border-[#5f259f] cursor-pointer"
+                  >
+                    <option value="ALL">All Years</option>
+                    {availableYears.map(yr => (
+                      <option key={yr} value={yr}>Year {yr}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                </div>
+              </div>
+
+              {/* Month Selector */}
+              <div>
+                <label className="block text-[10px] font-bold text-slate-400 mb-0.5 uppercase tracking-wider">
+                  Month
+                </label>
+                <div className="relative">
+                  <select
+                    value={filterMonth}
+                    onChange={(e) => setFilterMonth(e.target.value)}
+                    className="w-full appearance-none bg-slate-50 border border-slate-200 text-slate-800 text-xs font-extrabold rounded-xl py-2 px-3 pr-8 focus:outline-none focus:border-[#5f259f] cursor-pointer"
+                  >
+                    {MONTH_OPTIONS.map(m => (
+                      <option key={m.value} value={m.value}>{m.label}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Filter Presets */}
+            <div className="flex items-center justify-between pt-1 border-t border-slate-100 text-[11px]">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <button
+                  onClick={setAllTimePreset}
+                  className={`px-2 py-0.5 rounded-lg font-bold transition-all cursor-pointer ${
+                    filterYear === 'ALL' && filterMonth === 'ALL'
+                      ? 'bg-[#5f259f] text-white shadow-xs'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  All
+                </button>
+                <button
+                  onClick={setCurrentYearPreset}
+                  className={`px-2 py-0.5 rounded-lg font-bold transition-all cursor-pointer ${
+                    filterYear === new Date().getFullYear().toString() && filterMonth === 'ALL'
+                      ? 'bg-[#5f259f] text-white shadow-xs'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  Year {new Date().getFullYear()}
+                </button>
+                <button
+                  onClick={setCurrentMonthPreset}
+                  className={`px-2 py-0.5 rounded-lg font-bold transition-all cursor-pointer ${
+                    filterYear === new Date().getFullYear().toString() && filterMonth === String(new Date().getMonth() + 1).padStart(2, '0')
+                      ? 'bg-[#5f259f] text-white shadow-xs'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  This Month
+                </button>
+              </div>
+
+              {isFilterActive && (
+                <button
+                  onClick={setAllTimePreset}
+                  className="text-[10px] font-bold text-rose-500 hover:text-rose-700 transition-colors cursor-pointer"
+                >
+                  Reset
+                </button>
+              )}
+            </div>
           </div>
 
-          {/* Business Metrics Grid */}
+          {/* Business Metrics Grid (Reflects Filter) */}
           <div className="grid grid-cols-3 gap-2">
             <div className="bg-white p-3 rounded-2xl border border-slate-100 shadow-xs">
-              <small className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">
-                Total Business
+              <small className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block truncate">
+                {isFilterActive ? 'Filtered Business' : 'Total Business'}
               </small>
-              <b className="text-base font-black text-blue-600 mt-0.5 block">{formatMoney(totalBusiness)}</b>
+              <b className="text-base font-black text-blue-600 mt-0.5 block truncate">
+                {formatMoney(filteredBusiness)}
+              </b>
             </div>
             <div className="bg-white p-3 rounded-2xl border border-slate-100 shadow-xs">
               <small className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">
                 Orders
               </small>
-              <b className="text-base font-black text-slate-800 mt-0.5 block">{totalOrders}</b>
+              <b className="text-base font-black text-slate-800 mt-0.5 block">{filteredOrders}</b>
             </div>
             <div className="bg-white p-3 rounded-2xl border border-slate-100 shadow-xs">
               <small className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">
                 Pending
               </small>
-              <b className="text-base font-black text-amber-600 mt-0.5 block">{pendingJobs}</b>
+              <b className="text-base font-black text-amber-600 mt-0.5 block">{filteredPending}</b>
             </div>
             <div className="bg-white p-3 rounded-2xl border border-slate-100 shadow-xs col-span-1">
               <small className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">
                 Balance Due
               </small>
-              <b className="text-base font-black text-red-600 mt-0.5 block">{formatMoney(balanceDue)}</b>
+              <b className="text-base font-black text-red-600 mt-0.5 block">{formatMoney(filteredBalanceDue)}</b>
             </div>
             <div className="bg-white p-3 rounded-2xl border border-slate-100 shadow-xs col-span-2">
               <small className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">
-                Est. Profit
+                Est. Profit ({filteredMarginPct}% margin)
               </small>
-              <b className="text-base font-black text-emerald-600 mt-0.5 block">{formatMoney(estimatedProfit)}</b>
+              <b className="text-base font-black text-emerald-600 mt-0.5 block">{formatMoney(filteredEstProfit)}</b>
             </div>
           </div>
 

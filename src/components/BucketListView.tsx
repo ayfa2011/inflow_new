@@ -243,7 +243,7 @@ export const BucketListView: React.FC<{ onBack: () => void }> = ({ onBack }) => 
       <div className="grid grid-cols-2 gap-3">
         {filteredPlaces.length === 0 ? (
           <div className="col-span-2 bg-white rounded-3xl p-8 text-center text-xs text-slate-400 border border-slate-100">
-            ಯಾವುದೇ ಸ್ಥಳ ಕಂಡುಬಂದಿಲ್ಲ (No Places Found)
+            No Places Found
           </div>
         ) : (
           filteredPlaces.map((item) => (
@@ -355,7 +355,7 @@ export const BucketListView: React.FC<{ onBack: () => void }> = ({ onBack }) => 
                   📝 Notes &amp; Details:
                 </div>
                 <div className="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl min-h-[60px] leading-relaxed whitespace-pre-line border border-slate-100">
-                  {viewPlace.notes || 'ಯಾವುದೇ ವಿವರಣೆ/ಟಿಪ್ಪಣಿ ಸೇರಿಸಲಾಗಿಲ್ಲ (No notes provided).'}
+                  {viewPlace.notes || 'No notes provided.'}
                 </div>
               </div>
 

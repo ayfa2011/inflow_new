@@ -19,7 +19,7 @@ export const LockScreen: React.FC = () => {
         </div>
         <h1 className="text-2xl font-black text-[#0b3c5d] tracking-tight">inflow2036</h1>
         <p className="text-xs text-slate-500 font-medium mt-1 mb-5">
-          ಪಾಸ್‌ವರ್ಡ್ ಹಾಕಿ ಅನ್‌ಲಾಕ್ ಮಾಡಿ (Enter Password)
+          Enter Password to Unlock
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-3">

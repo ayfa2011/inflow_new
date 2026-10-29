@@ -49,7 +49,7 @@ export const SavingBankView: React.FC<{ onBack: () => void }> = ({ onBack }) => 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     if (!nameVal.trim()) {
-      alert('Bank name ಹಾಕಿ!');
+      alert('Please enter Bank name!');
       return;
     }
     saveSavingBank(
@@ -74,7 +74,7 @@ export const SavingBankView: React.FC<{ onBack: () => void }> = ({ onBack }) => 
           className="flex-1 py-2.5 px-3.5 bg-white border border-slate-200 rounded-2xl text-xs font-bold text-slate-800 shadow-xs hover:bg-slate-50 flex items-center gap-1.5 transition-all"
         >
           <ArrowLeft className="w-4 h-4 text-indigo-600" />
-          ಡ್ಯಾಶ್‌ಬೋರ್ಡ್‌ಗೆ ಹಿಂತಿರುಗಿ (Exit)
+          Back to Dashboard
         </button>
         <button
           onClick={openAdd}

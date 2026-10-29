@@ -8,14 +8,14 @@ import { getLocalDateString } from '../utils/dateUtils';
 export const RunWalkView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { data, saveRunWalkEntry, deleteRunWalkEntry } = useApp();
 
-  const kannadaDays = ['ಭಾನುವಾರ', 'ಸೋಮವಾರ', 'ಮಂಗಳವಾರ', 'ಬುಧವಾರ', 'ಗುರುವಾರ', 'ಶುಕ್ರವಾರ', 'ಶನಿವಾರ'];
-  const kannadaMonths = ['ಜನವರಿ', 'ಫೆಬ್ರವರಿ', 'ಮಾರ್ಚ್', 'ಏಪ್ರಿಲ್', 'ಮೇ', 'ಜೂನ್', 'ಜುಲೈ', 'ಆಗಸ್ಟ್', 'ಸೆಪ್ಟೆಂಬರ್', 'ಅಕ್ಟೋಬರ್', 'ನವೆಂಬರ್', 'ಡಿಸೆಂಬರ್'];
+  const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const monthsOfYear = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
   const now = new Date();
   const todayStr = getLocalDateString(now);
 
-  const todayDayName = kannadaDays[now.getDay()];
-  const todayFormatted = `${now.getDate()} ${kannadaMonths[now.getMonth()]} ${now.getFullYear()}`;
+  const todayDayName = daysOfWeek[now.getDay()];
+  const todayFormatted = `${now.getDate()} ${monthsOfYear[now.getMonth()]} ${now.getFullYear()}`;
 
   const todayEntries = data.runWalk.filter(x => x.date === todayStr);
   const todayKm = todayEntries.reduce((sum, x) => sum + Number(x.distance || 0), 0);
@@ -79,7 +79,7 @@ export const RunWalkView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       {/* Today's Hero Card */}
       <div className="rounded-3xl p-6 text-center shadow-sm bg-gradient-to-br from-blue-50 via-indigo-50/70 to-blue-100/60 border border-blue-100/80">
         <div className="text-xs font-bold text-blue-700 tracking-wide uppercase mb-1">
-          📅 ಇವತ್ತು · {todayDayName}, {todayFormatted}
+          📅 Today · {todayDayName}, {todayFormatted}
         </div>
         <div className="flex items-baseline justify-center gap-1.5 my-2">
           <span className="text-5xl font-black text-blue-950 tracking-tight">
@@ -90,15 +90,15 @@ export const RunWalkView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         <p className="text-xs font-bold text-blue-800 mb-4">
           {todayKm > 0
             ? todayKm >= 5
-              ? 'ಇಂದಿನ 5 KM ಗುರಿ ಮುಗಿದಿದೆ 🎉 Great job!'
-              : `ಇಂದಿನ ಓಟ: ${todayKm.toFixed(1)} KM`
-            : 'ಇವತ್ತು ಇನ್ನೂ ಓಟ ದಾಖಲಾಗಿಲ್ಲ'}
+              ? "Today's 5 KM goal achieved 🎉 Great job!"
+              : `Today's Run: ${todayKm.toFixed(1)} KM`
+            : 'No run recorded today yet'}
         </p>
 
         {/* Quick Edit */}
         <div className="bg-white/85 backdrop-blur-sm p-3 rounded-2xl max-w-xs mx-auto border border-blue-200/50 shadow-sm">
           <span className="block text-[11px] font-bold text-slate-500 mb-2">
-            ಇವತ್ತಿನ KM ತಿದ್ದುಪಡಿ / ಸೇರಿಸಿ (Quick Edit):
+            Quick Edit / Log Today's KM:
           </span>
           <form onSubmit={handleQuickSubmit} className="flex gap-2 justify-center">
             <input
@@ -108,7 +108,7 @@ export const RunWalkView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               max="100"
               value={quickKm}
               onChange={(e) => setQuickKm(e.target.value)}
-              placeholder="KM (ಉದಾ: 5.2)"
+              placeholder="KM (e.g. 5.2)"
               className="w-32 py-2 px-3 text-center border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
               required
             />
@@ -169,7 +169,7 @@ export const RunWalkView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                   {day.dayName}
                   {day.isToday && (
                     <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-blue-100 text-blue-700">
-                      ಇವತ್ತು
+                      Today
                     </span>
                   )}
                 </b>

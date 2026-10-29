@@ -144,7 +144,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       setLoginError('');
       return true;
     }
-    setLoginError('ತಪ್ಪು ಪಾಸ್‌ವರ್ಡ್ (Incorrect password)! ದಯವಿಟ್ಟು ಪರಿಶೀಲಿಸಿ.');
+    setLoginError('Incorrect password! Please try again.');
     return false;
   };
 
@@ -184,7 +184,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const resetToDefaults = () => {
-    if (window.confirm('ಖಂಡಿತ ಡೇಟಾವನ್ನು ರಿಸೆಟ್ ಮಾಡಲು ಬಯಸುವಿರಾ? (Are you sure you want to reset all data to default?)')) {
+    if (window.confirm('Are you sure you want to reset all data to default?')) {
       const defaults = StorageService.resetToDefaults();
       setData(defaults);
     }

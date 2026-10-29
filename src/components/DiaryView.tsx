@@ -35,7 +35,7 @@ export const DiaryView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     if (!titleVal.trim() && !notesVal.trim()) {
-      alert('ದಯವಿಟ್ಟು Title ಅಥವಾ Notes ನಮೂದಿಸಿ!');
+      alert('Please enter Title or Notes!');
       return;
     }
     saveDiaryEntry(
@@ -90,7 +90,7 @@ export const DiaryView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       <div className="space-y-3">
         {data.diary.length === 0 ? (
           <div className="bg-white rounded-3xl p-8 text-center text-slate-400 font-medium border border-slate-100 shadow-sm">
-            ಯಾವುದೇ Diary ಎಂಟ್ರಿ ಇಲ್ಲ. "+" ಬಟನ್ ಬಳಸಿ ಹೊಸ ಕಥೆ/ವಿವರಣೆ ಸೇರಿಸಿ.
+            No Diary entries yet. Tap "+" to write a new entry.
           </div>
         ) : (
           data.diary.map((entry) => (
@@ -179,7 +179,7 @@ export const DiaryView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                   <button
                     type="button"
                     onClick={() => {
-                      if (confirm('ಈ Diary Entry delete ಮಾಡಬೇಕೆ?')) {
+                      if (confirm('Delete this Diary Entry?')) {
                         deleteDiaryEntry(activeEntry.id);
                         setShowModal(false);
                       }
