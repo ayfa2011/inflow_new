@@ -11,6 +11,7 @@ import {
   BucketPlace,
   Plan,
   PlanItem,
+  MonthlyExpenseItem,
   GraphicJob,
   GraphicCustomer,
   InflowHolding,
@@ -77,11 +78,15 @@ interface AppContextType {
 
   // Planning
   createNewPlan: (planName: string) => void;
+  createMonthlyPlan: (plan: { name: string; budget: number; startDate: string; endDate?: string; totalDays?: number }) => void;
   renamePlan: (planId: string, newName: string) => void;
+  updateMonthlyPlanSettings: (planId: string, settings: { name?: string; budget?: number; startDate?: string; endDate?: string; totalDays?: number }) => void;
   deletePlan: (planId: string) => void;
   savePlanItem: (planId: string, item: Omit<PlanItem, 'id'>, existingId?: string) => void;
   togglePlanItemTick: (planId: string, itemId: string) => void;
   deletePlanItem: (planId: string, itemId: string) => void;
+  saveMonthlyExpense: (planId: string, expense: Omit<MonthlyExpenseItem, 'id'>, existingId?: string) => void;
+  deleteMonthlyExpense: (planId: string, expenseId: string) => void;
 
   // Graphic Zone
   saveGraphicJob: (job: Omit<GraphicJob, 'id' | 'jobNo' | 'totalAmount' | 'balanceDue' | 'estimatedProfit'> & { id?: string; jobNo?: string }) => void;
@@ -377,9 +382,43 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const newPlan: Plan = {
       id: `plan_${Date.now()}`,
       name: planName.trim(),
-      items: []
+      items: [],
+      planType: 'standard'
     };
     updateAppData(prev => ({ ...prev, plans: [newPlan, ...prev.plans] }));
+  };
+
+  const createMonthlyPlan = (planInput: { name: string; budget: number; startDate: string; endDate?: string; totalDays?: number }) => {
+    if (!planInput.name.trim()) return;
+    const newPlan: Plan = {
+      id: `plan_monthly_${Date.now()}`,
+      name: planInput.name.trim(),
+      items: [],
+      planType: 'monthly',
+      budget: Number(planInput.budget) || 0,
+      startDate: planInput.startDate || new Date().toISOString().split('T')[0],
+      endDate: planInput.endDate,
+      totalDays: Number(planInput.totalDays) > 0 ? Number(planInput.totalDays) : 30,
+      monthlyExpenses: []
+    };
+    updateAppData(prev => ({ ...prev, plans: [newPlan, ...prev.plans] }));
+  };
+
+  const updateMonthlyPlanSettings = (planId: string, settings: { name?: string; budget?: number; startDate?: string; endDate?: string; totalDays?: number }) => {
+    updateAppData(prev => ({
+      ...prev,
+      plans: prev.plans.map(p => {
+        if (p.id !== planId) return p;
+        return {
+          ...p,
+          name: settings.name !== undefined ? settings.name.trim() : p.name,
+          budget: settings.budget !== undefined ? Number(settings.budget) : p.budget,
+          startDate: settings.startDate !== undefined ? settings.startDate : p.startDate,
+          endDate: settings.endDate !== undefined ? settings.endDate : p.endDate,
+          totalDays: settings.totalDays !== undefined ? Number(settings.totalDays) : p.totalDays
+        };
+      })
+    }));
   };
 
   const renamePlan = (planId: string, newName: string) => {
@@ -433,6 +472,43 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         return {
           ...p,
           items: p.items.filter(it => it.id !== itemId)
+        };
+      })
+    }));
+  };
+
+  const saveMonthlyExpense = (planId: string, expense: Omit<MonthlyExpenseItem, 'id'>, existingId?: string) => {
+    updateAppData(prev => ({
+      ...prev,
+      plans: prev.plans.map(p => {
+        if (p.id !== planId) return p;
+        const currentExpenses = p.monthlyExpenses || [];
+        if (existingId) {
+          return {
+            ...p,
+            monthlyExpenses: currentExpenses.map(item => item.id === existingId ? { ...expense, id: existingId } : item)
+          };
+        }
+        const newExpense: MonthlyExpenseItem = {
+          ...expense,
+          id: `me_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`
+        };
+        return {
+          ...p,
+          monthlyExpenses: [newExpense, ...currentExpenses]
+        };
+      })
+    }));
+  };
+
+  const deleteMonthlyExpense = (planId: string, expenseId: string) => {
+    updateAppData(prev => ({
+      ...prev,
+      plans: prev.plans.map(p => {
+        if (p.id !== planId) return p;
+        return {
+          ...p,
+          monthlyExpenses: (p.monthlyExpenses || []).filter(item => item.id !== expenseId)
         };
       })
     }));
@@ -637,11 +713,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         deleteBucketPlace,
 
         createNewPlan,
+        createMonthlyPlan,
         renamePlan,
+        updateMonthlyPlanSettings,
         deletePlan,
         savePlanItem,
         togglePlanItemTick,
         deletePlanItem,
+        saveMonthlyExpense,
+        deleteMonthlyExpense,
 
         saveGraphicJob,
         markGraphicJobDelivered,

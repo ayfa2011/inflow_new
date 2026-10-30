@@ -79,10 +79,25 @@ export interface PlanItem {
   ticked: boolean;
 }
 
+export interface MonthlyExpenseItem {
+  id: string;
+  date: string; // YYYY-MM-DD
+  category: string; // Groceries, Vegetables, Milk, Fuel, Dining, Bills, Household, Other
+  item: string;
+  amount: number;
+  note?: string;
+}
+
 export interface Plan {
   id: string;
   name: string;
   items: PlanItem[];
+  planType?: 'standard' | 'monthly';
+  budget?: number;
+  startDate?: string; // YYYY-MM-DD
+  endDate?: string; // YYYY-MM-DD
+  totalDays?: number; // e.g. 30
+  monthlyExpenses?: MonthlyExpenseItem[];
 }
 
 export type GraphicJobStatus =

@@ -2,6 +2,22 @@ import { Plan } from '../types';
 
 export const initialPlanningData: Plan[] = [
   {
+    id: 'plan_monthly_sample',
+    name: 'October Daily Expenses',
+    planType: 'monthly',
+    budget: 12000,
+    startDate: '2026-10-10',
+    totalDays: 30,
+    items: [],
+    monthlyExpenses: [
+      { id: 'me_1', date: '2026-10-10', category: 'Vegetables', item: 'Vegetables & Greens', amount: 35, note: 'Tomato, Onion & Chilli' },
+      { id: 'me_2', date: '2026-10-11', category: 'Milk', item: 'Nandini Milk 500ml', amount: 24, note: 'Morning' },
+      { id: 'me_3', date: '2026-10-12', category: 'Groceries', item: 'Cooking Oil & Atta', amount: 160 },
+      { id: 'me_4', date: '2026-10-13', category: 'Fuel', item: 'Bike Petrol', amount: 100 },
+      { id: 'me_5', date: '2026-10-14', category: 'Vegetables', item: 'Potatoes & Beans', amount: 45 }
+    ]
+  },
+  {
     id: 'plan_september',
     name: 'September',
     items: [
