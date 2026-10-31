@@ -100,68 +100,68 @@ export const LiabilityAssetsView: React.FC<{ onBack: () => void }> = ({ onBack }
             + Add Asset
           </button>
         </div>
-        <div className="bg-emerald-50/70 text-xs font-extrabold text-emerald-900 uppercase tracking-wider px-4 py-2 flex justify-between border-b border-emerald-100/60">
+        <div className="bg-emerald-50/70 text-[11px] font-extrabold text-emerald-900 uppercase tracking-wider px-3.5 py-1.5 flex justify-between border-b border-emerald-100/60">
           <span>PARTICULAR / SOURCE</span>
           <span>AMOUNT</span>
         </div>
         <div className="divide-y divide-slate-100">
           {assets.length === 0 ? (
-            <div className="py-6 text-center text-sm text-slate-400 font-medium">No Liquid Assets added</div>
+            <div className="py-4 text-center text-xs text-slate-400 font-medium">No Liquid Assets added</div>
           ) : (
             assets.map(item => (
               <div
                 key={item.id}
                 onClick={() => openEdit(item)}
-                className="p-4 flex justify-between items-center hover:bg-slate-50/80 cursor-pointer transition-colors active:scale-[0.99]"
+                className="px-3.5 py-2.5 flex justify-between items-center hover:bg-slate-50/80 cursor-pointer transition-colors active:scale-[0.99]"
               >
-                <span className="text-sm font-bold text-slate-800">{item.name}</span>
-                <span className="text-sm font-black text-slate-900">{formatMoney(item.amount)}</span>
+                <span className="text-xs font-bold text-slate-800">{item.name}</span>
+                <span className="text-xs font-black text-slate-900">{formatMoney(item.amount)}</span>
               </div>
             ))
           )}
         </div>
-        <div className="bg-slate-50 p-4 flex justify-between text-sm font-black border-t border-slate-100">
+        <div className="bg-slate-50 px-3.5 py-2.5 flex justify-between text-xs font-black border-t border-slate-100">
           <span className="text-slate-700">Total Liquid Assets</span>
-          <span className="text-emerald-600 text-base">{formatMoney(totalAssets)}</span>
+          <span className="text-emerald-600 text-sm">{formatMoney(totalAssets)}</span>
         </div>
       </div>
 
       {/* Liabilities Section */}
       <div className="bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm">
-        <div className="bg-[#34495e] text-white p-4 flex items-center justify-between">
-          <span className="text-sm font-black tracking-wide">
+        <div className="bg-[#34495e] text-white p-3.5 flex items-center justify-between">
+          <span className="text-xs font-black tracking-wide">
             💳 Liabilities ({liabilities.length})
           </span>
           <button
             onClick={() => openAdd('LIABILITY')}
-            className="text-xs font-bold px-3.5 py-1.5 rounded-full bg-white/20 hover:bg-white/30 transition-colors active:scale-95 shadow-sm"
+            className="text-[11px] font-bold px-3 py-1 rounded-full bg-white/20 hover:bg-white/30 transition-colors active:scale-95 shadow-sm"
           >
             + Add Liability
           </button>
         </div>
-        <div className="bg-slate-100 text-xs font-extrabold text-slate-700 uppercase tracking-wider px-4 py-2 flex justify-between border-b border-slate-200">
+        <div className="bg-slate-100 text-[11px] font-extrabold text-slate-700 uppercase tracking-wider px-3.5 py-1.5 flex justify-between border-b border-slate-200">
           <span>PARTICULAR / PAYEE</span>
           <span>AMOUNT</span>
         </div>
         <div className="divide-y divide-slate-100">
           {liabilities.length === 0 ? (
-            <div className="py-6 text-center text-sm text-slate-400 font-medium">No Liabilities added</div>
+            <div className="py-4 text-center text-xs text-slate-400 font-medium">No Liabilities added</div>
           ) : (
             liabilities.map(item => (
               <div
                 key={item.id}
                 onClick={() => openEdit(item)}
-                className="p-4 flex justify-between items-center hover:bg-slate-50/80 cursor-pointer transition-colors active:scale-[0.99]"
+                className="px-3.5 py-2.5 flex justify-between items-center hover:bg-slate-50/80 cursor-pointer transition-colors active:scale-[0.99]"
               >
-                <span className="text-sm font-bold text-slate-800">{item.name}</span>
-                <span className="text-sm font-black text-rose-600">{formatMoney(item.amount)}</span>
+                <span className="text-xs font-bold text-slate-800">{item.name}</span>
+                <span className="text-xs font-black text-rose-600">{formatMoney(item.amount)}</span>
               </div>
             ))
           )}
         </div>
-        <div className="bg-slate-50 p-4 flex justify-between text-sm font-black border-t border-slate-100">
+        <div className="bg-slate-50 px-3.5 py-2.5 flex justify-between text-xs font-black border-t border-slate-100">
           <span className="text-slate-700">Total Liabilities</span>
-          <span className="text-rose-600 text-base">{formatMoney(totalLiabilities)}</span>
+          <span className="text-rose-600 text-sm">{formatMoney(totalLiabilities)}</span>
         </div>
       </div>
 

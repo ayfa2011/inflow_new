@@ -859,33 +859,33 @@ export const PlanningView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
             <div className="divide-y divide-slate-100">
               {incomes.length === 0 ? (
-                <div className="py-6 text-center text-sm text-slate-400 font-medium">No income items added</div>
+                <div className="py-4 text-center text-xs text-slate-400 font-medium">No income items added</div>
               ) : (
                 incomes.map(item => (
-                  <div key={item.id} className="p-3.5 px-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
-                    <div className="flex items-center gap-3 min-w-0">
+                  <div key={item.id} className="px-3.5 py-2.5 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                    <div className="flex items-center gap-2.5 min-w-0">
                       <button
                         onClick={() => togglePlanItemTick(activePlanId, item.id)}
-                        className="text-slate-400 hover:text-emerald-600 transition-colors"
+                        className="text-slate-400 hover:text-emerald-600 transition-colors flex-shrink-0"
                       >
                         {item.ticked ? (
-                          <CheckSquare className="w-5 h-5 text-emerald-600" />
+                          <CheckSquare className="w-4 h-4 text-emerald-600" />
                         ) : (
-                          <Square className="w-5 h-5 text-slate-300" />
+                          <Square className="w-4 h-4 text-slate-300" />
                         )}
                       </button>
-                      <span className={`text-sm sm:text-base font-bold text-slate-800 truncate ${item.ticked ? 'line-through text-slate-400' : ''}`}>
+                      <span className={`text-xs font-bold text-slate-800 truncate ${item.ticked ? 'line-through text-slate-400' : ''}`}>
                         {item.name}
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-2.5 flex-shrink-0">
-                      <span className={`text-sm sm:text-base font-black text-slate-900 ${item.ticked ? 'line-through text-slate-400' : ''}`}>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <span className={`text-xs font-black text-slate-900 ${item.ticked ? 'line-through text-slate-400' : ''}`}>
                         {formatMoney(item.amount)}
                       </span>
                       <button
                         onClick={() => openEditItem(item)}
-                        className="p-1.5 text-slate-400 hover:text-slate-700 rounded transition-colors text-sm"
+                        className="p-1 text-slate-400 hover:text-slate-700 rounded transition-colors text-xs"
                       >
                         ✏️
                       </button>
@@ -895,9 +895,9 @@ export const PlanningView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               )}
             </div>
 
-            <div className="bg-slate-50 p-4 flex justify-between text-sm sm:text-base font-black border-t border-slate-100">
+            <div className="bg-slate-50 px-3.5 py-2.5 flex justify-between text-xs font-black border-t border-slate-100">
               <span className="text-slate-700">Total Income</span>
-              <span className="text-emerald-600">{formatMoney(totalIncome)}</span>
+              <span className="text-emerald-600 text-sm">{formatMoney(totalIncome)}</span>
             </div>
           </div>
 
@@ -915,33 +915,33 @@ export const PlanningView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
             <div className="divide-y divide-slate-100">
               {expenses.length === 0 ? (
-                <div className="py-6 text-center text-sm text-slate-400 font-medium">No expense items added</div>
+                <div className="py-4 text-center text-xs text-slate-400 font-medium">No expense items added</div>
               ) : (
                 expenses.map(item => (
-                  <div key={item.id} className="p-3.5 px-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
-                    <div className="flex items-center gap-3 min-w-0">
+                  <div key={item.id} className="px-3.5 py-2.5 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                    <div className="flex items-center gap-2.5 min-w-0">
                       <button
                         onClick={() => togglePlanItemTick(activePlanId, item.id)}
-                        className="text-slate-400 hover:text-emerald-600 transition-colors"
+                        className="text-slate-400 hover:text-emerald-600 transition-colors flex-shrink-0"
                       >
                         {item.ticked ? (
-                          <CheckSquare className="w-5 h-5 text-emerald-600" />
+                          <CheckSquare className="w-4 h-4 text-emerald-600" />
                         ) : (
-                          <Square className="w-5 h-5 text-slate-300" />
+                          <Square className="w-4 h-4 text-slate-300" />
                         )}
                       </button>
-                      <span className={`text-sm sm:text-base font-bold text-slate-800 truncate ${item.ticked ? 'line-through text-slate-400' : ''}`}>
+                      <span className={`text-xs font-bold text-slate-800 truncate ${item.ticked ? 'line-through text-slate-400' : ''}`}>
                         {item.name}
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-2.5 flex-shrink-0">
-                      <span className={`text-sm sm:text-base font-black text-rose-600 ${item.ticked ? 'line-through text-slate-400' : ''}`}>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <span className={`text-xs font-black text-rose-600 ${item.ticked ? 'line-through text-slate-400' : ''}`}>
                         {formatMoney(item.amount)}
                       </span>
                       <button
                         onClick={() => openEditItem(item)}
-                        className="p-1.5 text-slate-400 hover:text-slate-700 rounded transition-colors text-sm"
+                        className="p-1 text-slate-400 hover:text-slate-700 rounded transition-colors text-xs"
                       >
                         ✏️
                       </button>
@@ -951,9 +951,9 @@ export const PlanningView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               )}
             </div>
 
-            <div className="bg-slate-50 p-4 flex justify-between text-sm sm:text-base font-black border-t border-slate-100">
+            <div className="bg-slate-50 px-3.5 py-2.5 flex justify-between text-xs font-black border-t border-slate-100">
               <span className="text-slate-700">Total Expense</span>
-              <span className="text-rose-600">{formatMoney(totalExpenses)}</span>
+              <span className="text-rose-600 text-sm">{formatMoney(totalExpenses)}</span>
             </div>
           </div>
         </div>
