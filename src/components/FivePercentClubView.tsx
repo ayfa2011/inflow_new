@@ -6,14 +6,8 @@ import {
   ArrowLeft,
   Plus,
   Search,
-  Calendar,
   Edit3,
-  Trash2,
-  TrendingUp,
-  TrendingDown,
-  ShieldAlert,
-  Clock,
-  Layers
+  Clock
 } from 'lucide-react';
 
 interface FivePercentClubViewProps {

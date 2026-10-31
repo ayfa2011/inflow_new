@@ -6,14 +6,11 @@ import {
   Check,
   X,
   RotateCw,
-  AlertCircle,
-  Wifi,
-  Radio
+  AlertCircle
 } from 'lucide-react';
 import {
   getScannerStocks,
-  evaluateStock,
-  EvaluatedStock
+  evaluateStock
 } from '../data/scannerStocks';
 import {
   fetchLiveScan,

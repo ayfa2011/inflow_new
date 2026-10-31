@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { DiaryEntry } from '../types';
-import { ArrowLeft, Plus, Calendar, Trash2, Edit3 } from 'lucide-react';
+import { ArrowLeft, Plus, Calendar, Trash2 } from 'lucide-react';
 
 export const DiaryView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { data, saveDiaryEntry, deleteDiaryEntry } = useApp();

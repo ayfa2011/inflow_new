@@ -28,15 +28,8 @@ import {
 } from '../services';
 import { getLocalDateString, getLocalDateTimeString } from '../utils/dateUtils';
 
-const AUTH_KEY = 'inflow2036_auth_v1';
-const DEFAULT_PASSWORD = 'shanu2';
-
 interface AppContextType {
   data: AppData;
-  isLocked: boolean;
-  loginError: string;
-  login: (pwd: string) => boolean;
-  logout: () => void;
   exportBackupJSON: () => void;
   backupToGoogleDrive: () => Promise<{ success: boolean; message: string; link?: string }>;
   importBackupJSON: (file: File) => Promise<boolean>;
@@ -126,11 +119,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }).catch(err => console.error('Cloud sync err:', err));
   }, []);
 
-  // Login temporarily disabled per user request - direct open
-  const [isLocked, setIsLocked] = useState<boolean>(false);
-
-  const [loginError, setLoginError] = useState<string>('');
-
   /**
    * Pure state updater helper that keeps StorageService calls outside React state updaters.
    */
@@ -140,23 +128,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       StorageService.saveAppData(nextData);
       return nextData;
     });
-  };
-
-  const login = (pwd: string): boolean => {
-    if (pwd === DEFAULT_PASSWORD) {
-      sessionStorage.setItem(AUTH_KEY, 'unlocked');
-      setIsLocked(false);
-      setLoginError('');
-      return true;
-    }
-    setLoginError('Incorrect password! Please try again.');
-    return false;
-  };
-
-  const logout = () => {
-    sessionStorage.removeItem(AUTH_KEY);
-    // Login temporarily disabled per user request
-    setIsLocked(false);
   };
 
   const exportBackupJSON = () => {
@@ -677,10 +648,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     <AppContext.Provider
       value={{
         data,
-        isLocked,
-        loginError,
-        login,
-        logout,
         exportBackupJSON,
         backupToGoogleDrive,
         importBackupJSON,

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { SavingBankItem } from '../types';
-import { ArrowLeft, Plus, Trash2, Building2 } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
 
 export const SavingBankView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { data, saveSavingBank, deleteSavingBank } = useApp();

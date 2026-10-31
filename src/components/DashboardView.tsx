@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { PWAInstallButton } from './PWAInstallButton';
 import {
-  LogOut,
   Zap,
   Briefcase,
   ChevronRight,
-  ShieldAlert,
   CloudUpload,
   ExternalLink,
   Loader2,
@@ -93,7 +92,7 @@ interface DashboardViewProps {
 }
 
 export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) => {
-  const { logout, backupToGoogleDrive, data } = useApp();
+  const { backupToGoogleDrive, data } = useApp();
   const [showBackupModal, setShowBackupModal] = useState(false);
   const [backupMessage, setBackupMessage] = useState('');
   const [isDriveUploading, setIsDriveUploading] = useState(false);
@@ -122,13 +121,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
       {/* CUTE COMPACT HERO CARD - PHONEPE THEME */}
       <div className="relative overflow-hidden rounded-2xl px-4 py-3 sm:px-5 sm:py-3.5 text-white shadow-md shadow-[#5f259f]/25 bg-gradient-to-r from-[#4d1680] via-[#5f259f] to-[#792fc4] flex items-center justify-between">
         <div className="relative z-10 flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-sm shadow-inner text-amber-300">
-            <Sparkles className="w-4 h-4 fill-amber-300 text-amber-300" />
-          </div>
+          <img
+            src="inflow_logo.png"
+            alt="inflow2036"
+            className="w-10 h-10 rounded-xl object-cover shadow-md border border-white/30 flex-shrink-0"
+          />
           <div>
             <h1 className="text-xl sm:text-2xl font-black tracking-tight leading-none text-white drop-shadow-sm">
               inflow2036
             </h1>
+            <p className="text-[10px] text-purple-200/90 font-bold mt-0.5 tracking-wide">
+              Journey to 2036
+            </p>
           </div>
         </div>
 
@@ -444,13 +448,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onSelectView }) =>
 
       {/* FOOTER ACTIONS */}
       <div className="flex justify-between items-center pt-2 px-1">
-        <button
-          onClick={logout}
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-rose-500 hover:text-rose-600 transition-colors py-2 px-2 rounded-xl hover:bg-rose-50/50 cursor-pointer"
-        >
-          <span className="text-sm font-black">↳</span>
-          Logout
-        </button>
+        <PWAInstallButton />
 
         <button
           onClick={() => setShowBackupModal(true)}

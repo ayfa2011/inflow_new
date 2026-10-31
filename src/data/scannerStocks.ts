@@ -18,14 +18,6 @@
  * ATR_TRAIL_MULTIPLIER = 3.0
  */
 
-export interface WatchlistStockConfig {
-  name: string;
-  symbol: string;
-  sector: string;
-  enabled: boolean;
-  isUnlisted?: boolean;
-}
-
 export interface ScannedStock {
   symbol: string;
   name: string;
@@ -68,65 +60,6 @@ export interface EvaluatedStock extends ScannedStock {
   target: number | null;
   targetProfit: number | null;
 }
-
-export const SWING_WATCHLIST_CONFIG: WatchlistStockConfig[] = [
-  { name: 'Polycab India', symbol: 'POLYCAB', sector: 'Power, Electricals & Capital Goods', enabled: true },
-  { name: 'Cummins India', symbol: 'CUMMINSIND', sector: 'Power, Electricals & Capital Goods', enabled: true },
-  { name: 'GE Vernova T&D India', symbol: 'GEVERNOVA', sector: 'Power, Electricals & Capital Goods', enabled: true },
-  { name: 'Siemens', symbol: 'SIEMENS', sector: 'Power, Electricals & Capital Goods', enabled: true },
-  { name: 'SBI Funds Management Ltd', symbol: 'SBIFUNDS', sector: 'Financial Services & Asset Management', enabled: true, isUnlisted: true },
-  { name: 'Caplin Point Laboratories', symbol: 'CAPLIPOINT', sector: 'Pharmaceuticals & Healthcare', enabled: true },
-  { name: 'Corona Remedies Ltd', symbol: 'CORONA', sector: 'Pharmaceuticals & Healthcare', enabled: true, isUnlisted: true },
-  { name: 'Inox India', symbol: 'INOXINDIA', sector: 'Industrial Equipment & Gases', enabled: true },
-  { name: 'Fiem Industries', symbol: 'FIEMIND', sector: 'Automobile Components', enabled: true },
-  { name: 'Raghav Productivity Enhancers', symbol: 'RPEL', sector: 'Industrial Materials', enabled: true },
-  { name: 'Atlanta Electricals Ltd', symbol: 'ATLANTAELE', sector: 'Power, Electricals & Capital Goods', enabled: true, isUnlisted: true },
-  { name: 'Action Construction Equipment', symbol: 'ACE', sector: 'Capital Goods', enabled: true },
-  { name: 'Travel Food Services Ltd', symbol: 'TRAVELFOOD', sector: 'Consumer Services', enabled: true, isUnlisted: true },
-  { name: 'Nippon Life India Asset Management', symbol: 'NAM-INDIA', sector: 'Financial Services & Asset Management', enabled: true },
-  { name: 'Anthem Biosciences Limited', symbol: 'ANTHEM', sector: 'Pharmaceuticals & Healthcare', enabled: true, isUnlisted: true },
-  { name: 'Kanohar Electricals Ltd', symbol: 'KANOHAR', sector: 'Power, Electricals & Capital Goods', enabled: true, isUnlisted: true },
-  { name: 'Waaree Renewable Technologies', symbol: 'WAAREERTL', sector: 'Renewable Energy', enabled: true },
-  { name: 'HBL Engineering Ltd / HBL Power', symbol: 'HBLENGINE', sector: 'Power, Electricals & Defence Electronics', enabled: true },
-  { name: 'Tips Music', symbol: 'TIPSMUSIC', sector: 'Media & Entertainment', enabled: true },
-  { name: 'Bharat Electronics', symbol: 'BEL', sector: 'Defence Electronics', enabled: true },
-  { name: 'RailTel Corporation of India', symbol: 'RAILTEL', sector: 'Telecom & Infrastructure', enabled: true },
-  { name: 'BLS International Services', symbol: 'BLS', sector: 'Business Services', enabled: true },
-  { name: 'Apollo Hospitals Enterprise', symbol: 'APOLLOHOSP', sector: 'Pharmaceuticals & Healthcare', enabled: true },
-  { name: 'RR Kabel', symbol: 'RRKABEL', sector: 'Power, Electricals & Capital Goods', enabled: true },
-  { name: 'Tata Capital Ltd', symbol: 'TATACAP', sector: 'Financial Services & Asset Management', enabled: true, isUnlisted: true },
-  { name: 'Kama Holdings', symbol: 'KAMAHOLD', sector: 'Industrial Materials', enabled: true },
-  { name: 'Berger Paints India', symbol: 'BERGEPAINT', sector: 'Consumer Durables', enabled: true },
-  { name: 'DDev Plastiks Industries', symbol: 'DDEVPLAST', sector: 'Industrial Materials', enabled: true },
-  { name: 'Khazanchi Jewellers', symbol: 'KHAZANCHI', sector: 'Consumer Durables', enabled: true },
-  { name: 'Hindustan Aeronautics', symbol: 'HAL', sector: 'Defence Electronics', enabled: true },
-  { name: 'Divi\'s Laboratories', symbol: 'DIVISLAB', sector: 'Pharmaceuticals & Healthcare', enabled: true },
-  { name: 'Central Depository Services (India)', symbol: 'CDSL', sector: 'Financial Services & Asset Management', enabled: true },
-  { name: 'Finolex Cables', symbol: 'FINCABLES', sector: 'Power, Electricals & Capital Goods', enabled: true },
-  { name: 'Force Motors', symbol: 'FORCEMOT', sector: 'Automobile Components', enabled: true },
-  { name: 'CG Power and Industrial Solutions', symbol: 'CGPOWER', sector: 'Power, Electricals & Capital Goods', enabled: true },
-  { name: 'Premier Energies', symbol: 'PREMIERENE', sector: 'Renewable Energy', enabled: true },
-  { name: 'Jyoti Resins & Adhesives', symbol: 'JYOTIRESIN', sector: 'Industrial Materials', enabled: true },
-  { name: 'Arrow Greentech', symbol: 'ARROWGREEN', sector: 'Industrial Materials', enabled: true },
-  { name: 'Natco Pharma', symbol: 'NATCOPHARM', sector: 'Pharmaceuticals & Healthcare', enabled: true },
-  { name: 'National Aluminium Company', symbol: 'NATIONALUM', sector: 'Metals & Mining', enabled: true },
-  { name: 'Gujarat Pipavav Port', symbol: 'GPPL', sector: 'Telecom & Infrastructure', enabled: true },
-  { name: 'Emmvee Photovoltaic Power Ltd.', symbol: 'EMMVEE', sector: 'Renewable Energy', enabled: true, isUnlisted: true },
-  { name: 'SEDEMAC Mechatronics Ltd', symbol: 'SEDEMAC', sector: 'Automobile Components', enabled: true, isUnlisted: true },
-  { name: 'Aditya Infotech Ltd', symbol: 'CPPLUS', sector: 'Electronics & Technology', enabled: true, isUnlisted: true },
-  { name: 'AJAX Engineering Ltd', symbol: 'AJAXENGG', sector: 'Capital Goods', enabled: true, isUnlisted: true },
-  { name: 'BSE Limited', symbol: 'BSE', sector: 'Financial Services & Exchanges', enabled: true },
-  { name: 'Multi Commodity Exchange of India', symbol: 'MCX', sector: 'Financial Services & Exchanges', enabled: true },
-  { name: 'Indian Railway Catering and Tourism Corp', symbol: 'IRCTC', sector: 'Consumer Services & Tourism', enabled: true },
-  { name: 'Garden Reach Shipbuilders & Engineers', symbol: 'GRSE', sector: 'Defence Electronics & Shipbuilding', enabled: true },
-  { name: 'Mazagon Dock Shipbuilders', symbol: 'MAZDOCK', sector: 'Defence Electronics & Shipbuilding', enabled: true },
-  { name: 'Persistent Systems', symbol: 'PERSISTENT', sector: 'Information Technology', enabled: true },
-  { name: 'Suzlon Energy', symbol: 'SUZLON', sector: 'Renewable Energy', enabled: true },
-  { name: 'Triveni Turbine', symbol: 'TRIVENITUR', sector: 'Power, Electricals & Capital Goods', enabled: true },
-  { name: 'Nazara Technologies', symbol: 'NAZARA', sector: 'Media & Entertainment', enabled: true },
-  { name: 'Anand Rathi Wealth', symbol: 'ANANDRATHI', sector: 'Financial Services & Asset Management', enabled: true },
-  { name: 'Prudent Corporate Advisory Services', symbol: 'PRUDENT', sector: 'Financial Services & Asset Management', enabled: true }
-];
 
 const LABELS = [
   'Original trend: Close > EMA200 OR EMA50 > EMA200',

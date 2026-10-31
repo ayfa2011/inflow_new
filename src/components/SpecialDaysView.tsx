@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { SpecialDay } from '../types';
 import { SpecialDaysService } from '../services';
-import { ArrowLeft, Plus, MessageCircle, Edit3, Trash2, Calendar, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Plus, MessageCircle, Edit3, Trash2, AlertTriangle } from 'lucide-react';
 
 export const SpecialDaysView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { data, saveSpecialDay, deleteSpecialDay } = useApp();

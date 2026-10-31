@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { ArrowLeft, Droplets, Moon, Dumbbell, Scale, Plus, Check } from 'lucide-react';
+import { ArrowLeft, Droplets, Moon, Dumbbell, Scale, Check } from 'lucide-react';
 
 import { getLocalDateString } from '../utils/dateUtils';
 

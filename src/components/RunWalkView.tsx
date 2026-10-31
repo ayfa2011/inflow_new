@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { RunWalkService } from '../services';
-import { ArrowLeft, Save, Calendar, Edit3, Trash2 } from 'lucide-react';
+import { ArrowLeft, Save, Edit3 } from 'lucide-react';
 
 import { getLocalDateString } from '../utils/dateUtils';
 

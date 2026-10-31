@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { SalaryEntry } from '../types';
 import { SalaryService } from '../services';
-import { ArrowLeft, Plus, Calendar, Trash2, Edit3, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Edit3, ChevronRight } from 'lucide-react';
 
 export const SalaryCardView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { data, saveSalaryEntry, deleteSalaryEntry } = useApp();

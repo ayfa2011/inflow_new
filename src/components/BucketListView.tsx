@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { BucketPlace } from '../types';
-import { ArrowLeft, Plus, Search, MapPin, Edit3, Trash2, Star, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Plus, Search, MapPin, Edit3, Trash2, Star } from 'lucide-react';
 
 export const BucketListView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { data, saveBucketPlace, deleteBucketPlace } = useApp();

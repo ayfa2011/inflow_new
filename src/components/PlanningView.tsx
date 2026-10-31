@@ -11,7 +11,6 @@ import {
   CheckSquare,
   Square,
   Calendar,
-  Wallet,
   TrendingUp,
   AlertCircle,
   CheckCircle2,

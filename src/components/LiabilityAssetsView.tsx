@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { LiabilityAssetItem } from '../types';
 import { LiabilityService } from '../services';
-import { ArrowLeft, Plus, Trash2, Edit3 } from 'lucide-react';
+import { ArrowLeft, Trash2 } from 'lucide-react';
 
 export const LiabilityAssetsView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { data, saveLiabilityAsset, deleteLiabilityAsset } = useApp();
